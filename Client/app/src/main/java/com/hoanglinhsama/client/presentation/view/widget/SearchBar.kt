@@ -25,11 +25,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.presentation.ui.theme.ClientTheme
-import com.hoanglinhsama.client.presentation.ui.theme.CopperRed
-import com.hoanglinhsama.client.presentation.ui.theme.DarkCharcoal
-import com.hoanglinhsama.client.presentation.ui.theme.ShadowBlack
-import com.hoanglinhsama.client.presentation.ui.theme.SpanishGray
+import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
+import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
+import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal1
+import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
+import com.hoanglinhsama.client.presentation.view.ui.theme.ShadowBlack
+import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 
 @Composable
 fun SearchBar(
@@ -37,8 +38,8 @@ fun SearchBar(
     value: String,
     placeholder: String,
     onFilterClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onValueChange: (String) -> Unit
+    onSearch: (String) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     val keyBoardController = LocalSoftwareKeyboardController.current
     TextField(
@@ -55,7 +56,7 @@ fun SearchBar(
             )
         },
         leadingIcon = {
-            IconButton(onClick = onSearchClick) {
+            IconButton(onClick = {}) {
                 Icon(
                     Icons.Filled.Search, contentDescription = null, tint = Color.White
                 )
@@ -66,15 +67,15 @@ fun SearchBar(
                 elevation = 4.dp,
                 spotColor = ShadowBlack,
                 ambientColor = ShadowBlack,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(Dimens.roundedCornerSize)
             ),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
             focusedPlaceholderColor = SpanishGray,
             unfocusedPlaceholderColor = SpanishGray,
-            focusedContainerColor = DarkCharcoal,
-            unfocusedContainerColor = DarkCharcoal,
+            focusedContainerColor = DarkCharcoal1,
+            unfocusedContainerColor = DarkCharcoal1,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             cursorColor = CopperRed
@@ -85,7 +86,7 @@ fun SearchBar(
                     onClick = onFilterClick,
                     modifier = Modifier.background(
                         color = CopperRed,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(Dimens.smallMargin)
                     )
                 ) {
                     Icon(
@@ -103,6 +104,7 @@ fun SearchBar(
         keyboardActions = KeyboardActions(
             onSearch = {
                 keyBoardController?.hide()
+                onSearch
             }
         )
     )
@@ -111,8 +113,8 @@ fun SearchBar(
 @Preview(showBackground = true)
 @Composable
 fun SearchBarPreview() {
-    ClientTheme {
-        SearchBar(Modifier, "", "Search drink", onFilterClick = {}, onSearchClick = {}) {
+    ClientTheme(dynamicColor = false) {
+        SearchBar(Modifier, "", "Tìm đồ uống", {}, {}) {
 
         }
     }
