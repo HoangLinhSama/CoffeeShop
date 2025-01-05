@@ -30,10 +30,17 @@ try {
                 "result" => $result
             ];
         } else {
-            $response = [
-                "status" => "fail: no data found !",
-                "result" => $result
-            ];
+            if ($page == 1) {
+                $response = [
+                    "status" => "fail: no data found",
+                    "result" => $result
+                ]; 
+            } else {
+                $response = [
+                    "status" => "fail: no more data",
+                    "result" => $result
+                ];
+            }
         }
     }
 } catch (mysqli_sql_exception $e) {

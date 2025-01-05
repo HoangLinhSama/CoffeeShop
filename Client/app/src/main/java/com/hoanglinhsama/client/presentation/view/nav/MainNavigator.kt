@@ -1,7 +1,7 @@
 package com.hoanglinhsama.client.presentation.view.nav
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -38,15 +38,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.navigation.navArgument
+import com.google.gson.Gson
 import com.hoanglinhsama.client.R
+import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
+import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -58,10 +63,9 @@ fun MainNavigator() {
             BottomNavigationItem(R.drawable.ic_shop, "Shop"),
             BottomNavigationItem(R.drawable.ic_order, "Order"),
             BottomNavigationItem(R.drawable.ic_promotion, "Promotion"),
-            BottomNavigationItem(R.drawable.ic_profile, "Profile")
+            BottomNavigationItem(R.drawable.ic_other, "Other")
         )
     }
-
     val navController = rememberNavController()
     val currentBackStackEntry = navController.currentBackStackEntryAsState().value
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -70,80 +74,92 @@ fun MainNavigator() {
         Route.ShopScreen.route -> 1
         Route.OrderScreen.route -> 2
         Route.PromotionScreen.route -> 3
-        Route.ProfileScreen.route -> 4
+        Route.OtherScreen.route -> 4
         else -> 0
     }
-
-    // TODO: Hide the bottom navigation when the user is in the details screen
-
+    val isBottomBarVisible = remember(key1 = currentBackStackEntry) {
+        currentBackStackEntry?.destination?.route == Route.HomeScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.ShopScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.OrderScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.PromotionScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.OtherScreen.route
+    }
     Scaffold(
         Modifier.fillMaxSize(),
         bottomBar = {
-            BottomAppBar(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .clip(RoundedCornerShape(size = 24.dp)),
-                containerColor = Color.White
-            ) {
-                bottomNavigationItems.forEachIndexed { index, item ->
-                    if (item.name == "Order") {
-                        Spacer(modifier = Modifier.weight(1f))
-                    } else {
-                        NavigationBarItem(
-                            selected = selectedItem == index,
-                            onClick = {
-                                when (index) {
-                                    0 -> navigateToTab(navController, Route.HomeScreen.route)
-                                    1 -> navigateToTab(navController, Route.ShopScreen.route)
-                                    3 -> navigateToTab(navController, Route.PromotionScreen.route)
-                                    4 -> navigateToTab(navController, Route.ProfileScreen.route)
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = item.icon),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            },
-                            label = {
-                                Box(
-                                    modifier = Modifier
-                                        .width(10.dp)
-                                        .height(5.dp)
-                                        .background(
-                                            color = if (selectedItem == index) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                            shape = RoundedCornerShape(size = 18.dp)
+            if (isBottomBarVisible) {
+                BottomAppBar(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(size = 24.dp)),
+                    containerColor = Color.White
+                ) {
+                    bottomNavigationItems.forEachIndexed { index, item ->
+                        if (item.name == "Order") {
+                            Spacer(modifier = Modifier.weight(1f))
+                        } else {
+                            NavigationBarItem(
+                                selected = selectedItem == index,
+                                onClick = {
+                                    when (index) {
+                                        0 -> navigateToTab(navController, Route.HomeScreen.route)
+                                        1 -> navigateToTab(navController, Route.ShopScreen.route)
+                                        3 -> navigateToTab(
+                                            navController,
+                                            Route.PromotionScreen.route
                                         )
 
-                                ) {
+                                        4 -> navigateToTab(navController, Route.OtherScreen.route)
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = item.icon),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = {
+                                    Box(
+                                        modifier = Modifier
+                                            .width(10.dp)
+                                            .height(5.dp)
+                                            .background(
+                                                color = if (selectedItem == index) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                                shape = RoundedCornerShape(size = 18.dp)
+                                            )
 
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = colorResource(id = R.color.philippineGray),
-                                indicatorColor = Color.Transparent
-                            ),
-                            modifier = Modifier.weight(1f)
-                        )
+                                    ) {
+
+                                    }
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    unselectedIconColor = colorResource(id = R.color.philippineGray),
+                                    indicatorColor = Color.Transparent
+                                ),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
-                containerColor = CopperRed,
-                modifier = Modifier
-                    .offset(y = 50.dp)
-                    .border(BorderStroke(5.dp, Color.White), CircleShape),
-                onClick = { navigateToTab(navController, Route.OrderScreen.route) }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_order), contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
+            if (isBottomBarVisible) {
+                FloatingActionButton(
+                    shape = CircleShape,
+                    containerColor = CopperRed,
+                    modifier = Modifier
+                        .offset(y = 50.dp)
+                        .border(BorderStroke(5.dp, Color.White), CircleShape),
+                    onClick = { navigateToTab(navController, Route.OrderScreen.route) }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_order), contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.Center
@@ -154,39 +170,33 @@ fun MainNavigator() {
         ) {
             composable(route = Route.HomeScreen.route) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
-                val itemsVoucher = homeViewModel.listPromotion.collectAsLazyPagingItems()
-                val itemsDrinkCategory = homeViewModel.listDrinkCategory.collectAsLazyPagingItems()
-                val itemsDrink = homeViewModel.listDrink.collectAsLazyPagingItems()
-                Log.d("HLSM", "Size: ${itemsDrink.itemCount}")
-                HomeScreen(
-                    itemsVoucher = itemsVoucher,
-                    itemsDrinkCategory = itemsDrinkCategory,
-                    itemsDrink = itemsDrink,
-                    onNotificationClick = {
+                HomeScreen(homeViewModel.state.value, homeViewModel::onEvent, onSearchClick = {
 
-                    },
-                    onFavoriteClick = {
-
-                    },
-                    onFilterClick = {
-
-                    },
-                    onAvatarClick = {
-
-                    },
-                    onVoucherClick = {
-
-                    },
-                    onSearchDrink = {
-
-                    }) {
-
+                }) {
+                    navController.navigate(
+                        "${Route.DetailDrinkScreen.route}/${Uri.encode(Gson().toJson(it))}"
+                    )
+                }
+            }
+            composable(
+                route = "${Route.DetailDrinkScreen.route}/{drink}",
+                arguments = listOf(navArgument("drink") {
+                    type = NavType.StringType
+                })
+            ) {
+                val detailDrinkViewModel: DetailDrinkViewModel = hiltViewModel()
+                val json = it.arguments?.getString("drink")
+                val drink = Gson().fromJson(json, Drink::class.java)
+                DetailDrinkScreen(
+                    drink!!,
+                    detailDrinkViewModel.state.value,
+                    detailDrinkViewModel::onEvent
+                ) {
+                    navController.popBackStack()
                 }
             }
         }
     }
-
-
 }
 
 fun navigateToTab(navController: NavHostController, route: String) {
@@ -204,7 +214,7 @@ fun navigateToTab(navController: NavHostController, route: String) {
 data class BottomNavigationItem(@DrawableRes val icon: Int, val name: String)
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun MainNavigatorPreview() {
     ClientTheme(dynamicColor = false) {
         MainNavigator()

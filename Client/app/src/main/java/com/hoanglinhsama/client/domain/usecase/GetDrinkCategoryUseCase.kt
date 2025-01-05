@@ -6,7 +6,7 @@ import com.hoanglinhsama.client.domain.repository.MainRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetDrinkCategoryUseCase @Inject constructor(val mainRepository: MainRepository) {
+class GetDrinkCategoryUseCase @Inject constructor(private val mainRepository: MainRepository) {
     operator fun invoke(): Flow<PagingData<DrinkCategory>> {
         return mainRepository.getDrinkCategory()
     }

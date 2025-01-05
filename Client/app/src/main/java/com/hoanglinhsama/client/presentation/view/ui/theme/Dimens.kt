@@ -6,4 +6,5 @@ object Dimens {
     val mediumMargin = 24.dp
     val smallMargin = 12.dp
     val roundedCornerSize = 16.dp
+    val smallIcon = 20.dp
 }

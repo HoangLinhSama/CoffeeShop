@@ -26,9 +26,11 @@ class VoucherPagingSource(private val mainApi: MainApi) :
                     return LoadResult.Page(
                         listVoucher,
                         if (page == 1) null else page - 1,
-                        if (listVoucher.size < params.loadSize) null else page + 1
+                        if (response.body()?.result?.isEmpty() == true) null else page + 1
                     )
-                } else if (response.body()?.status == "fail: no data found !") {
+                } else if (response.body()?.status == "fail: no data found") {
+                    throw Exception("fail: no data found")
+                } else if (response.body()?.status == "fail: no more data") {
                     return LoadResult.Page(emptyList(), null, null)
                 } else {
                     return LoadResult.Error(Exception("Failure: ${response.body()?.status}"))

@@ -7,7 +7,7 @@ sealed class Route(var route: String) {
     object HomeScreen : Route("homeScreen")
     object ShopScreen : Route("shopScreen")
     object PromotionScreen : Route("promotionScreen")
-    object ProfileScreen : Route("profileScreen")
+    object OtherScreen : Route("otherScreen")
     object DetailDrinkScreen : Route("detailDrinkScreen")
     object OrderScreen : Route("orderScreen")
     object OnBoardingNavigation : Route("onBoardingNavigation")

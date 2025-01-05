@@ -14,12 +14,12 @@ import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.hoanglinhsama.client.presentation.view.nav.NavigationGraph
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
-import com.hoanglinhsama.client.presentation.viewmodel.AppViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModels<AppViewModel>()
+    private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    NavigationGraph(startDestination = viewModel.startDestination.value)
+                    NavigationGraph(startDestination = mainViewModel.startDestination.value)
                 }
             }
         }

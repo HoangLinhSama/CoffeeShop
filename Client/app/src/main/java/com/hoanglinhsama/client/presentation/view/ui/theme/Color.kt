@@ -12,4 +12,5 @@ val SpanishGray = Color(0xFF989898)
 val ShadowBlack = Color(0x40000000)
 val DarkSlateGray = Color(0xFF2F4B4E)
 val DarkCharcoal2 = Color(0xFF2F2D2C)
+val Platinum = Color(0x40E4E4E4)
 

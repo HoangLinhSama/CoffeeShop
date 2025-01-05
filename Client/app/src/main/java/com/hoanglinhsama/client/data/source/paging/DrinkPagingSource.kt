@@ -7,7 +7,7 @@ import com.hoanglinhsama.client.data.mapper.toDrinkDomain
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 
-class DrinkPagingSource(val mainApi: MainApi) : PagingSource<Int, Drink>() {
+class DrinkPagingSource(private val mainApi: MainApi) : PagingSource<Int, Drink>() {
     override fun getRefreshKey(state: PagingState<Int, Drink>): Int? {
         return state.anchorPosition?.let { it ->
             val anchorPage = state.closestPageToPosition(it)
@@ -28,13 +28,18 @@ class DrinkPagingSource(val mainApi: MainApi) : PagingSource<Int, Drink>() {
                         if (page == 1) null else page - 1,
                         if (response.body()?.result?.isEmpty() == true) null else page + 1
                     )
-                } else if (response.body()?.status == "fail: no data found !") {
+                } else if (response.body()?.status == "fail: no data found") {
+                    throw Exception("fail: no data found")
+                } else if (response.body()?.status == "fail: no more data") {
+                    Log.d(
+                        "HLSM",
+                        response.body()?.status.toString() + response.body()?.result.toString()
+                    )
                     return LoadResult.Page(emptyList(), null, null)
                 } else {
                     return LoadResult.Error(Exception("Failure: ${response.body()?.status}"))
                 }
             } else {
-                Log.d("HLSM", "API request failed with status: ${response.code()}")
                 return LoadResult.Error(Exception(("API request failed with status: ${response.code()}")))
             }
         } catch (e: Throwable) {

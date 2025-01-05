@@ -14,20 +14,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
@@ -79,15 +78,22 @@ fun ErrorContent(modifier: Modifier, alphaAnim: Float, message: String) {
 fun parseErrorMessage(error: LoadState.Error?): String {
     return when (error?.error) {
         is SocketTimeoutException -> {
-            "Server không phản hồi."
+            "Server không phản hồi"
         }
 
         is ConnectException -> {
-            "Không có kết nối Internet."
+            "Không có kết nối Internet"
+        }
+
+        is Exception -> {
+            when (error.error.message) {
+                "fail: no data found" -> "Không có dữ liệu"
+                else -> "Lỗi không xác định"
+            }
         }
 
         else -> {
-            "Lỗi không xác định."
+            "Lỗi không xác định"
         }
     }
 }
@@ -97,7 +103,7 @@ fun parseErrorMessage(error: LoadState.Error?): String {
 fun ErrorCardPreview() {
     ClientTheme(dynamicColor = false) {
         ErrorContent(
-            Modifier.fillMaxWidth(), 0.3f, "Không có kết nối Internet."
+            Modifier.fillMaxWidth(), 0.3f, "Không có kết nối Internet"
         )
     }
 }

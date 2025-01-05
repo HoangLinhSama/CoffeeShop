@@ -1,8 +1,10 @@
 package com.hoanglinhsama.client.presentation.view.widget
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,14 +37,17 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
     value: String,
     placeholder: String,
+    isReadOnly: Boolean,
     onFilterClick: () -> Unit,
     onSearch: (String) -> Unit,
     onValueChange: (String) -> Unit,
 ) {
     val keyBoardController = LocalSoftwareKeyboardController.current
     TextField(
+        readOnly = isReadOnly,
         value = value,
         onValueChange = onValueChange,
         textStyle = MaterialTheme.typography.labelMedium.copy(
@@ -58,7 +63,10 @@ fun SearchBar(
         leadingIcon = {
             IconButton(onClick = {}) {
                 Icon(
-                    Icons.Filled.Search, contentDescription = null, tint = Color.White
+                    Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(Dimens.smallIcon)
                 )
             }
         },
@@ -68,7 +76,10 @@ fun SearchBar(
                 spotColor = ShadowBlack,
                 ambientColor = ShadowBlack,
                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
-            ),
+            )
+            .clickable {
+                if (isReadOnly) onClick
+            },
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
@@ -81,22 +92,24 @@ fun SearchBar(
             cursorColor = CopperRed
         ),
         trailingIcon = {
-            Row(modifier = Modifier.padding(end = 4.dp)) {
-                IconButton(
-                    onClick = onFilterClick,
-                    modifier = Modifier.background(
-                        color = CopperRed,
-                        shape = RoundedCornerShape(Dimens.smallMargin)
-                    )
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_filter),
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+            if (!isReadOnly) {
+                Row(modifier = Modifier.padding(end = 4.dp)) {
+                    IconButton(
+                        onClick = onFilterClick,
+                        modifier = Modifier.background(
+                            color = CopperRed,
+                            shape = RoundedCornerShape(Dimens.smallMargin)
+                        )
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_filter),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(Dimens.smallIcon)
+                        )
+                    }
                 }
             }
-
         },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Search
@@ -114,7 +127,7 @@ fun SearchBar(
 @Composable
 fun SearchBarPreview() {
     ClientTheme(dynamicColor = false) {
-        SearchBar(Modifier, "", "Tìm đồ uống", {}, {}) {
+        SearchBar(Modifier, {}, "", "Tìm đồ uống", false, {}, {}) {
 
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -35,10 +36,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,20 +44,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
-import com.hoanglinhsama.client.domain.model.DrinkCategory
 import com.hoanglinhsama.client.domain.model.User
-import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
 import com.hoanglinhsama.client.presentation.view.ui.theme.ChineseBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
@@ -74,28 +67,25 @@ import com.hoanglinhsama.client.presentation.view.widget.DrinkCardShimmerEffect
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCard
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCardShimmerEffect
 import com.hoanglinhsama.client.presentation.view.widget.SearchBar
+import com.hoanglinhsama.client.presentation.viewmodel.event.HomeEvent
+import com.hoanglinhsama.client.presentation.viewmodel.state.HomeState
 import com.hoanglinhsama.client.util.handlePagingResult
 import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
-    user: User? = null,
-    itemsVoucher: LazyPagingItems<Voucher>? = null,
-    itemsDrink: LazyPagingItems<Drink>? = null,
-    itemsDrinkCategory: LazyPagingItems<DrinkCategory>? = null,
-    onNotificationClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    onFilterClick: () -> Unit,
-    onAvatarClick: () -> Unit,
-    onVoucherClick: () -> Unit,
-    onSearchDrink: (String) -> Unit,
-    onDrinkCategoryClick: (String) -> Unit,
+    state: HomeState,
+    event: (HomeEvent) -> Unit,
+    onSearchClick: () -> Unit,
+    onDrinkClick: (Drink) -> Unit,
 ) {
+    val itemsVoucher = state.itemsVoucher?.collectAsLazyPagingItems()
+    val itemsDrinkCategory = state.itemsDrinkCategory?.collectAsLazyPagingItems()
+    val itemsDrink = state.itemsDrink?.collectAsLazyPagingItems()
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
-        val (constraintLayout1, constraintLayout2) = createRefs()
-        val (rowBar, rowSearch, spacer, promotionCard) = createRefs()
+        val (constraintLayout1, constraintLayout2, rowBar, rowSearch, spacer, promotionCard) = createRefs()
         ConstraintLayout(modifier = Modifier
             .background(
                 brush = Brush.linearGradient(
@@ -126,35 +116,51 @@ fun HomeScreen(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(
-                            onClick = onAvatarClick
+                            onClick = { state.user?.let { event(HomeEvent.AvatarClickEvent(it)) } }
                         )
                 ) {
                     AsyncImage(
                         modifier = Modifier.size(40.dp),
-                        model = ImageRequest.Builder(context).data(user?.image).build(),
+                        model = ImageRequest.Builder(context).data(state.user?.image).build(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
                 }
                 Spacer(modifier = Modifier.padding(end = 8.dp))
                 Text(
-                    text = "Xin chào, " + user?.name,
+                    text = "Xin chào, " + state.user?.name,
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.White,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                    onClick = onNotificationClick
+                    onClick = { event(HomeEvent.NotificationClickEvent) }
                 ) {
                     Icon(
-                        Icons.Outlined.Notifications, contentDescription = null, tint = Color.White
+                        Icons.Outlined.Notifications,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(Dimens.mediumMargin)
                     )
                 }
                 IconButton(
-                    onClick = onFavoriteClick
+                    onClick = {
+                        state.user?.id.let {
+                            it?.let { userId ->
+                                event(
+                                    HomeEvent.FavoriteClickEvent(
+                                        userId
+                                    )
+                                )
+                            }
+                        }
+                    }
                 ) {
                     Icon(
-                        Icons.Outlined.FavoriteBorder, contentDescription = null, tint = Color.White
+                        Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        Modifier.size(Dimens.mediumMargin),
+                        tint = Color.White
                     )
                 }
             }
@@ -167,7 +173,7 @@ fun HomeScreen(
                         width = Dimension.fillToConstraints
 
                     }
-                    .wrapContentHeight(), "", "Tìm đồ uống", onFilterClick, onSearchDrink
+                    .wrapContentHeight(), onSearchClick, "", "Tìm đồ uống", true, {}, {}
             ) {
 
             }
@@ -189,11 +195,12 @@ fun HomeScreen(
                         )
                     }
                 ) {
-                    var currentIndex by remember { mutableIntStateOf(0) }
                     val autoFlipInterval = 3000L
+                    var currentIndex = state.currentPromotionIndex
                     LaunchedEffect(key1 = currentIndex) {
                         delay(autoFlipInterval)
                         currentIndex = (currentIndex + 1) % itemsVoucher!!.itemCount
+                        event(HomeEvent.PromotionAutoFlipperEvent(currentIndex))
                     }
                     for (index in 0 until (itemsVoucher!!.itemCount)) {
                         AnimatedVisibility(
@@ -206,7 +213,9 @@ fun HomeScreen(
                                 voucher = itemsVoucher[index]!!,
                                 pageSize = itemsVoucher.itemCount,
                                 selectedPage = currentIndex,
-                                onClick = onVoucherClick
+                                onVoucherClick = {
+                                    event(HomeEvent.VoucherClickEvent)
+                                }
                             )
                         }
                     }
@@ -234,7 +243,6 @@ fun HomeScreen(
                 end.linkTo(parent.end, Dimens.mediumMargin)
                 width = Dimension.fillToConstraints
             }) {
-                var selectedItem by remember { mutableIntStateOf(-1) }
                 if (handlePagingResult(itemsDrinkCategory) {
                         Row(
                             modifier = Modifier.padding(top = Dimens.mediumMargin),
@@ -262,11 +270,15 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(count = itemsDrinkCategory!!.itemCount) {
-                            val isSelected = selectedItem == it
+                            val isSelected = state.selectedDrinkCategory == it
                             Button(
                                 onClick = {
-                                    onDrinkCategoryClick(itemsDrinkCategory[it]!!.name)
-                                    selectedItem = it
+                                    event(
+                                        HomeEvent.DrinkCategoryClickEvent(
+                                            itemsDrinkCategory[it]!!.name,
+                                            it
+                                        )
+                                    )
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     contentColor = if (isSelected) Color.White else DarkSlateGray,
@@ -294,7 +306,10 @@ fun HomeScreen(
                     end.linkTo(parent.end, Dimens.mediumMargin)
                     width = Dimension.fillToConstraints
                 }) {
-                if (handlePagingResult(itemsDrink, Modifier.aspectRatio(1f)) {
+                if (handlePagingResult(
+                        itemsDrink,
+                        Modifier.aspectRatio(1f)
+                    ) {
                         Column {
                             repeat(2) {
                                 Row {
@@ -314,19 +329,24 @@ fun HomeScreen(
                                 }
                             }
                         }
-                    }) {
+                    }
+                ) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
                         horizontalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        contentPadding = PaddingValues(
                             bottom = 530.dp
                         )
                     ) {
                         items(itemsDrink!!.itemCount) {
                             DrinkCard(
-                                drink = itemsDrink[it]!!
-                            )
+                                drink = itemsDrink[it]!!, onDrinkClick = {
+                                    onDrinkClick(it)
+                                }
+                            ) {
+                                event(HomeEvent.QuickOderClickEvent(it))
+                            }
                         }
                     }
                 }
@@ -339,8 +359,9 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     ClientTheme(dynamicColor = false) {
-        HomeScreen(null, null, null, null, {}, {}, {}, {}, {}, {}) {
-
-        }
+        val user = User(1, "Linh", "")
+        HomeScreen(
+            state = HomeState(_user = user), {}, {}, {}
+        )
     }
 }

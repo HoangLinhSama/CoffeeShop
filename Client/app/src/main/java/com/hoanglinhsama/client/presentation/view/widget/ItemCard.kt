@@ -50,12 +50,12 @@ fun PromotionCard(
     voucher: Voucher,
     pageSize: Int,
     selectedPage: Int,
-    onClick: () -> Unit,
+    onVoucherClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(Dimens.roundedCornerSize))
-            .clickable(onClick = onClick),
+            .clickable(onClick = onVoucherClick),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
@@ -116,7 +116,12 @@ fun PromotionCard(
 }
 
 @Composable
-fun DrinkCard(modifier: Modifier = Modifier, drink: Drink) {
+fun DrinkCard(
+    modifier: Modifier = Modifier,
+    drink: Drink,
+    onDrinkClick: (Drink) -> Unit,
+    onQuickOrderClick: (Drink) -> Unit,
+) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(Dimens.roundedCornerSize))
@@ -139,7 +144,10 @@ fun DrinkCard(modifier: Modifier = Modifier, drink: Drink) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        onDrinkClick(drink)
+                    },
                 error = painterResource(
                     R.drawable.img_not_found
                 )
@@ -158,9 +166,9 @@ fun DrinkCard(modifier: Modifier = Modifier, drink: Drink) {
                         modifier = Modifier.size(10.dp)
                     )
                     Text(
-                        text = drink.star?.toString() ?: "",
+                        text = drink.star.toString(),
                         style = MaterialTheme.typography.labelMedium.copy(fontSize = 10.sp),
-                        color = Color.White
+                        color = Color.Black
                     )
                 }
             }
@@ -195,11 +203,14 @@ fun DrinkCard(modifier: Modifier = Modifier, drink: Drink) {
                     .clip(RoundedCornerShape(10.dp))
                     .size(32.dp)
                     .background(CopperRed)
-                    .align(Alignment.CenterVertically),
+                    .align(Alignment.CenterVertically)
+                    .clickable {
+                        onQuickOrderClick(drink)
+                    },
             ) {
                 Icon(
                     Icons.Filled.Add,
-                    contentDescription = null,
+                    contentDescription = "Icon Quick Order",
                     tint = Color.White,
                     modifier = Modifier
                         .size(Dimens.roundedCornerSize)
@@ -211,8 +222,7 @@ fun DrinkCard(modifier: Modifier = Modifier, drink: Drink) {
 }
 
 val voucher = Voucher(
-    "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
-)
+    "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true)
 
 @Preview(showBackground = true)
 @Composable
@@ -222,20 +232,23 @@ fun PromotionCardPreview() {
     }
 }
 
-val priceSize = mapOf<String, Int>("Vừa" to 30000, "Lớn" to 40000, "Nhỏ" to 20000)
-val toppingPrice = mapOf<String, Int>("Bánh Flan" to 10000)
+val priceSize = mapOf<String, Int>("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
+val toppingPrice = mapOf<String, Int>(
+    "Shot Espresso" to 10000,
+    "Trân châu trắng" to 10000,
+    "Sốt Caramel" to 10000
+)
 val drink = Drink(
-    "Cà Phê Sữa Đá", priceSize, " ", 4.9F, "", toppingPrice
+    "Bạc Sỉu", priceSize, " ", 4.9F, "", toppingPrice
 )
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun DrinkCardPreview() {
     ClientTheme(dynamicColor = false) {
         DrinkCard(
             modifier = Modifier
                 .width(149.dp)
-                .wrapContentHeight(), drink
-        )
+                .wrapContentHeight(), drink, {}) {}
     }
 }

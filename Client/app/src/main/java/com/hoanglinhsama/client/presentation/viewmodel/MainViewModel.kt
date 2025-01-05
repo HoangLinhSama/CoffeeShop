@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AppViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor() : ViewModel() {
     private val _startDestination = mutableStateOf(Route.MainNavigation.route)
     val startDestination: State<String> = _startDestination
 

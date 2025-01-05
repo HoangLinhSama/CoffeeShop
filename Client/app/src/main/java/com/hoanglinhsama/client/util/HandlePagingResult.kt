@@ -38,22 +38,29 @@ fun <T : Any> handlePagingResult(
                 Toast.makeText(
                     context, when (error.error) {
                         is SocketTimeoutException -> {
-                            "Server không phản hồi."
+                            "Server không phản hồi"
                         }
 
                         is ConnectException -> {
-                            "Không có kết nối Internet."
+                            "Không có kết nối Internet"
+                        }
+
+                        is Exception -> {
+                            when (error.error.message) {
+                                "fail: no data found" -> "Không có dữ liệu"
+                                else -> "Lỗi không xác định"
+                            }
                         }
 
                         else -> {
-                            "Lỗi không xác định."
+                            "Lỗi không xác định"
                         }
                     }, Toast.LENGTH_SHORT
                 ).show().toString()
                 false
             }
         }
-        
+
         else -> {
             true
         }

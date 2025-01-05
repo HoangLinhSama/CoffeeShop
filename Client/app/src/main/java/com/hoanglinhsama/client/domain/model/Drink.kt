@@ -8,16 +8,10 @@ data class Drink(
     private val _description: String,
     private val _toppingPrice: Map<String, Int>?,
 ) {
-    val name
-        get() = _name
-    val priceSize
-        get() = _priceSize
-    val picture
-        get() = _picture
-    val star
-        get() = _star
-    val description
-        get() = _description
-    val toppingPrice
-        get() = _toppingPrice
+    val name = _name
+    val priceSize = _priceSize
+    val picture = _picture
+    val star = _star
+    val description = _description
+    val toppingPrice = _toppingPrice
 }
