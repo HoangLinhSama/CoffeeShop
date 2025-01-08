@@ -1,10 +1,13 @@
 package com.hoanglinhsama.client.presentation.view.nav
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.hoanglinhsama.client.presentation.view.screen.OnBoardingScreen
+import com.hoanglinhsama.client.presentation.viewmodel.OnBoardingViewModel
 
 @Composable
 fun NavigationGraph(startDestination: String) {
@@ -15,7 +18,10 @@ fun NavigationGraph(startDestination: String) {
             startDestination = Route.OnBoardingScreen.route
         ) {
             composable(route = Route.OnBoardingScreen.route) {
-                // TODO:Deploy OnBoardingScreen
+                val onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
+                OnBoardingScreen(onBoardingViewModel.state.value) {
+                    onBoardingViewModel::onEvent
+                }
             }
         }
         navigation(

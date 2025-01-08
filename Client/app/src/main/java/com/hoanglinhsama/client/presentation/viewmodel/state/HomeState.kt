@@ -13,7 +13,7 @@ data class HomeState(
     private val _itemsDrink: Flow<PagingData<Drink>>? = null,
     private val _user: User? = null,
     private val _selectedDrinkCategory: Int = -1,
-    private val _currentPromotionIndex: Int = 0
+    private val _currentPromotionIndex: Int = 0,
 ) {
     val itemsVoucher = _itemsVoucher
     val itemsDrinkCategory = _itemsDrinkCategory

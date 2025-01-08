@@ -70,8 +70,10 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.PromotionAutoFlipperEvent -> {
+                val currentPromotionIndex =
+                    (_state.value.currentPromotionIndex + 1) % event.numberVouchers
                 _state.value =
-                    _state.value.copy(_currentPromotionIndex = event.currentPromotionIndex)
+                    _state.value.copy(_currentPromotionIndex = currentPromotionIndex)
             }
         }
     }

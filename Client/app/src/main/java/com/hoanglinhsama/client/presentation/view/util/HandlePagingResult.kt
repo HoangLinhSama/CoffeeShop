@@ -1,4 +1,4 @@
-package com.hoanglinhsama.client.util
+package com.hoanglinhsama.client.presentation.view.util
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable

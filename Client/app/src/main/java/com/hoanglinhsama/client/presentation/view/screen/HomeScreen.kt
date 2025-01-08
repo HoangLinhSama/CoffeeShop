@@ -53,7 +53,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.hoanglinhsama.client.domain.model.Drink
-import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
 import com.hoanglinhsama.client.presentation.view.ui.theme.ChineseBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
@@ -69,7 +68,7 @@ import com.hoanglinhsama.client.presentation.view.widget.PromotionCardShimmerEff
 import com.hoanglinhsama.client.presentation.view.widget.SearchBar
 import com.hoanglinhsama.client.presentation.viewmodel.event.HomeEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.HomeState
-import com.hoanglinhsama.client.util.handlePagingResult
+import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
 import kotlinx.coroutines.delay
 
 @Composable
@@ -199,8 +198,7 @@ fun HomeScreen(
                     var currentIndex = state.currentPromotionIndex
                     LaunchedEffect(key1 = currentIndex) {
                         delay(autoFlipInterval)
-                        currentIndex = (currentIndex + 1) % itemsVoucher!!.itemCount
-                        event(HomeEvent.PromotionAutoFlipperEvent(currentIndex))
+                        event(HomeEvent.PromotionAutoFlipperEvent(itemsVoucher!!.itemCount))
                     }
                     for (index in 0 until (itemsVoucher!!.itemCount)) {
                         AnimatedVisibility(
@@ -359,9 +357,8 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     ClientTheme(dynamicColor = false) {
-        val user = User(1, "Linh", "")
         HomeScreen(
-            state = HomeState(_user = user), {}, {}, {}
+            state = HomeState(), {}, {}, {}
         )
     }
 }

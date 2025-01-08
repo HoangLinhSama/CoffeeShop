@@ -12,5 +12,6 @@ sealed class HomeEvent {
     data class DrinkCategoryClickEvent(val drinkCategoryName: String, val drinkCategoryIndex: Int) :
         HomeEvent()
 
-    data class PromotionAutoFlipperEvent(val currentPromotionIndex: Int) : HomeEvent()
+    data class PromotionAutoFlipperEvent(val numberVouchers: Int) :
+        HomeEvent()
 }

@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
-    private val _startDestination = mutableStateOf(Route.MainNavigation.route)
+    private val _startDestination = mutableStateOf(Route.OnBoardingNavigation.route)
     val startDestination: State<String> = _startDestination
 
     /* TODO: Set the screen that will appear when starting app */

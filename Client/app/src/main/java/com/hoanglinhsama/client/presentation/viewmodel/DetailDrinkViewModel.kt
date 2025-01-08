@@ -32,9 +32,9 @@ class DetailDrinkViewModel @Inject constructor() : ViewModel() {
             }
 
             is DetailDrinkEvent.ToppingCheckEvent -> {
-                val newListToppingChecked = _state.value.listToppingChecked.toMutableList()
-                newListToppingChecked[event.toppingIndex] = event.isChecked
-                _state.value = _state.value.copy(_listToppingChecked = newListToppingChecked)
+                val listToppingChecked = _state.value.listToppingChecked.toMutableList()
+                listToppingChecked[event.toppingIndex] = event.isChecked
+                _state.value = _state.value.copy(_listToppingChecked = listToppingChecked)
             }
 
             is DetailDrinkEvent.DrinkCountEvent -> {
