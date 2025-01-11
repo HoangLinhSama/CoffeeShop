@@ -48,6 +48,10 @@ class DetailDrinkViewModel @Inject constructor() : ViewModel() {
             DetailDrinkEvent.OrderEvent -> {
 
             }
+
+            is DetailDrinkEvent.NoteFocusEvent -> {
+                _state.value = _state.value.copy(_isFocus = event.isFocus)
+            }
         }
     }
 }

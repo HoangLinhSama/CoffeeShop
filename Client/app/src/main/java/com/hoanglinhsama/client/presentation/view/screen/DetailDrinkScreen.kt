@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -58,6 +59,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
+import com.hoanglinhsama.client.presentation.view.ui.theme.LightCopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Platinum
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.viewmodel.event.DetailDrinkEvent
@@ -320,11 +322,15 @@ fun DetailDrinkScreen(
                                 bottom.linkTo(parent.bottom, 200.dp)
                                 width = Dimension.fillToConstraints
                             }
+                            .clip(RoundedCornerShape(Dimens.roundedCornerSize))
                             .border(
                                 width = 1.dp,
-                                color = GainsBoro,
+                                color = if (state.isFocus) CopperRed else GainsBoro,
                                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
-                            ),
+                            )
+                            .onFocusChanged {
+                                event(DetailDrinkEvent.NoteFocusEvent(it.isFocused))
+                            },
                         textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                         placeholder = {
                             Text(
@@ -334,16 +340,24 @@ fun DetailDrinkScreen(
                                 )
                             )
                         },
+                        leadingIcon = {
+                            Icon(
+                                painterResource(R.drawable.ic_note),
+                                contentDescription = null
+                            )
+                        },
                         colors = TextFieldDefaults.colors(
-                            focusedTextColor = SpanishGray,
-                            unfocusedTextColor = SpanishGray,
-                            focusedPlaceholderColor = GainsBoro,
-                            unfocusedPlaceholderColor = GainsBoro,
+                            focusedTextColor = DarkCharcoal2,
+                            unfocusedTextColor = DarkCharcoal2,
+                            focusedPlaceholderColor = SpanishGray,
+                            unfocusedPlaceholderColor = SpanishGray,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = CopperRed,
-                            focusedContainerColor = Cultured,
-                            unfocusedContainerColor = Cultured
+                            focusedContainerColor = LightCopperRed,
+                            unfocusedContainerColor = GainsBoro,
+                            focusedLeadingIconColor = CopperRed,
+                            unfocusedLeadingIconColor = SpanishGray
                         ),
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done
@@ -427,7 +441,8 @@ fun DetailDrinkScreen(
                 modifier = Modifier
                     .clip(RoundedCornerShape(Dimens.roundedCornerSize))
                     .background(CopperRed)
-                    .weight(0.5f),
+                    .weight(0.5f)
+                    .height(Dimens.buttonHeight),
             ) {
                 val totalToppingPrice = if (drink.toppingPrice != null) {
                     state.listToppingChecked.mapIndexed { index, isChecked ->

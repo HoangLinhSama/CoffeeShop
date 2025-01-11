@@ -83,7 +83,7 @@ fun OnBoardingScreen(state: OnBoardingState, event: (OnBoardingEvent) -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(62.dp),
+                    .height(Dimens.buttonHeight),
                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
             ) {
                 val text = when (pagerState.currentPage) {

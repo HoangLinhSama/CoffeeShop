@@ -7,4 +7,5 @@ object Dimens {
     val smallMargin = 12.dp
     val roundedCornerSize = 16.dp
     val smallIcon = 20.dp
+    val buttonHeight = 62.dp
 }

@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    NavigationGraph(startDestination = mainViewModel.startDestination.value)
+                    NavigationGraph(startDestination = mainViewModel.startDestination)
                 }
             }
         }

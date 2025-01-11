@@ -15,6 +15,10 @@ class OnBoardingViewModel @Inject constructor() : ViewModel() {
     val state = _state
 
     init {
+        initDataPage()
+    }
+
+    private fun initDataPage() {
         val lisPage = listOf(
             Page(
                 R.drawable.img_onboarding_1,

@@ -222,7 +222,8 @@ fun DrinkCard(
 }
 
 val voucher = Voucher(
-    "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true)
+    "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
+)
 
 @Preview(showBackground = true)
 @Composable
@@ -239,7 +240,7 @@ val toppingPrice = mapOf<String, Int>(
     "Sốt Caramel" to 10000
 )
 val drink = Drink(
-    "Bạc Sỉu", priceSize, " ", 4.9F, "", toppingPrice
+    "Bạc Sỉu", priceSize, "", 4.9F, "", toppingPrice
 )
 
 @Preview(showBackground = true)

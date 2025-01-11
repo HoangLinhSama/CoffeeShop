@@ -49,10 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.domain.model.DrinkCategory
+import com.hoanglinhsama.client.domain.model.User
+import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
 import com.hoanglinhsama.client.presentation.view.ui.theme.ChineseBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
@@ -61,6 +65,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal1
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkSlateGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
+import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
 import com.hoanglinhsama.client.presentation.view.widget.DrinkCard
 import com.hoanglinhsama.client.presentation.view.widget.DrinkCardShimmerEffect
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCard
@@ -68,8 +73,9 @@ import com.hoanglinhsama.client.presentation.view.widget.PromotionCardShimmerEff
 import com.hoanglinhsama.client.presentation.view.widget.SearchBar
 import com.hoanglinhsama.client.presentation.viewmodel.event.HomeEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.HomeState
-import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
+import kotlin.collections.listOf
 
 @Composable
 fun HomeScreen(
@@ -356,9 +362,33 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
+    val listVoucher = listOf(
+        Voucher(
+            "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
+        )
+    )
+    val priceSize = mapOf("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
+    val toppingPrice = mapOf("Shot Espresso" to 10000, "Trân châu trắng" to 10000)
+    val drink = Drink("Bạc Sỉu", priceSize, "", 4.9F, "", toppingPrice)
+    val listDrink = listOf(drink, drink, drink)
+    val drinkCategory = DrinkCategory("Cafe")
+    val listDrinkCategory = listOf(drinkCategory, drinkCategory, drinkCategory)
+
+    val mockVoucherPagingData = PagingData.from(listVoucher)
+    val mockDrinkPagingData = PagingData.from(listDrink)
+    val mockCategoryPagingData = PagingData.from(listDrinkCategory)
+
     ClientTheme(dynamicColor = false) {
         HomeScreen(
-            state = HomeState(), {}, {}, {}
+            state = HomeState(
+                flowOf(mockVoucherPagingData),
+                flowOf(mockCategoryPagingData),
+                flowOf(mockDrinkPagingData),
+                User(1, "Linh", "")
+            ),
+            event = {},
+            onSearchClick = {},
+            onDrinkClick = {}
         )
     }
 }
