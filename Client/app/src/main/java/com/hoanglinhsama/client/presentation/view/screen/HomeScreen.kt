@@ -249,8 +249,11 @@ fun HomeScreen(
             }) {
                 if (handlePagingResult(itemsDrinkCategory) {
                         Row(
-                            modifier = Modifier.padding(top = Dimens.mediumMargin),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier
+                                .padding(top = Dimens.mediumMargin)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             repeat(3) {
                                 Box(
@@ -262,9 +265,6 @@ fun HomeScreen(
                                         .shimmerEffect()
 
                                 )
-                                if (it < 3) {
-                                    Spacer(modifier = Modifier.size(8.dp))
-                                }
                             }
                         }
                     }) {
@@ -316,16 +316,16 @@ fun HomeScreen(
                     ) {
                         Column {
                             repeat(2) {
-                                Row {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     repeat(2) {
                                         DrinkCardShimmerEffect(
                                             modifier = Modifier
                                                 .height(250.dp)
                                                 .width(160.dp)
                                         )
-                                        if (it < 2) {
-                                            Spacer(Modifier.size(Dimens.mediumMargin))
-                                        }
                                     }
                                 }
                                 if (it < 2) {

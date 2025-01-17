@@ -3,7 +3,6 @@ package com.hoanglinhsama.client.presentation.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.hoanglinhsama.client.domain.model.Page
-import com.hoanglinhsama.client.presentation.viewmodel.event.OnBoardingEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OnBoardingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -37,14 +36,5 @@ class OnBoardingViewModel @Inject constructor() : ViewModel() {
             )
         )
         _state.value = _state.value.copy(_listPage = lisPage)
-    }
-
-    // TODO ("Deploy events on OnBoardingScreen)
-    fun onEvent(event: OnBoardingEvent) {
-        when (event) {
-            is OnBoardingEvent.ClickNextButtonEvent -> {
-
-            }
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.hoanglinhsama.client.presentation.view.nav
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,7 +17,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.OnBoardingViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun NavigationGraph(startDestination: String) {
+fun NavigationGraph(startDestination: String, activity: Activity) {
     val navigationController = rememberNavController()
     NavHost(navController = navigationController, startDestination = startDestination) {
         navigation(
@@ -27,7 +28,7 @@ fun NavigationGraph(startDestination: String) {
                 LaunchedEffect(Unit) {
                     delay(2000L)
                     navigationController.navigate(Route.OnBoardingNavigation.route) {
-                        popUpTo(SplashScreen.route) { inclusive = true }
+                        popUpTo(Route.SplashNavigation.route) { inclusive = true }
                     }
                 }
             }
@@ -39,7 +40,9 @@ fun NavigationGraph(startDestination: String) {
             composable(route = Route.OnBoardingScreen.route) {
                 val onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
                 OnBoardingScreen(onBoardingViewModel.state.value) {
-                    onBoardingViewModel::onEvent
+                    navigationController.navigate(Route.AuthNavigation.route) {
+                        popUpTo(Route.OnBoardingNavigation.route) { inclusive = true }
+                    }
                 }
             }
         }
@@ -49,11 +52,18 @@ fun NavigationGraph(startDestination: String) {
             composable(route = Route.LoginScreen.route) {
                 val loginViewModel: LoginViewModel = hiltViewModel()
                 LoginScreen(
-                    loginViewModel.state.value, loginViewModel::onEvent,
-                    onSignup = {},
-                    onForgetPassword = {},
-                ) { }
+                    activity, loginViewModel.state.value, loginViewModel::onEvent, {
+                        navigationController.navigate(Route.MainNavigation.route) {
+                            popUpTo(Route.AuthNavigation.route){
+                                inclusive = true
+                            }
+                        }
+                    }
+                ) {
+                    navigationController.popBackStack()
+                }
             }
+            // TODO ("Deploy SignUpScreen and ForgetPasswordScreen with other authentication")
             composable(route = Route.SignUpScreen.route) {
 
             }

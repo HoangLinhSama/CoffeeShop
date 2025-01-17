@@ -1,19 +1,26 @@
 package com.hoanglinhsama.client.presentation.viewmodel.state
 
+import com.google.firebase.auth.PhoneAuthProvider
 import com.hoanglinhsama.client.domain.model.LoginMethod
 
 data class LoginState(
     private val _listMethodLogin: List<LoginMethod>? = null,
-    private val _listIsFocus: List<Boolean> = List(2) { false },
+    private val _isFocus: Boolean = false,
     private val _phoneNumber: String = "",
-    private val _password: String = "",
-    private val _isShowPassword: Boolean = false,
-    private val _isCheckRemember: Boolean = false,
+    private val _isCheckRemember: Boolean = true,
+    private val _listCharacterOtp: List<String> = List(6) { "" },
+    private val _messageSendVerCode: String = "",
+    private val _timeOtpRemaining: Long = 60,
+    private val _shouldStartCountdown: Boolean = false,
+    private val _tokenResend: PhoneAuthProvider.ForceResendingToken? = null,
 ) {
     val listMethodLogin = _listMethodLogin
-    val listIsFocus = _listIsFocus
+    val isFocus = _isFocus
     val phoneNumber = _phoneNumber
-    val password = _password
-    val isShowPassword = _isShowPassword
     val isCheckRemember = _isCheckRemember
+    val listCharacterOtp = _listCharacterOtp
+    val messageSendVerCode = _messageSendVerCode
+    val timeOtpRemaining = _timeOtpRemaining
+    val shouldStartCountdown = _shouldStartCountdown
+    val tokenResend = _tokenResend
 }

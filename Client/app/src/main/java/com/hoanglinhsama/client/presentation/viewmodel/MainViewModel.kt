@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
-    private val _startDestination = Route.AuthNavigation.route
+    private val _startDestination = Route.SplashNavigation.route
     val startDestination = _startDestination
 
     /* TODO: Set the screen that will appear when starting app */

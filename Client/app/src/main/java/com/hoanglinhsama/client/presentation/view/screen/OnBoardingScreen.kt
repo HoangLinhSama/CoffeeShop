@@ -23,7 +23,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Page
@@ -33,12 +32,11 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal1
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.widget.OnBoardingPage
 import com.hoanglinhsama.client.presentation.view.widget.PagerIndicator
-import com.hoanglinhsama.client.presentation.viewmodel.event.OnBoardingEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OnBoardingState
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnBoardingScreen(state: OnBoardingState, event: (OnBoardingEvent) -> Unit) {
+fun OnBoardingScreen(state: OnBoardingState, onButtonNextClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -78,6 +76,8 @@ fun OnBoardingScreen(state: OnBoardingState, event: (OnBoardingEvent) -> Unit) {
                     scope.launch {
                         if (pagerState.currentPage < state.listPage.size - 1) {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        } else {
+                            onButtonNextClick()
                         }
                     }
                 },

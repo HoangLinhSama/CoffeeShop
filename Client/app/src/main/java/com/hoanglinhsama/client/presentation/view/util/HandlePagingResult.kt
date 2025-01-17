@@ -55,7 +55,7 @@ fun <T : Any> handlePagingResult(
                         else -> {
                             "Lỗi không xác định"
                         }
-                    }, Toast.LENGTH_SHORT
+                    }, Toast.LENGTH_LONG
                 ).show().toString()
                 false
             }

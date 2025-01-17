@@ -3,6 +3,7 @@ package com.hoanglinhsama.client.presentation.view.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +42,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -102,7 +102,7 @@ fun DetailDrinkScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Chi tiết", color = DarkCharcoal2,
-                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp)
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle)
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -240,12 +240,15 @@ fun DetailDrinkScreen(
                             )
                         }
                     }
-                    Row(modifier = Modifier.constrainAs(rowSize) {
-                        top.linkTo(rowDescription.bottom, Dimens.mediumMargin)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        width = Dimension.fillToConstraints
-                    }, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.constrainAs(rowSize) {
+                            top.linkTo(rowDescription.bottom, Dimens.mediumMargin)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                        }, verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         if (drink.priceSize.keys.toList()[0] != " ") {
                             repeat(drink.priceSize.size) {
                                 val isSelected = state.indexSizeSelected == it
@@ -265,9 +268,6 @@ fun DetailDrinkScreen(
                                         text = drink.priceSize.keys.toList()[it],
                                         style = MaterialTheme.typography.labelMedium
                                     )
-                                }
-                                if (it < drink.priceSize.size) {
-                                    Spacer(modifier = Modifier.size(Dimens.mediumMargin))
                                 }
                             }
                         }
@@ -309,7 +309,6 @@ fun DetailDrinkScreen(
                             }
                         }
                     }
-                    val keyBoardController = LocalSoftwareKeyboardController.current
                     val focusManager = LocalFocusManager.current
                     TextField(
                         value = state.noteOrder, onValueChange = {
@@ -363,7 +362,6 @@ fun DetailDrinkScreen(
                             imeAction = ImeAction.Done
                         ), keyboardActions = KeyboardActions(
                             onDone = {
-                                keyBoardController?.hide()
                                 focusManager.clearFocus()
                             }
                         )
