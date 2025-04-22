@@ -24,19 +24,26 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.domain.model.Page
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.hoanglinhsama.client.domain.model.Onboarding
 import com.hoanglinhsama.client.presentation.view.ui.theme.ChineseBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal1
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.widget.OnBoardingPage
 import com.hoanglinhsama.client.presentation.view.widget.PagerIndicator
+import com.hoanglinhsama.client.presentation.viewmodel.event.OnBoardingEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OnBoardingState
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnBoardingScreen(state: OnBoardingState, onButtonNextClick: () -> Unit) {
+fun OnBoardingScreen(
+    state: OnBoardingState,
+    event: (OnBoardingEvent) -> Unit,
+    onButtonNextClick: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,12 +55,13 @@ fun OnBoardingScreen(state: OnBoardingState, onButtonNextClick: () -> Unit) {
                 )
             )
     ) {
+        val itemsOnboarding = state.itemsOnboarding?.collectAsLazyPagingItems()
         val pagerState = rememberPagerState(initialPage = 0) {
-            state.listPage.size
+            itemsOnboarding?.itemCount!!
         }
         val scope = rememberCoroutineScope()
         HorizontalPager(state = pagerState) {
-            OnBoardingPage(state.listPage[it])
+            OnBoardingPage(itemsOnboarding?.get(it)!!)
         }
 
         Column(
@@ -67,16 +75,17 @@ fun OnBoardingScreen(state: OnBoardingState, onButtonNextClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             PagerIndicator(
-                pageSize = state.listPage.size,
+                pageSize = itemsOnboarding?.itemCount!!,
                 selectedPage = pagerState.currentPage,
             )
             Spacer(modifier = Modifier.size(Dimens.mediumMargin))
             Button(
                 onClick = {
                     scope.launch {
-                        if (pagerState.currentPage < state.listPage.size - 1) {
+                        if (pagerState.currentPage < itemsOnboarding.itemCount - 1) {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         } else {
+                            event(OnBoardingEvent.UpdateStateEnterAppEvent)
                             onButtonNextClick()
                         }
                     }
@@ -106,24 +115,25 @@ fun OnBoardingScreen(state: OnBoardingState, onButtonNextClick: () -> Unit) {
 @Composable
 fun OnBoardingScreenPreview() {
     ClientTheme(dynamicColor = false) {
-        val lisPage = listOf(
-            Page(
-                R.drawable.img_onboarding_1,
+        val listOnboarding = listOf(
+            Onboarding(
+                "",
                 "Khám phá hương vị yêu thích",
                 "Từ cà phê đậm đà, trà xanh thanh mát đến trà sữa béo ngậy,... chúng tôi có tất cả để bạn lựa chọn"
             ),
-            Page(
-                R.drawable.img_onboarding_2,
+            Onboarding(
+                "",
                 "Thanh toán tiện lợi, bảo mật cao",
                 "Hỗ trợ nhiều phương thức thanh toán điện tử giúp bạn dễ dàng hoàn tất đơn hàng chỉ trong vài giây"
             ),
-            Page(
-                R.drawable.img_onboarding_3,
+            Onboarding(
+                "",
                 "Đặt hàng dễ dàng, nhanh chóng",
                 "Chỉ với vài thao tác, đồ uống thơm ngon sẽ được giao tận tay bạn ngay lập tức"
             )
         )
-        OnBoardingScreen(OnBoardingState(lisPage)) {
+        val mockOnboardingPagingData = PagingData.from(listOnboarding)
+        OnBoardingScreen(OnBoardingState(flowOf(mockOnboardingPagingData)), {}) {
 
         }
     }

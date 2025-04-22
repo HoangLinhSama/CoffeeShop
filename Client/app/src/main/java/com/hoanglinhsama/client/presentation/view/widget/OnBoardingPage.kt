@@ -1,6 +1,5 @@
 package com.hoanglinhsama.client.presentation.view.widget
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.domain.model.Page
+import coil.compose.AsyncImage
+import com.hoanglinhsama.client.domain.model.Onboarding
 import com.hoanglinhsama.client.presentation.view.ui.theme.ChineseBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
@@ -32,7 +30,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 
 @Composable
 fun OnBoardingPage(
-    page: Page,
+    onboarding: Onboarding,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -45,8 +43,8 @@ fun OnBoardingPage(
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            painterResource(page.image),
+        AsyncImage(
+            onboarding.image,
             contentDescription = null,
             modifier = Modifier
                 .padding(
@@ -58,7 +56,7 @@ fun OnBoardingPage(
                 .fillMaxWidth()
         )
         Text(
-            text = page.title,
+            text = onboarding.title,
             color = Cultured,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.labelMedium.copy(fontSize = 34.sp),
@@ -70,7 +68,7 @@ fun OnBoardingPage(
         )
         Spacer(modifier = Modifier.size(Dimens.mediumMargin))
         Text(
-            text = page.description,
+            text = onboarding.description,
             textAlign = TextAlign.Center,
             color = SpanishGray,
             modifier = Modifier.padding(
@@ -86,12 +84,12 @@ fun OnBoardingPage(
 @Preview(showBackground = true)
 @Composable
 fun OnBoardingPagePreview() {
-    val page = Page(
-        R.drawable.img_onboarding_1,
+    val onboarding = Onboarding(
+        "",
         "Khám phá hương vị yêu thích",
         "Từ cà phê đậm đà, trà xanh thanh mát đến trà sữa béo ngậy,.. chúng tôi có tất cả để bạn lựa chọn"
     )
     ClientTheme(dynamicColor = false) {
-        OnBoardingPage(page, Modifier.wrapContentHeight())
+        OnBoardingPage(onboarding, Modifier.wrapContentHeight())
     }
 }

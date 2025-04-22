@@ -5,16 +5,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.domain.model.LoginMethod
-import com.hoanglinhsama.client.domain.usecase.ResendOtpUseCase
-import com.hoanglinhsama.client.domain.usecase.SendVerificationCodeUseCase
-import com.hoanglinhsama.client.domain.usecase.VerifyCodeUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.AutoFillPhoneUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.CheckHadAccountUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.ResendOtpUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.SavePhoneUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.SendVerificationCodeUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.UpdateStateRememberPhoneUseCase
+import com.hoanglinhsama.client.domain.usecase.auth.VerifyCodeUseCase
+import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
+import com.hoanglinhsama.client.presentation.view.screen.revertE164ToPhoneNumber
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.LightAzure
 import com.hoanglinhsama.client.presentation.view.ui.theme.TrueBlue
 import com.hoanglinhsama.client.presentation.viewmodel.event.LoginEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,12 +29,33 @@ class LoginViewModel @Inject constructor(
     private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
     private val verifyCodeUseCase: VerifyCodeUseCase,
     private val resendOtpUseCase: ResendOtpUseCase,
+    private val checkHadAccountUseCase: CheckHadAccountUseCase,
+    private val savePhoneUseCase: SavePhoneUseCase,
+    private val updateStateRememberPhoneUseCase: UpdateStateRememberPhoneUseCase,
+    private val autoFillPhoneUseCase: AutoFillPhoneUseCase,
+    private val getPhoneUseCase: GetPhoneUseCase,
 ) : ViewModel() {
     private val _state = mutableStateOf(LoginState())
     val state = _state
 
     init {
         initDataMethodLogin()
+        autoFillPhone()
+    }
+
+    private fun autoFillPhone() {
+        viewModelScope.launch {
+            autoFillPhoneUseCase().first().let {
+                _state.value = _state.value.copy(_isCheckRemember = it)
+                if (it) {
+                    getPhoneUseCase().collect {
+                        _state.value =
+                            _state.value.copy(_phoneNumber = revertE164ToPhoneNumber(it, "+84"))
+                    }
+                }
+            }
+        }
+
     }
 
     private fun initDataMethodLogin() {
@@ -41,7 +68,6 @@ class LoginViewModel @Inject constructor(
         _state.value = _state.value.copy(_listMethodLogin = listMethodLogin)
     }
 
-    // TODO ("Deploy events on LoginScreen)
     fun onEvent(event: LoginEvent) {
         when (event) {
             is LoginEvent.TextFieldFocusEvent -> {
@@ -58,6 +84,9 @@ class LoginViewModel @Inject constructor(
 
             is LoginEvent.RememberPhoneEvent -> {
                 _state.value = state.value.copy(_isCheckRemember = event.isCheckRemember)
+                viewModelScope.launch {
+                    updateStateRememberPhoneUseCase(event.isCheckRemember)
+                }
             }
 
             is LoginEvent.VerifyCodeEvent -> {
@@ -103,6 +132,32 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.TokenResendEvent -> {
                 _state.value = _state.value.copy(_tokenResend = event.token)
             }
+
+            is LoginEvent.CheckHadAccountEvent -> {
+                viewModelScope.launch {
+                    checkHadAccountUseCase(event.phoneNumber, event.callback).collect {
+
+                    }
+                }
+            }
+
+            is LoginEvent.SavePhoneEvent -> {
+                viewModelScope.launch {
+                    savePhoneUseCase(event.phoneNumber, event.callback)
+                }
+            }
         }
     }
+}
+
+data class LoginMethod(
+    private val _icon: Int,
+    private val _title: String,
+    private val _containerColor: Color,
+    private val _contentColor: Color,
+) {
+    val icon = _icon
+    val title = _title
+    val containerColor = _containerColor
+    val contentColor = _contentColor
 }

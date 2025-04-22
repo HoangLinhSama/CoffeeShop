@@ -2,39 +2,41 @@ package com.hoanglinhsama.client.presentation.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.hoanglinhsama.client.domain.model.Page
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import com.hoanglinhsama.client.domain.usecase.onboarding.GetOnboardingUseCase
+import com.hoanglinhsama.client.domain.usecase.onboarding.UpdateStateEnterAppUseCase
+import com.hoanglinhsama.client.presentation.viewmodel.event.OnBoardingEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OnBoardingState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.hoanglinhsama.client.R
 
 @HiltViewModel
-class OnBoardingViewModel @Inject constructor() : ViewModel() {
+class OnBoardingViewModel @Inject constructor(
+    private val updateStateEnterAppUseCase: UpdateStateEnterAppUseCase,
+    private val getOnboardingUseCase: GetOnboardingUseCase,
+) :
+    ViewModel() {
     private val _state = mutableStateOf(OnBoardingState())
     val state = _state
 
     init {
-        initDataPage()
+        getOnboarding()
     }
 
-    private fun initDataPage() {
-        val lisPage = listOf(
-            Page(
-                R.drawable.img_onboarding_1,
-                "Khám phá hương vị yêu thích",
-                "Từ cà phê đậm đà, trà xanh thanh mát đến trà sữa béo ngậy,... chúng tôi có tất cả để bạn lựa chọn"
-            ),
-            Page(
-                R.drawable.img_onboarding_2,
-                "Thanh toán tiện lợi, bảo mật cao",
-                "Hỗ trợ nhiều phương thức thanh toán điện tử giúp bạn dễ dàng hoàn tất đơn hàng chỉ trong vài giây"
-            ),
-            Page(
-                R.drawable.img_onboarding_3,
-                "Đặt hàng dễ dàng, nhanh chóng",
-                "Chỉ với vài thao tác, đồ uống thơm ngon sẽ được giao tận tay bạn ngay lập tức"
-            )
-        )
-        _state.value = _state.value.copy(_listPage = lisPage)
+    private fun getOnboarding() {
+        val itemsOnboarding = getOnboardingUseCase().cachedIn(viewModelScope)
+        _state.value = _state.value.copy(_itemsOnboarding = itemsOnboarding)
+    }
+
+    fun onEvent(event: OnBoardingEvent) {
+        when (event) {
+            OnBoardingEvent.UpdateStateEnterAppEvent -> {
+                viewModelScope.launch {
+                    updateStateEnterAppUseCase()
+                }
+            }
+        }
     }
 }

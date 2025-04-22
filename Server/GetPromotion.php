@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
 include "Connect.php";
 $page = $_POST["page"];
 $limit = $_POST["pageSize"];
@@ -39,7 +41,7 @@ try {
                 $response = [
                     "status" => "fail: no data found",
                     "result" => $result
-                ]; 
+                ];
             } else {
                 $response = [
                     "status" => "fail: no more data",

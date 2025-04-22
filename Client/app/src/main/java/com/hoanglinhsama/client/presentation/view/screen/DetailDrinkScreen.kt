@@ -207,7 +207,7 @@ fun DetailDrinkScreen(
                             .height(1.dp)
                             .background(GainsBoro)
                     )
-                    val maxLines: Int = 3
+                    val maxLines = 3
                     Column(modifier = Modifier.constrainAs(rowDescription) {
                         top.linkTo(barDivide.bottom, Dimens.smallMargin)
                         start.linkTo(parent.start)
@@ -333,10 +333,7 @@ fun DetailDrinkScreen(
                         textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                         placeholder = {
                             Text(
-                                text = "Thêm ghi chú",
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.Normal
-                                )
+                                text = "Thêm ghi chú"
                             )
                         },
                         leadingIcon = {
@@ -462,18 +459,18 @@ fun DetailDrinkScreen(
 @Preview(showBackground = true)
 @Composable
 fun DetailDrinkScreenPreview() {
-    val priceSize = mapOf<String, Int>("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
+    val priceSize = mapOf<String, Int>("Nhỏ" to 49000, "Vừa" to 55000, "Lớn" to 65000)
     val toppingPrice = mapOf<String, Int>(
         "Shot Espresso" to 10000,
         "Trân châu trắng" to 10000,
         "Sốt Caramel" to 10000
     )
     val drink = Drink(
-        "Bạc Sỉu",
+        "Phin Sữa Tươi Bánh Flan",
         priceSize,
-        " ",
+        "",
         4.9F,
-        "Bạc sỉu chính là \"Ly sữa trắng kèm một chút cà phê\". Thức uống này rất phù hợp những ai vừa muốn trải nghiệm chút vị đắng của cà phê vừa muốn thưởng thức vị ngọt béo ngậy từ sữa.",
+        "Tỉnh tức thì cùng cà phê Robusta pha phin đậm đà và bánh flan núng nính. Uống là tỉnh, ăn là dính, xứng đáng là highlight trong ngày của bạn.",
         toppingPrice
     )
     ClientTheme(dynamicColor = false) {

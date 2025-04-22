@@ -1,13 +1,13 @@
 package com.hoanglinhsama.client.presentation.viewmodel.state
 
 import com.google.firebase.auth.PhoneAuthProvider
-import com.hoanglinhsama.client.domain.model.LoginMethod
+import com.hoanglinhsama.client.presentation.viewmodel.LoginMethod
 
 data class LoginState(
     private val _listMethodLogin: List<LoginMethod>? = null,
     private val _isFocus: Boolean = false,
     private val _phoneNumber: String = "",
-    private val _isCheckRemember: Boolean = true,
+    private val _isCheckRemember: Boolean = false,
     private val _listCharacterOtp: List<String> = List(6) { "" },
     private val _messageSendVerCode: String = "",
     private val _timeOtpRemaining: Long = 60,

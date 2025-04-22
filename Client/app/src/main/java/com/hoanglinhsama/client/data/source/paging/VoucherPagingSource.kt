@@ -21,19 +21,19 @@ class VoucherPagingSource(private val mainApi: MainApi) :
             val response = mainApi.getPromotion(page, params.loadSize)
             if (response.isSuccessful) {
                 if (response.body()?.status == "success") {
-                    val listVoucher: List<Voucher> =
-                        response.body()!!.result.map { it.toVoucherDomain() }
+                    val listVoucher: List<Voucher>? =
+                        response.body()?.result?.map { it.toVoucherDomain() }
                     return LoadResult.Page(
-                        listVoucher,
+                        listVoucher!!,
                         if (page == 1) null else page - 1,
                         if (response.body()?.result?.isEmpty() == true) null else page + 1
                     )
                 } else if (response.body()?.status == "fail: no data found") {
-                    throw Exception("fail: no data found")
+                    return LoadResult.Error(Exception("${response.body()?.status}"))
                 } else if (response.body()?.status == "fail: no more data") {
                     return LoadResult.Page(emptyList(), null, null)
                 } else {
-                    return LoadResult.Error(Exception("Failure: ${response.body()?.status}"))
+                    return LoadResult.Error(Exception("${response.body()?.status}"))
                 }
             } else {
                 return LoadResult.Error(Exception(("API request failed with status: ${response.code()}")))

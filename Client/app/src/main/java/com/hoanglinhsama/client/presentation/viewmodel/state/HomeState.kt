@@ -21,5 +21,4 @@ data class HomeState(
     val user = _user
     val selectedDrinkCategory = _selectedDrinkCategory
     val currentPromotionIndex = _currentPromotionIndex
-
 }

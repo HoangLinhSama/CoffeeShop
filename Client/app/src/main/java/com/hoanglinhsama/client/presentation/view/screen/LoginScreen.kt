@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.presentation.view.screen
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.domain.model.LoginMethod
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
@@ -64,6 +64,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.ShadowBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.TrueBlue
 import com.hoanglinhsama.client.presentation.view.widget.OtpCard
+import com.hoanglinhsama.client.presentation.viewmodel.LoginMethod
 import com.hoanglinhsama.client.presentation.viewmodel.event.LoginEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.LoginState
 import kotlinx.coroutines.launch
@@ -74,7 +75,7 @@ fun LoginScreen(
     activity: Activity? = null,
     state: LoginState,
     event: (LoginEvent) -> Unit,
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String, Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -134,7 +135,42 @@ fun LoginScreen(
                                     Toast.LENGTH_LONG
                                 ).show()
                             } else {
-                                onLoginSuccess()
+                                event(
+                                    LoginEvent.CheckHadAccountEvent(
+                                        formatPhoneNumberToE164(
+                                            state.phoneNumber,
+                                            "+84"
+                                        )
+                                    ) { status, hadAccount ->
+                                        if (status == "success") {
+                                            hadAccount?.let {
+                                                onLoginSuccess(
+                                                    formatPhoneNumberToE164(
+                                                        state.phoneNumber,
+                                                        "+84"
+                                                    ), it
+                                                )
+                                            }
+                                            if (hadAccount!!) {
+                                                event(
+                                                    LoginEvent.SavePhoneEvent(
+                                                        formatPhoneNumberToE164(
+                                                            state.phoneNumber,
+                                                            "+84"
+                                                        )
+                                                    ) {
+
+                                                    })
+                                            }
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Đã có lỗi xảy ra: $status",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            Log.d("HLSM", "Đã có lỗi xảy ra: $status")
+                                        }
+                                    })
                             }
                         })
                 }) { index, newValue ->
@@ -157,7 +193,8 @@ fun LoginScreen(
                     width = Dimension.fillToConstraints
                 }, verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painterResource(R.drawable.ic_arrow_back),
+                Icon(
+                    painterResource(R.drawable.ic_arrow_back),
                     contentDescription = null,
                     modifier = Modifier.clickable {
                         onBackClick()
@@ -191,6 +228,7 @@ fun LoginScreen(
                                 ambientColor = ShadowBlack,
                                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
                             )
+                            .height(Dimens.buttonHeight)
                     ) {
                         Icon(
                             painterResource(state.listMethodLogin[it].icon),
@@ -240,7 +278,8 @@ fun LoginScreen(
                 )
             }
             val focusManager = LocalFocusManager.current
-            TextField(value = state.phoneNumber,
+            TextField(
+                value = state.phoneNumber,
                 onValueChange = {
                     event(LoginEvent.PhoneNumberEvent(it))
                 },
@@ -312,44 +351,46 @@ fun LoginScreen(
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
                 )
             }
-            Button(modifier = Modifier
-                .constrainAs(buttonLogin) {
-                    bottom.linkTo(parent.bottom, Dimens.mediumMargin)
-                    start.linkTo(parent.start, Dimens.mediumMargin)
-                    end.linkTo(parent.end, Dimens.mediumMargin)
-                    width = Dimension.fillToConstraints
-                }
-                .height(Dimens.buttonHeight),
+            Button(
+                modifier = Modifier
+                    .constrainAs(buttonLogin) {
+                        bottom.linkTo(parent.bottom, Dimens.mediumMargin)
+                        start.linkTo(parent.start, Dimens.mediumMargin)
+                        end.linkTo(parent.end, Dimens.mediumMargin)
+                        width = Dimension.fillToConstraints
+                    }
+                    .height(Dimens.buttonHeight),
                 shape = RoundedCornerShape(Dimens.roundedCornerSize),
                 onClick = {
                     if (state.phoneNumber.length == 10) {
-                        event(LoginEvent.ButtonLoginClickEvent(
-                            activity!!,
-                            formatPhoneNumberToE164(
-                                state.phoneNumber, "+84"
-                            )
-                        ) { status, message, token ->
-                            if (!status) {
-                                Toast.makeText(
-                                    context,
-                                    "Có lỗi xảy ra trong quá trình xác thực, vui lòng kiểm tra lại",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else if (message != null) {
-                                coroutineScope.launch {
-                                    scaffoldState.bottomSheetState.expand()
-                                    event(LoginEvent.ShouldStartCountdownEvent(true))
+                        event(
+                            LoginEvent.ButtonLoginClickEvent(
+                                activity!!,
+                                formatPhoneNumberToE164(
+                                    state.phoneNumber, "+84"
+                                )
+                            ) { status, message, token ->
+                                if (!status) {
+                                    Toast.makeText(
+                                        context,
+                                        "Có lỗi xảy ra trong quá trình xác thực, vui lòng kiểm tra lại",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else if (message != null) {
+                                    coroutineScope.launch {
+                                        scaffoldState.bottomSheetState.expand()
+                                        event(LoginEvent.ShouldStartCountdownEvent(true))
+                                    }
+                                    event(LoginEvent.MessageSendVerCodeEvent(message))
+                                    event(LoginEvent.TokenResendEvent(token))
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Quá trình xác thực sẽ tự động hoàn tất",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
-                                event(LoginEvent.MessageSendVerCodeEvent(message))
-                                event(LoginEvent.TokenResendEvent(token))
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Quá trình xác thực sẽ tự động hoàn tất",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                            })
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -371,6 +412,11 @@ fun formatPhoneNumberToE164(phoneNumber: String, countryCode: String): String {
     return countryCode + phoneNumber.drop(1)
 }
 
+fun revertE164ToPhoneNumber(e164Number: String, countryCode: String): String {
+    return "0" + e164Number.removePrefix(countryCode)
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
@@ -381,6 +427,7 @@ fun LoginScreenPreview() {
         LoginMethod(R.drawable.ic_twitter, "Twitter", LightAzure, Color.White)
     )
     ClientTheme(dynamicColor = false) {
-        LoginScreen(null, LoginState(listMethodLogin), {}, {}) {}
+        LoginScreen(null, LoginState(listMethodLogin), {}, { phone, hadAccount ->
+        }) {}
     }
 }

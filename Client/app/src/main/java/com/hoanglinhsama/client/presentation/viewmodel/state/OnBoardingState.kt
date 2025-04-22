@@ -1,9 +1,11 @@
 package com.hoanglinhsama.client.presentation.viewmodel.state
 
-import com.hoanglinhsama.client.domain.model.Page
+import androidx.paging.PagingData
+import com.hoanglinhsama.client.domain.model.Onboarding
+import kotlinx.coroutines.flow.Flow
 
 data class OnBoardingState(
-    private val _listPage: List<Page> = emptyList<Page>(),
+    private val _itemsOnboarding: Flow<PagingData<Onboarding>>? = null,
 ) {
-    val listPage = _listPage
+    val itemsOnboarding = _itemsOnboarding
 }

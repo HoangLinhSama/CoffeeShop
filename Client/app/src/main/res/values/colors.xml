@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+    <color name="copper_red">#FFC67C4E</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="philippineGray">#8D8D8D</color>
+    <color name="philippine_gray">#8D8D8D</color>
 </resources>
