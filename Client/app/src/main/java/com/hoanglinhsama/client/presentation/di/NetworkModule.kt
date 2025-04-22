@@ -34,7 +34,7 @@ object NetworkModule {
     fun provideGson(): Gson {
         return GsonBuilder()
             .setLenient()
-            .create();
+            .create()
     }
 
     @Provides
@@ -44,8 +44,8 @@ object NetworkModule {
         gson: Gson,
     ): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create(gson))
             .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .baseUrl(ApiUtil.BASE_URL)
             .client(okHttpClient)
             .build()

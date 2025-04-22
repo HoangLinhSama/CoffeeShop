@@ -9,4 +9,5 @@ sealed class DetailDrinkEvent {
     data class DrinkCountEvent(val countDrink: Int) : DetailDrinkEvent()
     data class NoteOrderEvent(val noteOrder: String) : DetailDrinkEvent()
     object OrderEvent : DetailDrinkEvent()
+    data class NoteFocusEvent(val isFocus: Boolean) : DetailDrinkEvent()
 }

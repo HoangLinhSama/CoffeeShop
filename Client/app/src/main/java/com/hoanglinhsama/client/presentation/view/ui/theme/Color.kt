@@ -13,4 +13,8 @@ val ShadowBlack = Color(0x40000000)
 val DarkSlateGray = Color(0xFF2F4B4E)
 val DarkCharcoal2 = Color(0xFF2F2D2C)
 val Platinum = Color(0x40E4E4E4)
+val MilkChocolate = Color(0xFF8B5A2B)
+val LightAzure = Color(0xFF64b4ff)
+val TrueBlue = Color(0xFF007dd1)
+val LightCopperRed = Color(0xFFC67C4E).copy(alpha = 0.3f)
 

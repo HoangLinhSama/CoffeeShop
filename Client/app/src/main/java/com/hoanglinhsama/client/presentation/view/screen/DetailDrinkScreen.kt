@@ -3,6 +3,7 @@ package com.hoanglinhsama.client.presentation.view.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,10 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -58,6 +59,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
+import com.hoanglinhsama.client.presentation.view.ui.theme.LightCopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Platinum
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.viewmodel.event.DetailDrinkEvent
@@ -100,7 +102,7 @@ fun DetailDrinkScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Chi tiết", color = DarkCharcoal2,
-                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 18.sp)
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle)
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -205,7 +207,7 @@ fun DetailDrinkScreen(
                             .height(1.dp)
                             .background(GainsBoro)
                     )
-                    val maxLines: Int = 3
+                    val maxLines = 3
                     Column(modifier = Modifier.constrainAs(rowDescription) {
                         top.linkTo(barDivide.bottom, Dimens.smallMargin)
                         start.linkTo(parent.start)
@@ -238,12 +240,15 @@ fun DetailDrinkScreen(
                             )
                         }
                     }
-                    Row(modifier = Modifier.constrainAs(rowSize) {
-                        top.linkTo(rowDescription.bottom, Dimens.mediumMargin)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        width = Dimension.fillToConstraints
-                    }, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.constrainAs(rowSize) {
+                            top.linkTo(rowDescription.bottom, Dimens.mediumMargin)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                        }, verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         if (drink.priceSize.keys.toList()[0] != " ") {
                             repeat(drink.priceSize.size) {
                                 val isSelected = state.indexSizeSelected == it
@@ -263,9 +268,6 @@ fun DetailDrinkScreen(
                                         text = drink.priceSize.keys.toList()[it],
                                         style = MaterialTheme.typography.labelMedium
                                     )
-                                }
-                                if (it < drink.priceSize.size) {
-                                    Spacer(modifier = Modifier.size(Dimens.mediumMargin))
                                 }
                             }
                         }
@@ -307,7 +309,6 @@ fun DetailDrinkScreen(
                             }
                         }
                     }
-                    val keyBoardController = LocalSoftwareKeyboardController.current
                     val focusManager = LocalFocusManager.current
                     TextField(
                         value = state.noteOrder, onValueChange = {
@@ -320,36 +321,44 @@ fun DetailDrinkScreen(
                                 bottom.linkTo(parent.bottom, 200.dp)
                                 width = Dimension.fillToConstraints
                             }
+                            .clip(RoundedCornerShape(Dimens.roundedCornerSize))
                             .border(
                                 width = 1.dp,
-                                color = GainsBoro,
+                                color = if (state.isFocus) CopperRed else GainsBoro,
                                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
-                            ),
+                            )
+                            .onFocusChanged {
+                                event(DetailDrinkEvent.NoteFocusEvent(it.isFocused))
+                            },
                         textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                         placeholder = {
                             Text(
-                                text = "Thêm ghi chú",
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.Normal
-                                )
+                                text = "Thêm ghi chú"
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painterResource(R.drawable.ic_note),
+                                contentDescription = null
                             )
                         },
                         colors = TextFieldDefaults.colors(
-                            focusedTextColor = SpanishGray,
-                            unfocusedTextColor = SpanishGray,
-                            focusedPlaceholderColor = GainsBoro,
-                            unfocusedPlaceholderColor = GainsBoro,
+                            focusedTextColor = DarkCharcoal2,
+                            unfocusedTextColor = DarkCharcoal2,
+                            focusedPlaceholderColor = SpanishGray,
+                            unfocusedPlaceholderColor = SpanishGray,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = CopperRed,
-                            focusedContainerColor = Cultured,
-                            unfocusedContainerColor = Cultured
+                            focusedContainerColor = LightCopperRed,
+                            unfocusedContainerColor = GainsBoro,
+                            focusedLeadingIconColor = CopperRed,
+                            unfocusedLeadingIconColor = SpanishGray
                         ),
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done
                         ), keyboardActions = KeyboardActions(
                             onDone = {
-                                keyBoardController?.hide()
                                 focusManager.clearFocus()
                             }
                         )
@@ -427,7 +436,8 @@ fun DetailDrinkScreen(
                 modifier = Modifier
                     .clip(RoundedCornerShape(Dimens.roundedCornerSize))
                     .background(CopperRed)
-                    .weight(0.5f),
+                    .weight(0.5f)
+                    .height(Dimens.buttonHeight),
             ) {
                 val totalToppingPrice = if (drink.toppingPrice != null) {
                     state.listToppingChecked.mapIndexed { index, isChecked ->
@@ -449,18 +459,18 @@ fun DetailDrinkScreen(
 @Preview(showBackground = true)
 @Composable
 fun DetailDrinkScreenPreview() {
-    val priceSize = mapOf<String, Int>("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
+    val priceSize = mapOf<String, Int>("Nhỏ" to 49000, "Vừa" to 55000, "Lớn" to 65000)
     val toppingPrice = mapOf<String, Int>(
         "Shot Espresso" to 10000,
         "Trân châu trắng" to 10000,
         "Sốt Caramel" to 10000
     )
     val drink = Drink(
-        "Bạc Sỉu",
+        "Phin Sữa Tươi Bánh Flan",
         priceSize,
-        " ",
+        "",
         4.9F,
-        "Bạc sỉu chính là \"Ly sữa trắng kèm một chút cà phê\". Thức uống này rất phù hợp những ai vừa muốn trải nghiệm chút vị đắng của cà phê vừa muốn thưởng thức vị ngọt béo ngậy từ sữa.",
+        "Tỉnh tức thì cùng cà phê Robusta pha phin đậm đà và bánh flan núng nính. Uống là tỉnh, ăn là dính, xứng đáng là highlight trong ngày của bạn.",
         toppingPrice
     )
     ClientTheme(dynamicColor = false) {

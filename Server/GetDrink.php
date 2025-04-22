@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
 include "Connect.php";
 $page = $_POST["page"];
 $limit = $_POST["pageSize"];
@@ -7,7 +9,11 @@ $query = "SELECT drink.name,
 picture,
 star,
 description,
-GROUP_CONCAT(DISTINCT CONCAT (IFNULL(size,' '),':',drink_price.price)) AS priceSize,
+GROUP_CONCAT(DISTINCT CONCAT (IFNULL(size,' '),':',drink_price.price)ORDER BY CASE size
+        WHEN 'Nhỏ' THEN 1
+        WHEN 'Vừa' THEN 2
+        WHEN 'Lớn' THEN 3
+    END ASC) AS priceSize,
 GROUP_CONCAT(DISTINCT CONCAT(topping.name,':',topping.price)) AS toppingPrice
 FROM drink 
 JOIN drink_price ON drink.id=drink_price.drink_id
@@ -34,7 +40,7 @@ try {
                 $response = [
                     "status" => "fail: no data found",
                     "result" => $result
-                ]; 
+                ];
             } else {
                 $response = [
                     "status" => "fail: no more data",

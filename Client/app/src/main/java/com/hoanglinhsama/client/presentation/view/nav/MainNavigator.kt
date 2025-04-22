@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -49,10 +48,11 @@ import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
-import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
+import com.hoanglinhsama.client.presentation.view.screen.OtherScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -135,7 +135,7 @@ fun MainNavigator() {
                                 },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = MaterialTheme.colorScheme.primary,
-                                    unselectedIconColor = colorResource(id = R.color.philippineGray),
+                                    unselectedIconColor = colorResource(id = R.color.philippine_gray),
                                     indicatorColor = Color.Transparent
                                 ),
                                 modifier = Modifier.weight(1f)
@@ -170,9 +170,12 @@ fun MainNavigator() {
         ) {
             composable(route = Route.HomeScreen.route) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
-                HomeScreen(homeViewModel.state.value, homeViewModel::onEvent, onSearchClick = {
+                HomeScreen(
+                    homeViewModel.state.value,
+                    homeViewModel::onEvent,
+                    onSearchClick = {
 
-                }) {
+                    }) {
                     navController.navigate(
                         "${Route.DetailDrinkScreen.route}/${Uri.encode(Gson().toJson(it))}"
                     )
@@ -188,12 +191,16 @@ fun MainNavigator() {
                 val json = it.arguments?.getString("drink")
                 val drink = Gson().fromJson(json, Drink::class.java)
                 DetailDrinkScreen(
-                    drink!!,
+                    drink,
                     detailDrinkViewModel.state.value,
                     detailDrinkViewModel::onEvent
                 ) {
                     navController.popBackStack()
                 }
+            }
+            composable(route = Route.OtherScreen.route) {
+                val otherViewModel: OtherViewModel = hiltViewModel()
+                OtherScreen(otherViewModel.state.value, otherViewModel::onEvent)
             }
         }
     }
@@ -212,12 +219,3 @@ fun navigateToTab(navController: NavHostController, route: String) {
 }
 
 data class BottomNavigationItem(@DrawableRes val icon: Int, val name: String)
-
-@Composable
-@Preview(showBackground = true)
-fun MainNavigatorPreview() {
-    ClientTheme(dynamicColor = false) {
-        MainNavigator()
-    }
-}
-

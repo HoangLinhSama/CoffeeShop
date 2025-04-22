@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -154,6 +155,43 @@ fun DrinkCardShimmerEffect(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun PolicySheetShimmerEffect(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(15.dp)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.size(Dimens.smallMargin))
+        repeat(3) { timeSentence ->
+            repeat(3) { timeRow ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(
+                            fraction = if (timeRow == 2) 0.5f else 1f
+                        )
+                        .height(15.dp)
+                        .shimmerEffect()
+                )
+                Spacer(modifier = Modifier.size(size = if (timeSentence == 2 && timeRow == 2) 0.dp else Dimens.smallMargin / 2))
+            }
+        }
+        Spacer(modifier = Modifier.size(Dimens.mediumMargin))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PolicySheetShimmerEffectPreview() {
+    ClientTheme(dynamicColor = false) {
+        PolicySheetShimmerEffect(
+            modifier = Modifier.wrapContentHeight()
+        )
     }
 }
 

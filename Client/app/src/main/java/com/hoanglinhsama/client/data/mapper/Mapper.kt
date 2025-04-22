@@ -2,6 +2,9 @@ package com.hoanglinhsama.client.data.mapper
 
 import com.hoanglinhsama.client.data.model.Drink
 import com.hoanglinhsama.client.data.model.DrinkCategory
+import com.hoanglinhsama.client.data.model.Onboarding
+import com.hoanglinhsama.client.data.model.Policies
+import com.hoanglinhsama.client.data.model.User
 import com.hoanglinhsama.client.data.model.Voucher
 
 fun Voucher.toVoucherDomain(): com.hoanglinhsama.client.domain.model.Voucher {
@@ -39,13 +42,36 @@ fun Drink.toDrinkDomain(): com.hoanglinhsama.client.domain.model.Drink {
     )
 }
 
-fun <K : Any, T : Any> listToMap(
+fun <K, T> listToMap(
     list: List<String>?,
     keyMapper: (String) -> K,
     valueMapper: (String) -> T,
 ): Map<K, T>? {
-    return list?.map {
+    return list?.associate {
         val parts = it.split(":")
         keyMapper(parts[0]) to valueMapper(parts[1])
-    }?.toMap()
+    }
+}
+
+fun Policies.toPolicyDomain(): com.hoanglinhsama.client.domain.model.Policies {
+    return com.hoanglinhsama.client.domain.model.Policies(this.title, this.content)
+}
+
+fun User.toUserDomain(): com.hoanglinhsama.client.domain.model.User {
+    return com.hoanglinhsama.client.domain.model.User(
+        this.id,
+        this.firstName,
+        this.lastName,
+        this.phone,
+        this.address,
+        this.image
+    )
+}
+
+fun Onboarding.toOnboardingDomain(): com.hoanglinhsama.client.domain.model.Onboarding {
+    return com.hoanglinhsama.client.domain.model.Onboarding(
+        this.image,
+        this.title,
+        this.description
+    )
 }
