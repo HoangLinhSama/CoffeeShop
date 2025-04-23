@@ -22,6 +22,7 @@ fun DrinkCategory.toDrinkCategoryDomain(): com.hoanglinhsama.client.domain.model
 
 fun Drink.toDrinkDomain(): com.hoanglinhsama.client.domain.model.Drink {
     return com.hoanglinhsama.client.domain.model.Drink(
+        this.id,
         this.name,
         listToMap(this.priceSize, keyMapper = {
             it.toString()
@@ -35,7 +36,8 @@ fun Drink.toDrinkDomain(): com.hoanglinhsama.client.domain.model.Drink {
             it.toString()
         }, valueMapper = {
             it.toInt()
-        })
+        }),
+        this.countReview
     )
 }
 
