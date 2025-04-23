@@ -106,14 +106,15 @@ fun DetailDrinkScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
-            Column(modifier = Modifier
-                .constrainAs(columnMain) {
-                    top.linkTo(rowActionBar1.bottom, Dimens.mediumMargin)
-                    start.linkTo(parent.start, Dimens.mediumMargin)
-                    end.linkTo(parent.end, Dimens.mediumMargin)
-                    width = Dimension.fillToConstraints
-                }
-                .verticalScroll(rememberScrollState())
+            Column(
+                modifier = Modifier
+                    .constrainAs(columnMain) {
+                        top.linkTo(rowActionBar1.bottom, Dimens.mediumMargin)
+                        start.linkTo(parent.start, Dimens.mediumMargin)
+                        end.linkTo(parent.end, Dimens.mediumMargin)
+                        width = Dimension.fillToConstraints
+                    }
+                    .verticalScroll(rememberScrollState())
             ) {
                 ConstraintLayout(modifier = Modifier.fillMaxSize()) {
                     AsyncImage(
@@ -168,8 +169,17 @@ fun DetailDrinkScreen(
                             )
                             Text(
                                 text = drink.star.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontSize = 16.sp),
+                                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubtitle),
                                 color = DarkCharcoal2
+                            )
+                            Text(
+                                text = "(${drink.countReview} đánh giá)",
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                modifier = Modifier
+                                    .clickable {
+                                        event(DetailDrinkEvent.ReviewClickEvent(drink.id))
+                                    }
+                                    .padding(start = Dimens.smallMargin)
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
@@ -272,13 +282,14 @@ fun DetailDrinkScreen(
                             }
                         }
                     }
-                    Column(modifier = Modifier
-                        .constrainAs(columnTopping) {
-                            top.linkTo(rowSize.bottom, Dimens.mediumMargin)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            width = Dimension.fillToConstraints
-                        }) {
+                    Column(
+                        modifier = Modifier
+                            .constrainAs(columnTopping) {
+                                top.linkTo(rowSize.bottom, Dimens.mediumMargin)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                width = Dimension.fillToConstraints
+                            }) {
                         if (drink.toppingPrice != null) {
                             repeat(drink.toppingPrice.size) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -466,12 +477,13 @@ fun DetailDrinkScreenPreview() {
         "Sốt Caramel" to 10000
     )
     val drink = Drink(
+        1,
         "Phin Sữa Tươi Bánh Flan",
         priceSize,
         "",
-        4.9F,
+        5F,
         "Tỉnh tức thì cùng cà phê Robusta pha phin đậm đà và bánh flan núng nính. Uống là tỉnh, ăn là dính, xứng đáng là highlight trong ngày của bạn.",
-        toppingPrice
+        toppingPrice, 1
     )
     ClientTheme(dynamicColor = false) {
         DetailDrinkScreen(drink, DetailDrinkState(), {

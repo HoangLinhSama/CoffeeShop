@@ -56,6 +56,7 @@ interface MainApi {
         @Field("phone") phone: String,
         @Field("address") address: String,
         @Field("image") image: String,
+        @Field("storeId") storeId: String,
     ): Response<String>
 
     @POST("GetUser.php")

@@ -11,7 +11,7 @@ import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.data.source.paging.DrinkCategoryPagingSource
 import com.hoanglinhsama.client.data.source.paging.DrinkPagingSource
 import com.hoanglinhsama.client.data.source.paging.VoucherPagingSource
-import com.hoanglinhsama.client.data.source.preferences.PreferenceKey
+import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory

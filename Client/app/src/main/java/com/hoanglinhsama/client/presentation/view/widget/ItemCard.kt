@@ -240,7 +240,7 @@ val toppingPrice = mapOf<String, Int>(
     "Sốt Caramel" to 10000
 )
 val drink = Drink(
-    "Bạc Sỉu", priceSize, "", 4.9F, "", toppingPrice
+    1, "Bạc Sỉu", priceSize, "", 5F, "", toppingPrice, 1
 )
 
 @Preview(showBackground = true)

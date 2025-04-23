@@ -52,6 +52,10 @@ class DetailDrinkViewModel @Inject constructor() : ViewModel() {
             is DetailDrinkEvent.NoteFocusEvent -> {
                 _state.value = _state.value.copy(_isFocus = event.isFocus)
             }
+
+            is DetailDrinkEvent.ReviewClickEvent -> {
+
+            }
         }
     }
 }
