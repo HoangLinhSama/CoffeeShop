@@ -169,7 +169,7 @@ fun DetailDrinkScreen(
                             )
                             Text(
                                 text = drink.star.toString(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubtitle),
+                                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
                                 color = DarkCharcoal2
                             )
                             Text(

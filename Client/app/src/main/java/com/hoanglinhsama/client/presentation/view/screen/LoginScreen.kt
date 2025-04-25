@@ -63,7 +63,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.LightCopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.ShadowBlack
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.TrueBlue
-import com.hoanglinhsama.client.presentation.view.widget.OtpCard
+import com.hoanglinhsama.client.presentation.view.widget.BottomSheetOtp
 import com.hoanglinhsama.client.presentation.viewmodel.LoginMethod
 import com.hoanglinhsama.client.presentation.viewmodel.event.LoginEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.LoginState
@@ -78,16 +78,16 @@ fun LoginScreen(
     onLoginSuccess: (String, Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val bottomSheetState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     BottomSheetScaffold(
         modifier = Modifier.imePadding(),
-        scaffoldState = scaffoldState,
+        scaffoldState = bottomSheetState,
         sheetContainerColor = Color.White,
         sheetContent = {
-            OtpCard(
-                Modifier,
+            BottomSheetOtp(
+                Modifier.fillMaxWidth(),
                 context,
                 state.shouldStartCountdown,
                 6,
@@ -378,7 +378,7 @@ fun LoginScreen(
                                     ).show()
                                 } else if (message != null) {
                                     coroutineScope.launch {
-                                        scaffoldState.bottomSheetState.expand()
+                                        bottomSheetState.bottomSheetState.expand()
                                         event(LoginEvent.ShouldStartCountdownEvent(true))
                                     }
                                     event(LoginEvent.MessageSendVerCodeEvent(message))

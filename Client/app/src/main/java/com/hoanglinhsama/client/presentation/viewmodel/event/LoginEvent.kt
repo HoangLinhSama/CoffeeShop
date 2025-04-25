@@ -34,8 +34,11 @@ sealed class LoginEvent {
     data class TokenResendEvent(val token: PhoneAuthProvider.ForceResendingToken? = null) :
         LoginEvent()
 
-    data class CheckHadAccountEvent(val phoneNumber: String, val callback: (String, Boolean?) -> Unit) :
+    data class CheckHadAccountEvent(
+        val phoneNumber: String,
+        val callback: (String, Boolean?) -> Unit,
+    ) :
         LoginEvent()
-    data class SavePhoneEvent(val phoneNumber: String, val callback: () -> Unit) : LoginEvent()
 
+    data class SavePhoneEvent(val phoneNumber: String, val callback: () -> Unit) : LoginEvent()
 }

@@ -6,7 +6,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -65,7 +62,6 @@ import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.domain.model.Policies
 import com.hoanglinhsama.client.presentation.view.ui.anim.LoadingOverlay
-import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
@@ -75,8 +71,7 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
 import com.hoanglinhsama.client.presentation.view.ui.theme.LightCopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.util.HandleFlowResult
-import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
-import com.hoanglinhsama.client.presentation.view.widget.PolicySheetShimmerEffect
+import com.hoanglinhsama.client.presentation.view.widget.BottomSheetPolicy
 import com.hoanglinhsama.client.presentation.viewmodel.event.SignupEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.SignupState
 import kotlinx.coroutines.flow.flowOf
@@ -94,70 +89,19 @@ fun SignupScreen(
     onSignupSuccess: () -> Unit,
 ) {
     val context = LocalContext.current
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val bottomSheetState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val itemsPolicy = state.itemsPolicy?.collectAsLazyPagingItems()
     BottomSheetScaffold(
         modifier = Modifier.imePadding(),
-        scaffoldState = scaffoldState,
+        scaffoldState = bottomSheetState,
         sheetContainerColor = Color.White,
         sheetContent = {
-            Column(
-                modifier = Modifier.padding(
-                    top = Dimens.mediumMargin,
-                    start = Dimens.mediumMargin,
-                    end = Dimens.mediumMargin,
-                    bottom = Dimens.mediumMargin
-                ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                itemsPolicy?.let {
-                    if (handlePagingResult(itemsPolicy, Modifier.fillMaxSize()) {
-                            Box(
-                                modifier = Modifier
-                                    .height(30.dp)
-                                    .fillMaxWidth(0.5f)
-                                    .shimmerEffect()
-                            )
-                            Spacer(modifier = Modifier.size(Dimens.mediumMargin))
-                            repeat(3) {
-                                PolicySheetShimmerEffect(Modifier.fillMaxWidth())
-                            }
-                        }) {
-                        Text(
-                            text = "Điều khoản và điều kiện",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontSize = Dimens.sizeTitle, fontWeight = FontWeight.Bold
-                            ),
-                            color = DarkCharcoal2
-                        )
-                        LazyColumn(
-                            modifier = Modifier.padding(top = Dimens.mediumMargin),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin)
-                        ) {
-                            items(itemsPolicy.itemCount) {
-                                Column {
-                                    Text(
-                                        text = itemsPolicy[it]?.title.toString(),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = DarkCharcoal2
-                                    )
-                                    Spacer(modifier = Modifier.size(Dimens.smallMargin))
-                                    Text(
-                                        text = itemsPolicy[it]?.content.toString(),
-                                        style = MaterialTheme.typography.labelMedium.copy(
-                                            fontWeight = FontWeight.Normal
-                                        ),
-                                        color = SpanishGray
-                                    )
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
+            BottomSheetPolicy(
+                itemsPolicy, Modifier
+                    .fillMaxWidth()
+                    .height(750.dp)
+            )
         },
         sheetPeekHeight = 0.dp
     ) {
@@ -421,7 +365,7 @@ fun SignupScreen(
                         ),
                         modifier = Modifier.clickable {
                             coroutineScope.launch {
-                                scaffoldState.bottomSheetState.expand()
+                                bottomSheetState.bottomSheetState.expand()
                             }
                             event(SignupEvent.ReadPolicyEvent)
                         })

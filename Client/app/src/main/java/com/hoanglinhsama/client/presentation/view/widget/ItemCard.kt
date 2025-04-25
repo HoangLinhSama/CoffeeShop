@@ -175,7 +175,7 @@ fun DrinkCard(
         }
         Text(
             text = drink.name,
-            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubtitle),
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
             color = DarkCharcoal2,
             modifier = Modifier.padding(
                 start = Dimens.smallMargin,

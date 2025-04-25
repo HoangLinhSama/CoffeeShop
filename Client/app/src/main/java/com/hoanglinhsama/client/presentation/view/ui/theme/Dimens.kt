@@ -10,5 +10,5 @@ object Dimens {
     val smallIcon = 20.dp
     val buttonHeight = 62.dp
     val sizeTitle = 18.sp
-    val sizeSubtitle = 16.sp
+    val sizeSubTitle = 16.sp
 }

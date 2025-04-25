@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
@@ -122,7 +121,7 @@ fun OtherScreen(
                             text = listFeatureItem[it].title,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Normal,
-                                fontSize = Dimens.sizeSubtitle
+                                fontSize = Dimens.sizeSubTitle
                             ),
                             color = if (it != listFeatureItem.size - 1) DarkCharcoal2 else Color.Red
                         )
