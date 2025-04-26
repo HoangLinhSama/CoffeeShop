@@ -5,6 +5,7 @@ import com.hoanglinhsama.client.data.model.DrinkCategory
 import com.hoanglinhsama.client.data.model.MainResponse
 import com.hoanglinhsama.client.data.model.Onboarding
 import com.hoanglinhsama.client.data.model.Policies
+import com.hoanglinhsama.client.data.model.Shop
 import com.hoanglinhsama.client.data.model.User
 import com.hoanglinhsama.client.data.model.Voucher
 import okhttp3.MultipartBody
@@ -73,4 +74,11 @@ interface MainApi {
         @Field("page") page: Int,
         @Field("pageSize") pageSize: Int,
     ): Response<MainResponse<Onboarding>>
+
+    @POST("GetShop.php")
+    @FormUrlEncoded
+    suspend fun getShop(
+        @Field("page") page: Int,
+        @Field("pageSize") pageSize: Int,
+    ): Response<MainResponse<Shop>>
 }

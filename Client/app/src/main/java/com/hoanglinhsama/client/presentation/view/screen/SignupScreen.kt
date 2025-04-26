@@ -189,6 +189,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateFirstNameEvent(it))
                 },
+                maxLines = 1,
                 modifier = Modifier
                     .constrainAs(textFieldFirstName) {
                         top.linkTo(imageAvatar.bottom, Dimens.mediumMargin)
@@ -239,6 +240,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateLastNameEvent(it))
                 },
+                maxLines = 1,
                 modifier = Modifier
                     .constrainAs(textFieldLastName) {
                         top.linkTo(textFieldFirstName.bottom, Dimens.mediumMargin)
@@ -289,6 +291,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateAddressEvent(it))
                 },
+                maxLines = 2,
                 modifier = Modifier
                     .constrainAs(textFieldAddress) {
                         top.linkTo(textFieldLastName.bottom, Dimens.mediumMargin)

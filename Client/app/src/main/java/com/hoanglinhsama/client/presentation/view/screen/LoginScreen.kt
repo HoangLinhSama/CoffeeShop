@@ -283,6 +283,7 @@ fun LoginScreen(
                 onValueChange = {
                     event(LoginEvent.PhoneNumberEvent(it))
                 },
+                maxLines = 1,
                 modifier = Modifier
                     .constrainAs(textFieldPhoneNumber) {
                         top.linkTo(rowDivide.bottom, Dimens.mediumMargin)

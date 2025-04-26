@@ -34,14 +34,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkSlateGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
-import com.hoanglinhsama.client.R
 import java.text.DecimalFormat
 
 @Composable
@@ -144,7 +145,6 @@ fun DrinkCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .fillMaxWidth()
                     .clickable {
                         onDrinkClick(drink)
                     },
@@ -221,14 +221,88 @@ fun DrinkCard(
     }
 }
 
-val voucher = Voucher(
-    "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
-)
+@Composable
+fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(Dimens.roundedCornerSize))
+            .background(Color.White)
+            .clickable {
+                onShopClick
+            }, verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = shop.picture,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            error = painterResource(
+                R.drawable.img_not_found
+            ),
+            modifier = Modifier
+                .aspectRatio(1f)
+                .clip(
+                    RoundedCornerShape(
+                        topEnd = Dimens.roundedCornerSize,
+                        bottomEnd = Dimens.roundedCornerSize
+                    )
+                )
+
+        )
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = Dimens.smallMargin,
+                    bottom = Dimens.smallMargin,
+                    start = Dimens.smallMargin,
+                    end = Dimens.smallMargin
+                )
+                .weight(1f)
+        ) {
+            Text(
+                text = shop.name,
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubtitle),
+                color = DarkCharcoal2,
+            )
+            Text(
+                text = shop.address,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                color = DarkCharcoal2,
+                modifier = Modifier.padding(top = Dimens.smallMargin)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopCardPreview() {
+    ClientTheme(dynamicColor = false) {
+        val shop = Shop(
+            "HCM Nguyễn Ảnh Thủ",
+            "",
+            "93/5 Nguyễn Ảnh Thủ, Huyện Hóc Môn, Hồ Chí Minh, Việt Nam",
+            "",
+            "07:00 - 21:30"
+        )
+        ShopCard(
+            modifier = Modifier
+                .height(140.dp)
+                .fillMaxWidth(),
+            shop
+        ) {
+
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun PromotionCardPreview() {
     ClientTheme(dynamicColor = false) {
+        val voucher = Voucher(
+            "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
+        )
         PromotionCard(Modifier.height(140.dp), voucher, 3, 1) {}
     }
 }

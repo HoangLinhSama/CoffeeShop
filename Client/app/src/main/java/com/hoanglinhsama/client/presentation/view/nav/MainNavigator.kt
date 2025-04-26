@@ -52,12 +52,14 @@ import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.screen.OrderScreen
 import com.hoanglinhsama.client.presentation.view.screen.OtherScreen
+import com.hoanglinhsama.client.presentation.view.screen.ShopScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OrderViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.ShopViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -83,11 +85,15 @@ fun MainNavigator() {
         else -> 0
     }
     val isBottomBarVisible = remember(key1 = currentBackStackEntry) {
-        currentBackStackEntry?.destination?.route == Route.HomeScreen.route || currentBackStackEntry?.destination?.route == Route.ShopScreen.route || currentBackStackEntry?.destination?.route == Route.PromotionScreen.route || currentBackStackEntry?.destination?.route == Route.OtherScreen.route
+        currentBackStackEntry?.destination?.route == Route.HomeScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.ShopScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.PromotionScreen.route ||
+                currentBackStackEntry?.destination?.route == Route.OtherScreen.route
     }
     val orderViewModel: OrderViewModel = hiltViewModel()
     Scaffold(
-        Modifier.fillMaxSize(), bottomBar = {
+        Modifier.fillMaxSize(),
+        bottomBar = {
             if (isBottomBarVisible) {
                 BottomAppBar(
                     modifier = Modifier
@@ -100,23 +106,27 @@ fun MainNavigator() {
                             Spacer(modifier = Modifier.weight(1f))
                         } else {
                             NavigationBarItem(
-                                selected = selectedItem == index, onClick = {
+                                selected = selectedItem == index,
+                                onClick = {
                                     when (index) {
                                         0 -> navigateToTab(navController, Route.HomeScreen.route)
                                         1 -> navigateToTab(navController, Route.ShopScreen.route)
                                         3 -> navigateToTab(
-                                            navController, Route.PromotionScreen.route
+                                            navController,
+                                            Route.PromotionScreen.route
                                         )
 
                                         4 -> navigateToTab(navController, Route.OtherScreen.route)
                                     }
-                                }, icon = {
+                                },
+                                icon = {
                                     Icon(
                                         painter = painterResource(id = item.icon),
                                         contentDescription = null,
                                         modifier = Modifier.size(24.dp)
                                     )
-                                }, label = {
+                                },
+                                label = {
                                     Box(
                                         modifier = Modifier
                                             .width(10.dp)
@@ -129,17 +139,20 @@ fun MainNavigator() {
                                     ) {
 
                                     }
-                                }, colors = NavigationBarItemDefaults.colors(
+                                },
+                                colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = MaterialTheme.colorScheme.primary,
                                     unselectedIconColor = colorResource(id = R.color.philippine_gray),
                                     indicatorColor = Color.Transparent
-                                ), modifier = Modifier.weight(1f)
+                                ),
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
                 }
             }
-        }, floatingActionButton = {
+        },
+        floatingActionButton = {
             if (isBottomBarVisible) {
                 Box(
                     modifier = Modifier.offset(y = 50.dp)
@@ -176,15 +189,19 @@ fun MainNavigator() {
                     }
                 }
             }
-        }, floatingActionButtonPosition = FabPosition.Center
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) {
         NavHost(
-            navController = navController, startDestination = Route.HomeScreen.route
+            navController = navController,
+            startDestination = Route.HomeScreen.route
         ) {
             composable(route = Route.HomeScreen.route) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 HomeScreen(
-                    homeViewModel.state.value, homeViewModel::onEvent, onSearchClick = {
+                    homeViewModel.state.value,
+                    homeViewModel::onEvent,
+                    onSearchClick = {
 
                     }) {
                     navController.navigate(
@@ -202,7 +219,9 @@ fun MainNavigator() {
                 val json = it.arguments?.getString("drink")
                 val drink = Gson().fromJson(json, Drink::class.java)
                 DetailDrinkScreen(
-                    drink, detailDrinkViewModel.state.value, detailDrinkViewModel::onEvent
+                    drink,
+                    detailDrinkViewModel.state.value,
+                    detailDrinkViewModel::onEvent
                 ) {
                     navController.popBackStack()
                 }
@@ -214,6 +233,12 @@ fun MainNavigator() {
             composable(route = Route.OrderScreen.route) {
                 OrderScreen(orderViewModel.state.value, orderViewModel::onEvent) {
                     navController.popBackStack()
+                }
+            }
+            composable(route = Route.ShopScreen.route) {
+                val shopViewModel: ShopViewModel = hiltViewModel()
+                ShopScreen(shopViewModel.state.value, shopViewModel::onEvent, {}) {
+
                 }
             }
         }

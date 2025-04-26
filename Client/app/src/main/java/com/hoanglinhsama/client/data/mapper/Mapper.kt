@@ -4,6 +4,7 @@ import com.hoanglinhsama.client.data.model.Drink
 import com.hoanglinhsama.client.data.model.DrinkCategory
 import com.hoanglinhsama.client.data.model.Onboarding
 import com.hoanglinhsama.client.data.model.Policies
+import com.hoanglinhsama.client.data.model.Shop
 import com.hoanglinhsama.client.data.model.User
 import com.hoanglinhsama.client.data.model.Voucher
 
@@ -75,5 +76,15 @@ fun Onboarding.toOnboardingDomain(): com.hoanglinhsama.client.domain.model.Onboa
         this.image,
         this.title,
         this.description
+    )
+}
+
+fun Shop.toShopDomain(): com.hoanglinhsama.client.domain.model.Shop {
+    return com.hoanglinhsama.client.domain.model.Shop(
+        this.name,
+        this.picture,
+        this.address,
+        this.phone,
+        this.operatingHour
     )
 }
