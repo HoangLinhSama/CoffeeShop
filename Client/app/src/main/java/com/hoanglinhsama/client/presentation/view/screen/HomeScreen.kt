@@ -175,7 +175,15 @@ fun HomeScreen(
                         width = Dimension.fillToConstraints
 
                     }
-                    .wrapContentHeight(), onSearchClick, "", "Tìm đồ uống", true, {}, {}
+                    .wrapContentHeight(),
+                onSearchClick,
+                "",
+                DarkCharcoal1,
+                Color.White,
+                "Tìm đồ uống",
+                true,
+                {},
+                {}
             ) {
 
             }

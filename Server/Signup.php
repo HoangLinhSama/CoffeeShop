@@ -18,24 +18,12 @@ if ($storeId == "") {
 } else {
     $storeId = "'" . mysqli_real_escape_string($connect, $storeId) . "'";
 }
-$query1 = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,3,$storeId,$image)";
-$query2 = "SELECT id FROM user WHERE phone ='$phone'";
+$query = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,3,$storeId,$image)";
 $result = array();
 try {
-    $data1 = mysqli_query($connect, $query1);
-    if ($data1) {
-        if ($storeId == 'null') {
-            $data2 = mysqli_query($connect, $query2);
-            if ($data2) {
-                $row = mysqli_fetch_assoc($data2);
-                $userId = $row["id"];
-                $query3 = "INSERT INTO cart VALUES (null,'$userId')";
-                $data3 = mysqli_query($connect, $query3);
-                if ($data3) {
-                    echo "success";
-                }
-            }
-        }
+    $data = mysqli_query($connect, $query);
+    if ($data) {
+        echo "success";
     } else {
         echo "fail";
     }

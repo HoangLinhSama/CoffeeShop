@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +40,8 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     value: String,
+    containerColor: Color,
+    textColor: Color,
     placeholder: String,
     isReadOnly: Boolean,
     onFilterClick: () -> Unit,
@@ -46,6 +49,7 @@ fun SearchBar(
     onValueChange: (String) -> Unit,
 ) {
     val keyBoardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     TextField(
         readOnly = isReadOnly,
         value = value,
@@ -53,6 +57,7 @@ fun SearchBar(
         textStyle = MaterialTheme.typography.labelMedium.copy(
             fontWeight = FontWeight.Normal
         ),
+        maxLines = 1,
         placeholder = {
             Text(
                 text = placeholder, style = MaterialTheme.typography.labelMedium.copy(
@@ -81,12 +86,12 @@ fun SearchBar(
                 if (isReadOnly) onClick
             },
         colors = TextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor,
             focusedPlaceholderColor = SpanishGray,
             unfocusedPlaceholderColor = SpanishGray,
-            focusedContainerColor = DarkCharcoal1,
-            unfocusedContainerColor = DarkCharcoal1,
+            focusedContainerColor = containerColor,
+            unfocusedContainerColor = containerColor,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             cursorColor = CopperRed
@@ -118,6 +123,7 @@ fun SearchBar(
             onSearch = {
                 keyBoardController?.hide()
                 onSearch
+                focusManager.clearFocus()
             }
         )
     )
@@ -127,7 +133,7 @@ fun SearchBar(
 @Composable
 fun SearchBarPreview() {
     ClientTheme(dynamicColor = false) {
-        SearchBar(Modifier, {}, "", "Tìm đồ uống", false, {}, {}) {
+        SearchBar(Modifier, {}, "", DarkCharcoal1, Color.White, "Tìm đồ uống", false, {}, {}) {
 
         }
     }

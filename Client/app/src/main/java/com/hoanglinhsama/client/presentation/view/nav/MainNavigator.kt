@@ -49,10 +49,12 @@ import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.screen.OtherScreen
+import com.hoanglinhsama.client.presentation.view.screen.ShopScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.ShopViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -201,6 +203,12 @@ fun MainNavigator() {
             composable(route = Route.OtherScreen.route) {
                 val otherViewModel: OtherViewModel = hiltViewModel()
                 OtherScreen(otherViewModel.state.value, otherViewModel::onEvent)
+            }
+            composable(route = Route.ShopScreen.route) {
+                val shopViewModel: ShopViewModel = hiltViewModel()
+                ShopScreen(shopViewModel.state.value, shopViewModel::onEvent, {}) {
+
+                }
             }
         }
     }
