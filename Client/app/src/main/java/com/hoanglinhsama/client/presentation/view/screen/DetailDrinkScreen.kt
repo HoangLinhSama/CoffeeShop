@@ -440,9 +440,31 @@ fun DetailDrinkScreen(
                 )
             }
             Spacer(modifier = Modifier.padding(end = Dimens.mediumMargin))
+            val totalToppingPrice = if (drink.toppingPrice != null) {
+                state.listToppingChecked.mapIndexed { index, isChecked ->
+                    if (isChecked) drink.toppingPrice.values.toList()[index] else 0
+                }.sum()
+            } else 0
+            val totalPrice: Float = (priceSize!! + totalToppingPrice).times(state.countDrink).toFloat()
             IconButton(
                 onClick = {
-                    event(DetailDrinkEvent.OrderEvent)
+                    val size =
+                        if (drink.priceSize.keys.toList()[0] == " ") null else drink.priceSize.keys.toList()[state.indexSizeSelected]
+                    val listToppingChecked: List<String>? = drink.toppingPrice?.keys
+                        ?.toList()
+                        ?.filterIndexed { index, _ ->
+                            state.listToppingChecked[index]
+                        }
+                    event(
+                        DetailDrinkEvent.OrderEvent(
+                            drink.picture,
+                            drink.name,
+                            totalPrice,
+                            size,
+                            listToppingChecked
+                        )
+                    )
+                    onBackClick()
                 },
                 modifier = Modifier
                     .clip(RoundedCornerShape(Dimens.roundedCornerSize))
@@ -450,12 +472,6 @@ fun DetailDrinkScreen(
                     .weight(0.5f)
                     .height(Dimens.buttonHeight),
             ) {
-                val totalToppingPrice = if (drink.toppingPrice != null) {
-                    state.listToppingChecked.mapIndexed { index, isChecked ->
-                        if (isChecked) drink.toppingPrice.values.toList()[index] else 0
-                    }.sum()
-                } else 0
-                val totalPrice: Int = (priceSize!! + totalToppingPrice).times(state.countDrink)
                 Text(
                     text = totalPrice.let { formatter.format(it) + " đ" },
                     style = MaterialTheme.typography.labelMedium.copy(fontSize = 16.sp),
@@ -486,9 +502,7 @@ fun DetailDrinkScreenPreview() {
         toppingPrice, 1
     )
     ClientTheme(dynamicColor = false) {
-        DetailDrinkScreen(drink, DetailDrinkState(), {
-
-        }) {
+        DetailDrinkScreen(drink, DetailDrinkState(), {}) {
 
         }
     }

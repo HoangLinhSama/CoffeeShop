@@ -2,6 +2,7 @@ package com.hoanglinhsama.client.presentation.view.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.hoanglinhsama.client.R
+import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
@@ -41,6 +44,8 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.widget.BottomSheetUpdateInfoDelivery
+import com.hoanglinhsama.client.presentation.view.widget.DrinkOrderCard
+import com.hoanglinhsama.client.presentation.view.widget.EmptyCart
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OrderState
 import kotlinx.coroutines.launch
@@ -51,6 +56,8 @@ fun OrderScreen(
     state: OrderState,
     event: (OrderEvent) -> Unit,
     onBackClick: () -> Unit,
+    onShopSelect: () -> Unit,
+    onAddMoreDrinkClick: () -> Unit,
 ) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -58,19 +65,13 @@ fun OrderScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Cultured)
-            .verticalScroll(rememberScrollState())
-            .padding(
-                top = Dimens.mediumMargin,
-                start = Dimens.mediumMargin,
-                end = Dimens.mediumMargin
-            )
     ) {
-        val (rowTitle, rowOrderType, columnDeliveryInformation) = createRefs()
+        val (emptyCard, constraintLayout1, barDivide1, barDivide2, barDivide3, rowTitle, columnSelectedDrink, rowOrderType, columnDeliveryInformation) = createRefs()
         Row(
             modifier = Modifier.constrainAs(rowTitle) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+                top.linkTo(parent.top, Dimens.mediumMargin)
+                start.linkTo(parent.start, Dimens.mediumMargin)
+                end.linkTo(parent.end, Dimens.mediumMargin)
                 width = Dimension.fillToConstraints
             }, verticalAlignment = Alignment.CenterVertically
         ) {
@@ -88,97 +89,215 @@ fun OrderScreen(
             )
             Spacer(modifier = Modifier.weight(1f))
         }
-        Row(
-            modifier = Modifier.constrainAs(rowOrderType) {
-                top.linkTo(rowTitle.bottom, Dimens.mediumMargin)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }, verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                onClick = {
-                    event(OrderEvent.OrderTypeClickEvent(true))
-                },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (state.isDelivery) CopperRed else GainsBoro
-                )
-            ) {
-                Text(
-                    text = "Giao hàng",
-                    color = if (state.isDelivery) Color.White else DarkCharcoal2,
-                    style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle)
-                )
-            }
-            Button(
-                onClick = {
-                    event(OrderEvent.OrderTypeClickEvent(false))
-                },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!state.isDelivery) CopperRed else GainsBoro
-                )
-            ) {
-                Text(
-                    text = "Mang đi",
-                    color = if (!state.isDelivery) Color.White else DarkCharcoal2,
-                    style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle)
-                )
-            }
-        }
-        Column(modifier = Modifier.constrainAs(columnDeliveryInformation) {
-            top.linkTo(rowOrderType.bottom, Dimens.mediumMargin)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            width = Dimension.fillToConstraints
-        }) {
-            Text(
-                text = if (state.isDelivery) "Thông tin giao hàng" else "Tự đến lấy hàng",
-                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
-                color = DarkCharcoal2
-            )
-            Column(
-                modifier = Modifier
-                    .padding(top = Dimens.smallMargin)
-                    .clickable {
-                        if (state.isDelivery) {
-                            event(OrderEvent.SelectBottomSheetShowEvent(BottomSheetContent.BottomSheetUpdateInfoDelivery))
+        ConstraintLayout(
+            modifier = Modifier
+                .constrainAs(constraintLayout1) {
+                    top.linkTo(rowTitle.bottom, Dimens.mediumMargin)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())) {
+            if (state.listDrinkOrder?.isNotEmpty() == true) {
+                Box(
+                    modifier = Modifier
+                        .constrainAs(barDivide1) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
                         }
-                    }) {
-                if (state.isDelivery) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = state.listInformation?.get(0) ?: "",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                            color = DarkCharcoal2
+                        .height(Dimens.smallMargin)
+                        .background(GainsBoro)
+                )
+                Row(
+                    modifier = Modifier.constrainAs(rowOrderType) {
+                        top.linkTo(barDivide1.bottom, Dimens.mediumMargin)
+                        start.linkTo(parent.start, Dimens.mediumMargin)
+                        end.linkTo(parent.end, Dimens.mediumMargin)
+                        width = Dimension.fillToConstraints
+                    }, verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            event(OrderEvent.OrderTypeClickEvent(true))
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (state.isDelivery) CopperRed else GainsBoro
                         )
-                        Spacer(modifier = Modifier.weight(1f))
+                    ) {
                         Text(
-                            text = state.listInformation?.get(1).toString(),
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                            color = SpanishGray,
-                            modifier = Modifier.padding(top = Dimens.smallMargin)
+                            text = "Giao hàng",
+                            color = if (state.isDelivery) Color.White else DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            event(OrderEvent.OrderTypeClickEvent(false))
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (!state.isDelivery) CopperRed else GainsBoro
+                        )
+                    ) {
+                        Text(
+                            text = "Mang đi",
+                            color = if (!state.isDelivery) Color.White else DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle)
                         )
                     }
                 }
-                if (state.isDelivery) {
+                Column(modifier = Modifier.constrainAs(columnDeliveryInformation) {
+                    top.linkTo(rowOrderType.bottom, Dimens.mediumMargin)
+                    start.linkTo(parent.start, Dimens.mediumMargin)
+                    end.linkTo(parent.end, Dimens.mediumMargin)
+                    width = Dimension.fillToConstraints
+                }) {
                     Text(
-                        text = state.listInformation?.get(2).toString(),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                        color = SpanishGray
+                        text = if (state.isDelivery) "Thông tin giao hàng" else "Tự đến lấy hàng",
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
+                        color = DarkCharcoal2
                     )
-                } else {
-                    Text(
-                        text = state.addressShop,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                        color = SpanishGray,
-                        modifier = Modifier.clickable {
-                            event(OrderEvent.SelectShop)
+                    Column(
+                        modifier = Modifier
+                            .padding(top = Dimens.smallMargin)
+                            .clickable {
+                                if (state.isDelivery) {
+                                    event(OrderEvent.SelectBottomSheetShowEvent(BottomSheetContent.BottomSheetUpdateInfoDelivery))
+                                }
+                            }) {
+                        if (state.isDelivery) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = state.listInformation?.get(0) ?: "",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                    color = DarkCharcoal2
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = state.listInformation?.get(1).toString(),
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                    color = SpanishGray,
+                                    modifier = Modifier.padding(top = Dimens.smallMargin)
+                                )
+                            }
                         }
-                    )
+                        if (state.isDelivery) {
+                            Text(
+                                text = state.listInformation?.get(2).toString(),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                color = SpanishGray
+                            )
+                        } else {
+                            Text(
+                                text = state.shopName,
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                color = SpanishGray,
+                                modifier = Modifier.clickable {
+                                    onShopSelect()
+                                    event(OrderEvent.UpdateSelectModeEvent(true))
+                                }
+                            )
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .constrainAs(barDivide2) {
+                            top.linkTo(columnDeliveryInformation.bottom, Dimens.mediumMargin)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                        }
+                        .height(Dimens.smallMargin)
+                        .background(GainsBoro)
+                )
+                Column(
+                    modifier = Modifier.constrainAs(columnSelectedDrink) {
+                        top.linkTo(barDivide2.bottom, Dimens.mediumMargin)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                    }
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        Text(
+                            text = "Sản phẩm đã chọn",
+                            color = DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontSize = Dimens.sizeSubTitle
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "+ Thêm",
+                            color = CopperRed,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            modifier = Modifier.clickable {
+                                onAddMoreDrinkClick()
+                            }
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.padding(top = Dimens.mediumMargin)
+                    ) {
+                        state.listDrinkOrder.let { listDrinkOrder ->
+                            repeat(listDrinkOrder.size) { index ->
+                                DrinkOrderCard(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(), listDrinkOrder[index]
+                                )
+                                if (index != listDrinkOrder.size - 1) {
+                                    Box(
+                                        modifier = Modifier
+                                            .height(1.dp)
+                                            .background(GainsBoro)
+                                            .fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .constrainAs(barDivide3) {
+                            top.linkTo(columnSelectedDrink.bottom, Dimens.mediumMargin)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                        }
+                        .height(Dimens.smallMargin)
+                        .background(GainsBoro)
+                )
+            } else {
+                EmptyCart(
+                    Modifier
+                        .constrainAs(emptyCard) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxSize(), "Đặt đồ uống ngay thôi nào"
+                ) {
+                    onBackClick()
                 }
             }
         }
@@ -231,12 +350,19 @@ fun OrderScreen(
 @Composable
 fun OrderScreenPreview() {
     ClientTheme(dynamicColor = false) {
+        val drinkOrder = DrinkOrder(
+            "", "Bạc xỉu", "Nhỏ", listOf(
+                "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
+            ), "Bỏ ít đá", 1, 59000F
+        )
+        val listDrinkOrder = listOf<DrinkOrder>(drinkOrder, drinkOrder)
         OrderScreen(
             OrderState(
+                _listDrinkOrder = listDrinkOrder,
                 _listInformation = listOf(
                     "Linh Hoàng", "+84968674274", "Quận 12, Hồ Chí Minh"
                 )
-            ), {}) {}
+            ), {}, {}, {}) {}
     }
 }
 

@@ -5,7 +5,7 @@ include "Connect.php";
 $page = $_POST["page"];
 $limit = $_POST["pageSize"];
 $offset = ($page - 1) * $limit;
-$query = "SELECT 
+$query = "SELECT drink.id,
     drink.name,
     picture,
     ROUND(AVG(feedback.star), 1) AS star,

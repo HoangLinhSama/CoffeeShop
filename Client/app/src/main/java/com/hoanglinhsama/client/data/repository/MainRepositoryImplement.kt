@@ -8,6 +8,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.hoanglinhsama.client.data.mapper.toUserDomain
 import com.hoanglinhsama.client.data.model.Result
+import com.hoanglinhsama.client.data.model.UniqueResult
 import com.hoanglinhsama.client.data.source.paging.DrinkCategoryPagingSource
 import com.hoanglinhsama.client.data.source.paging.DrinkPagingSource
 import com.hoanglinhsama.client.data.source.paging.ShopPagingSource
@@ -16,6 +17,7 @@ import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
+import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
@@ -103,4 +105,25 @@ class MainRepositoryImplement @Inject constructor(
             }).flow
     }
 
+    override fun createTempOrder(
+        picture: String,
+        name: String,
+        size: String?,
+        listTopping: List<String>?,
+        noteOrder: String,
+        countDrink: Int,
+        totalPrice: Float,
+    ): Flow<UniqueResult<DrinkOrder>> {
+        return flow {
+            emit(UniqueResult(result = Result.Loading))
+            try {
+                val order = DrinkOrder(
+                    picture, name, size, listTopping, noteOrder, countDrink, totalPrice
+                )
+                emit(UniqueResult(result = Result.Success(order)))
+            } catch (e: Exception) {
+                emit(UniqueResult(result = Result.Error(e)))
+            }
+        }
+    }
 }

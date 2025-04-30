@@ -291,7 +291,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateAddressEvent(it))
                 },
-                maxLines = 2,
+                maxLines = 3,
                 modifier = Modifier
                     .constrainAs(textFieldAddress) {
                         top.linkTo(textFieldLastName.bottom, Dimens.mediumMargin)

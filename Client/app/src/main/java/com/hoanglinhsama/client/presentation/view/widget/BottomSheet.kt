@@ -127,6 +127,7 @@ fun BottomSheetOtp(
                             }
                         }
                     },
+                    maxLines = 1,
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(Dimens.roundedCornerSize))
@@ -282,6 +283,7 @@ fun BottomSheetUpdateInfoDelivery(
             onValueChange = {
                 onValueChange(0, it)
             },
+            maxLines = 1,
             modifier = Modifier
                 .padding(top = Dimens.mediumMargin)
                 .clip(RoundedCornerShape(Dimens.roundedCornerSize))
@@ -327,6 +329,7 @@ fun BottomSheetUpdateInfoDelivery(
             onValueChange = {
                 onValueChange(1, it)
             },
+            maxLines = 1,
             modifier = Modifier
                 .padding(top = Dimens.mediumMargin)
                 .clip(RoundedCornerShape(Dimens.roundedCornerSize))
@@ -372,6 +375,7 @@ fun BottomSheetUpdateInfoDelivery(
             onValueChange = {
                 onValueChange(2, it)
             },
+            maxLines = 3,
             modifier = Modifier
                 .padding(top = Dimens.mediumMargin)
                 .clip(RoundedCornerShape(Dimens.roundedCornerSize))

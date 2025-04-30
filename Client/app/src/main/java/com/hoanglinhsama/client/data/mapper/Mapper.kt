@@ -81,6 +81,7 @@ fun Onboarding.toOnboardingDomain(): com.hoanglinhsama.client.domain.model.Onboa
 
 fun Shop.toShopDomain(): com.hoanglinhsama.client.domain.model.Shop {
     return com.hoanglinhsama.client.domain.model.Shop(
+        this.id,
         this.name,
         this.picture,
         this.address,

@@ -45,10 +45,11 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun ShopScreen(
+    isSelectMode: Boolean,
     state: ShopState,
     event: (ShopEvent) -> Unit,
     onMapClick: () -> Unit,
-    onShopClick: () -> Unit,
+    onShopClick: (Boolean, Shop) -> Unit,
 ) {
     val itemsShop = state.itemsShop?.collectAsLazyPagingItems()
     ConstraintLayout(
@@ -144,9 +145,11 @@ fun ShopScreen(
                         ) {
                             items(itemsShop.itemCount) {
                                 itemsShop[it]?.let { shop ->
-                                    ShopCard(Modifier.height(140.dp), shop) {
-                                        onShopClick()
-                                    }
+                                    ShopCard(
+                                        Modifier.height(140.dp),
+                                        shop,
+                                        onShopClick = { onShopClick(isSelectMode, shop) }
+                                    )
                                 }
                             }
                         }
@@ -162,6 +165,7 @@ fun ShopScreen(
 fun ShopScreenPreview() {
     ClientTheme(dynamicColor = false) {
         val shop = Shop(
+            1,
             "HCM Nguyễn Ảnh Thủ",
             "",
             "93/5 Nguyễn Ảnh Thủ, Huyện Hóc Môn, Hồ Chí Minh, Việt Nam",
@@ -170,6 +174,11 @@ fun ShopScreenPreview() {
         )
         val listShop = listOf(shop, shop, shop)
         val mockShopPagingData = PagingData.from(listShop)
-        ShopScreen(ShopState(_itemsShop = flowOf(mockShopPagingData)), {}, {}) {}
+        ShopScreen(
+            false,
+            ShopState(_itemsShop = flowOf(mockShopPagingData)),
+            {},
+            {}) { isSelectMode, idShop ->
+        }
     }
 }

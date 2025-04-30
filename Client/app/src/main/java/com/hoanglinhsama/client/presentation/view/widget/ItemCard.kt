@@ -36,13 +36,16 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
+import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkSlateGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
+import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import java.text.DecimalFormat
 
 @Composable
@@ -228,7 +231,7 @@ fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit)
             .clip(RoundedCornerShape(Dimens.roundedCornerSize))
             .background(Color.White)
             .clickable {
-                onShopClick
+                onShopClick()
             }, verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -260,7 +263,7 @@ fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit)
         ) {
             Text(
                 text = shop.name,
-                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubtitle),
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
                 color = DarkCharcoal2,
             )
             Text(
@@ -274,11 +277,108 @@ fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit)
     }
 }
 
+@Composable
+fun DrinkOrderCard(modifier: Modifier = Modifier, drinkOrder: DrinkOrder) {
+    val formatter = DecimalFormat("#,###")
+    Row(
+        modifier = modifier.background(Cultured), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = Dimens.smallMargin,
+                    bottom = Dimens.smallMargin,
+                    start = Dimens.mediumMargin,
+                )
+                .weight(1f)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = Dimens.smallMargin / 2)
+            ) {
+                Text(
+                    text = "${drinkOrder.count}x ",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = DarkCharcoal2
+                )
+                Text(
+                    text = drinkOrder.name,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = DarkCharcoal2
+                )
+            }
+            if (drinkOrder.listTopping != null) {
+                repeat(drinkOrder.listTopping.size) {
+                    Text(
+                        text = drinkOrder.listTopping[it],
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Normal
+                        ),
+                        color = SpanishGray,
+                    )
+                }
+            }
+            if (drinkOrder.note != "") {
+                Text(
+                    text = drinkOrder.note,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Normal
+                    ),
+                    color = SpanishGray,
+                    modifier = Modifier.padding(top = Dimens.smallMargin / 2)
+                )
+            }
+        }
+        if (drinkOrder.size != null) {
+            Text(
+                text = drinkOrder.size,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                color = SpanishGray,
+                modifier = Modifier.padding(start = Dimens.smallMargin)
+            )
+        }
+        Text(
+            text = drinkOrder.price.let { formatter.format(it) } + "đ",
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Normal
+            ),
+            color = DarkCharcoal2,
+            modifier = Modifier.padding(
+                top = Dimens.smallMargin,
+                bottom = Dimens.smallMargin,
+                start = Dimens.smallMargin,
+                end = Dimens.mediumMargin
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DrinkOrderCardPreview() {
+    ClientTheme(dynamicColor = false) {
+        val drinkOrder = DrinkOrder(
+            "", "Bạc xỉu", "Nhỏ", listOf(
+                "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
+            ), "Bỏ ít đá", 1, 59000F
+        )
+        DrinkOrderCard(
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(), drinkOrder
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ShopCardPreview() {
     ClientTheme(dynamicColor = false) {
         val shop = Shop(
+            1,
             "HCM Nguyễn Ảnh Thủ",
             "",
             "93/5 Nguyễn Ảnh Thủ, Huyện Hóc Môn, Hồ Chí Minh, Việt Nam",
@@ -314,7 +414,7 @@ val toppingPrice = mapOf<String, Int>(
     "Sốt Caramel" to 10000
 )
 val drink = Drink(
-    1, "Bạc Sỉu", priceSize, "", 5F, "", toppingPrice, 1
+    1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1
 )
 
 @Preview(showBackground = true)

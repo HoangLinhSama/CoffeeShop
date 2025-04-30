@@ -48,6 +48,7 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.screen.OrderScreen
@@ -60,10 +61,12 @@ import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OrderViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.ShopViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainNavigator() {
+    val orderViewModel: OrderViewModel = hiltViewModel()
     val bottomNavigationItems = remember {
         listOf(
             BottomNavigationItem(R.drawable.ic_home, "Home"),
@@ -86,11 +89,10 @@ fun MainNavigator() {
     }
     val isBottomBarVisible = remember(key1 = currentBackStackEntry) {
         currentBackStackEntry?.destination?.route == Route.HomeScreen.route ||
-                currentBackStackEntry?.destination?.route == Route.ShopScreen.route ||
+                (currentBackStackEntry?.destination?.route == Route.ShopScreen.route && !orderViewModel.state.value.shopScreenIsSelectMode) ||
                 currentBackStackEntry?.destination?.route == Route.PromotionScreen.route ||
                 currentBackStackEntry?.destination?.route == Route.OtherScreen.route
     }
-    val orderViewModel: OrderViewModel = hiltViewModel()
     Scaffold(
         Modifier.fillMaxSize(),
         bottomBar = {
@@ -169,7 +171,7 @@ fun MainNavigator() {
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    orderViewModel.state.value.listOrder?.let {
+                    orderViewModel.state.value.listDrinkOrder?.let {
                         if (it.isNotEmpty()) {
                             Box(
                                 modifier = Modifier
@@ -179,8 +181,9 @@ fun MainNavigator() {
                                     .align(Alignment.TopEnd),
                                 contentAlignment = Alignment.Center
                             ) {
+                                val totalCount = it.sumOf { it.count }
                                 Text(
-                                    text = it.size.toString(),
+                                    text = totalCount.toString(),
                                     color = CopperRed,
                                     style = MaterialTheme.typography.labelSmall
                                 )
@@ -231,14 +234,35 @@ fun MainNavigator() {
                 OtherScreen(otherViewModel.state.value, otherViewModel::onEvent)
             }
             composable(route = Route.OrderScreen.route) {
-                OrderScreen(orderViewModel.state.value, orderViewModel::onEvent) {
+                val result =
+                    navController.currentBackStackEntry?.savedStateHandle?.get<Shop>("shop")
+                result?.let {
+                    orderViewModel.onEvent(OrderEvent.UpdateSelectShopEvent(it, false))
+                }
+                OrderScreen(orderViewModel.state.value, orderViewModel::onEvent, {
+                    navController.popBackStack()
+                }, {
+                    navController.navigate(Route.ShopScreen.route)
+                }) {
                     navController.popBackStack()
                 }
             }
             composable(route = Route.ShopScreen.route) {
                 val shopViewModel: ShopViewModel = hiltViewModel()
-                ShopScreen(shopViewModel.state.value, shopViewModel::onEvent, {}) {
-
+                ShopScreen(
+                    orderViewModel.state.value.shopScreenIsSelectMode,
+                    shopViewModel.state.value,
+                    shopViewModel::onEvent,
+                    {}) { isSelectMode, shop ->
+                    if (isSelectMode) {
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "shop",
+                            shop
+                        )
+                        navController.popBackStack()
+                    } else {
+                        // TODO ("Deploy DetailShopScreen)
+                    }
                 }
             }
         }
