@@ -457,13 +457,15 @@ fun DetailDrinkScreen(
                         }
                     event(
                         DetailDrinkEvent.OrderEvent(
+                            drink.id,
                             drink.picture,
                             drink.name,
                             totalPrice,
                             size,
-                            listToppingChecked
+                            listToppingChecked,
                         )
                     )
+                    event(DetailDrinkEvent.SendUpdateDrinkOrderEvent(drink))
                     onBackClick()
                 },
                 modifier = Modifier

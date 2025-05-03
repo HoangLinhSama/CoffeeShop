@@ -106,6 +106,7 @@ class MainRepositoryImplement @Inject constructor(
     }
 
     override fun createTempOrder(
+        id: Int,
         picture: String,
         name: String,
         size: String?,
@@ -118,7 +119,7 @@ class MainRepositoryImplement @Inject constructor(
             emit(UniqueResult(result = Result.Loading))
             try {
                 val order = DrinkOrder(
-                    picture, name, size, listTopping, noteOrder, countDrink, totalPrice
+                    id, picture, name, size, listTopping, noteOrder, countDrink, totalPrice
                 )
                 emit(UniqueResult(result = Result.Success(order)))
             } catch (e: Exception) {

@@ -18,17 +18,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -38,32 +45,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.hoanglinhsama.client.R
+import com.hoanglinhsama.client.domain.model.Drink
+import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.Policies
 import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
+import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
 import com.hoanglinhsama.client.presentation.view.ui.theme.LightCopperRed
+import com.hoanglinhsama.client.presentation.view.ui.theme.Platinum
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
+import java.text.DecimalFormat
 
 @Composable
 fun BottomSheetOtp(
@@ -439,6 +455,345 @@ fun BottomSheetUpdateInfoDelivery(
     }
 }
 
+@Composable
+fun BottomSheetUpdateTempOrder(
+    drink: Drink,
+    drinkOrder: DrinkOrder,
+    modifier: Modifier = Modifier,
+    isFocus: Boolean,
+    focusChangeEvent: (Boolean) -> Unit,
+    onValueChange: (String) -> Unit,
+    onUpdateSize: (String) -> Unit,
+    onUpdateTopping: (Int, Boolean) -> Unit,
+    onUpdateDrinkCount: (Int) -> Unit,
+    onConfirmInfo: () -> Unit,
+) {
+    val formatter = DecimalFormat("#,###")
+    val focusManager = LocalFocusManager.current
+    Box(modifier = modifier.background(Cultured)) {
+        Column {
+            Text(
+                text = drink.name,
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle),
+                color = DarkCharcoal2,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(
+                        top = Dimens.mediumMargin,
+                        start = Dimens.mediumMargin,
+                        end = Dimens.mediumMargin
+                    )
+            )
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = Dimens.mediumMargin)
+                        .height(Dimens.smallMargin)
+                        .background(GainsBoro)
+                        .fillMaxWidth()
+                )
+                if (drink.priceSize!!.keys.toList()[0] != " ") {
+                    Text(
+                        text = "Size",
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
+                        color = DarkCharcoal2,
+                        modifier = Modifier
+                            .padding(
+                                top = Dimens.mediumMargin,
+                                start = Dimens.mediumMargin,
+                                end = Dimens.mediumMargin
+                            )
+                    )
+                    Column(
+                        modifier = Modifier.padding(
+                            top = Dimens.smallMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        repeat(drink.priceSize.size) { index ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = drink.priceSize.keys.toList()[index] == drinkOrder.size,
+                                    onClick = {
+                                        onUpdateSize(drink.priceSize.keys.toList()[index])
+                                    },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = CopperRed,
+                                        unselectedColor = SpanishGray,
+                                    )
+                                )
+                                Text(
+                                    text = drink.priceSize.keys.toList()[index],
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                    color = DarkCharcoal2,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = drink.priceSize.values.toList()[index].let {
+                                        formatter.format(
+                                            it
+                                        )
+                                    } + "đ",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                    color = DarkCharcoal2
+                                )
+                            }
+                            if (index != drink.priceSize.size - 1) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(1.dp)
+                                        .background(GainsBoro)
+                                        .fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(top = Dimens.mediumMargin)
+                            .height(Dimens.smallMargin)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
+                    if (drink.toppingPrice != null) {
+                        Text(
+                            text = "Topping",
+                            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
+                            color = DarkCharcoal2,
+                            modifier = Modifier
+                                .padding(
+                                    top = Dimens.mediumMargin,
+                                    start = Dimens.mediumMargin,
+                                    end = Dimens.mediumMargin
+                                )
+                        )
+                        Column(
+                            modifier = Modifier.padding(
+                                top = Dimens.smallMargin,
+                                start = Dimens.mediumMargin,
+                                end = Dimens.mediumMargin
+                            )
+                        ) {
+                            repeat(drink.toppingPrice.size) { index ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = drinkOrder.listTopping?.contains(drink.toppingPrice.keys.toList()[index]) == true,
+                                        onCheckedChange = { isChecked ->
+                                            onUpdateTopping(index, isChecked)
+                                        },
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = CopperRed,
+                                            uncheckedColor = SpanishGray
+                                        )
+                                    )
+                                    Text(
+                                        text = drink.toppingPrice.keys.toList()[index],
+                                        modifier = Modifier.weight(1f),
+                                        color = DarkCharcoal2,
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
+                                    )
+                                    Text(
+                                        text = drink.toppingPrice.values.toList()[index].let {
+                                            formatter.format(
+                                                it
+                                            )
+                                        } + " đ",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                        color = DarkCharcoal2
+                                    )
+                                }
+                                if (index != drink.priceSize.size - 1) {
+                                    Box(
+                                        modifier = Modifier
+                                            .height(1.dp)
+                                            .background(GainsBoro)
+                                            .fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(top = Dimens.mediumMargin)
+                                .height(Dimens.smallMargin)
+                                .background(GainsBoro)
+                                .fillMaxWidth()
+                        )
+                        TextField(
+                            value = drinkOrder.note,
+                            onValueChange = {
+                                onValueChange(it)
+                            },
+                            maxLines = 3,
+                            modifier = Modifier
+                                .padding(
+                                    top = Dimens.mediumMargin,
+                                    start = Dimens.mediumMargin,
+                                    end = Dimens.mediumMargin,
+                                    bottom = 150.dp
+                                )
+                                .clip(RoundedCornerShape(Dimens.roundedCornerSize))
+                                .border(
+                                    width = 1.dp,
+                                    color = if (isFocus) CopperRed else GainsBoro,
+                                    shape = RoundedCornerShape(Dimens.roundedCornerSize)
+                                )
+                                .onFocusChanged {
+                                    focusChangeEvent(it.isFocused)
+                                }
+                                .fillMaxWidth(),
+                            textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                            placeholder = {
+                                Text(
+                                    text = "Thêm ghi chú"
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(painterResource(R.drawable.ic_note), contentDescription = null)
+                            },
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = DarkCharcoal2,
+                                unfocusedTextColor = DarkCharcoal2,
+                                focusedPlaceholderColor = SpanishGray,
+                                unfocusedPlaceholderColor = SpanishGray,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = CopperRed,
+                                focusedContainerColor = LightCopperRed,
+                                unfocusedContainerColor = GainsBoro,
+                                focusedLeadingIconColor = CopperRed,
+                                unfocusedLeadingIconColor = SpanishGray
+                            ), keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(onDone = {
+                                focusManager.clearFocus()
+                            })
+                        )
+                    }
+
+                }
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(
+                    RoundedCornerShape(
+                        topStart = Dimens.mediumMargin,
+                        topEnd = Dimens.mediumMargin
+                    )
+                )
+                .height(100.dp)
+                .align(Alignment.BottomCenter)
+                .background(Color.White)
+                .shadow(
+                    elevation = 24.dp,
+                    spotColor = Platinum,
+                    ambientColor = Platinum
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(0.5f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_minus),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = Dimens.mediumMargin)
+                        .size(Dimens.mediumMargin)
+                        .border(
+                            width = 1.dp,
+                            color = GainsBoro,
+                            shape = RoundedCornerShape(3.dp)
+                        )
+                        .clickable {
+                            if (drinkOrder.count > 1) {
+                                onUpdateDrinkCount(drinkOrder.count - 1)
+                            }
+                        },
+                    tint = if (drinkOrder.count == 1) GainsBoro else CopperRed
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = drinkOrder.count.toString(),
+                    color = DarkCharcoal2,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    painterResource(R.drawable.ic_plus),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(Dimens.mediumMargin)
+                        .border(
+                            width = 1.dp,
+                            color = GainsBoro,
+                            shape = RoundedCornerShape(3.dp)
+                        )
+                        .clickable {
+                            onUpdateDrinkCount(drinkOrder.count + 1)
+                        },
+                    tint = CopperRed
+                )
+            }
+            Spacer(modifier = Modifier.padding(end = Dimens.mediumMargin))
+            IconButton(
+                onClick = {
+                    onConfirmInfo()
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(Dimens.roundedCornerSize))
+                    .background(CopperRed)
+                    .weight(0.5f)
+                    .height(Dimens.buttonHeight),
+            ) {
+                Text(
+                    text = drinkOrder.price.let { formatter.format(it) + " đ" },
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.padding(end = Dimens.mediumMargin))
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun BottomSheetUpdateTempOrderPreview() {
+    ClientTheme(dynamicColor = false) {
+        val priceSize = mapOf<String, Int>("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
+        val toppingPrice = mapOf<String, Int>(
+            "Shot Espresso" to 10000,
+            "Trân châu trắng" to 10000,
+            "Sốt Caramel" to 10000
+        )
+        val drink = Drink(
+            1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1
+        )
+        val drinkOrder = DrinkOrder(
+            1,
+            "", "Bạc xỉu", "Nhỏ", listOf(
+                "Shot Espresso", "Sốt Caramel"
+            ), "", 2, 98000F
+        )
+        BottomSheetUpdateTempOrder(
+            drink,
+            drinkOrder,
+            Modifier.fillMaxSize(),
+            false,
+            {},
+            {},
+            {},
+            { index, isSelect -> }, {}) {}
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetOtpPreview() {
@@ -480,7 +835,8 @@ fun BottomSheetPolicyPreview() {
                 "Ứng dụng thu thập thông tin như họ tên, số điện thoại, email, địa chỉ khi khách hàng đăng ký tài khoản hoặc đặt hàng.\n" + "Các thông tin này chỉ được sử dụng để phục vụ nhu cầu mua hàng, giao hàng, chăm sóc khách hàng và cải thiện dịch vụ.\n" + "Dữ liệu cá nhân của khách hàng được mã hóa và lưu trữ an toàn.\n" + "Ứng dụng không chia sẻ thông tin người dùng với bên thứ ba mà không có sự đồng ý của họ."
             )
         )
-        val mockPolicyPagingData = flowOf(PagingData.from(listPolicy)).collectAsLazyPagingItems()
+        val mockPolicyPagingData =
+            flowOf(PagingData.from(listPolicy)).collectAsLazyPagingItems()
         BottomSheetPolicy(mockPolicyPagingData, Modifier.fillMaxWidth())
     }
 }

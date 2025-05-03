@@ -21,6 +21,7 @@ interface MainRepository {
     suspend fun logOut()
     fun getShop(): Flow<PagingData<Shop>>
     fun createTempOrder(
+        id:Int,
         picture: String,
         name: String,
         size: String?,

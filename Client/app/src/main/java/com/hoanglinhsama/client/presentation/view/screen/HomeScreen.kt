@@ -118,9 +118,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(
-                            onClick = { state.user?.let { event(HomeEvent.AvatarClickEvent(it)) } }
-                        )
-                ) {
+                            onClick = { state.user?.let { event(HomeEvent.AvatarClickEvent(it)) } })) {
                     AsyncImage(
                         modifier = Modifier.size(40.dp),
                         model = state.user?.image,
@@ -136,8 +134,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                    onClick = { event(HomeEvent.NotificationClickEvent) }
-                ) {
+                    onClick = { event(HomeEvent.NotificationClickEvent) }) {
                     Icon(
                         Icons.Outlined.Notifications,
                         contentDescription = null,
@@ -156,8 +153,7 @@ fun HomeScreen(
                                 )
                             }
                         }
-                    }
-                ) {
+                    }) {
                     Icon(
                         Icons.Outlined.FavoriteBorder,
                         contentDescription = null,
@@ -183,13 +179,11 @@ fun HomeScreen(
                 "Tìm đồ uống",
                 true,
                 {},
-                {}
-            ) {
+                {}) {
 
             }
             Box(
-                modifier = Modifier
-                    .constrainAs(promotionCard) {
+                modifier = Modifier.constrainAs(promotionCard) {
                         top.linkTo(rowSearch.bottom, Dimens.mediumMargin)
                         start.linkTo(parent.start, Dimens.mediumMargin)
                         end.linkTo(parent.end, Dimens.mediumMargin)
@@ -197,8 +191,7 @@ fun HomeScreen(
                     }) {
                 itemsVoucher?.let {
                     if (handlePagingResult(
-                            items = it,
-                            Modifier
+                            items = it, Modifier
                                 .height(140.dp)
                                 .fillMaxWidth()
                         ) {
@@ -227,8 +220,7 @@ fun HomeScreen(
                                         selectedPage = currentIndex,
                                         onVoucherClick = {
                                             event(HomeEvent.VoucherClickEvent)
-                                        }
-                                    )
+                                        })
                                 }
                             }
                         }
@@ -242,15 +234,14 @@ fun HomeScreen(
                 end.linkTo(parent.end)
             })
         }
-        ConstraintLayout(
-            modifier = Modifier
-                .background(Cultured)
-                .constrainAs(constraintLayout2) {
-                    top.linkTo(constraintLayout1.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .fillMaxSize()) {
+        ConstraintLayout(modifier = Modifier
+            .background(Cultured)
+            .constrainAs(constraintLayout2) {
+                top.linkTo(constraintLayout1.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .fillMaxSize()) {
             val (drinkCategoryLazyRow, drinkLazyVerticalGrid) = createRefs()
             Box(modifier = Modifier.constrainAs(drinkCategoryLazyRow) {
                 top.linkTo(spacer.bottom, Dimens.mediumMargin)
@@ -290,8 +281,7 @@ fun HomeScreen(
                                 onClick = {
                                     event(
                                         HomeEvent.DrinkCategoryClickEvent(
-                                            itemsDrinkCategory[it]!!.name,
-                                            it
+                                            itemsDrinkCategory[it]!!.name, it
                                         )
                                     )
                                 },
@@ -315,16 +305,14 @@ fun HomeScreen(
                 }
             }
             Column(
-                modifier = Modifier
-                    .constrainAs(drinkLazyVerticalGrid) {
+                modifier = Modifier.constrainAs(drinkLazyVerticalGrid) {
                         top.linkTo(drinkCategoryLazyRow.bottom, Dimens.mediumMargin)
                         start.linkTo(parent.start, Dimens.mediumMargin)
                         end.linkTo(parent.end, Dimens.mediumMargin)
                         width = Dimension.fillToConstraints
                     }) {
                 if (handlePagingResult(
-                        itemsDrink!!,
-                        Modifier.aspectRatio(1f)
+                        itemsDrink!!, Modifier.aspectRatio(1f)
                     ) {
                         Column {
                             repeat(2) {
@@ -359,8 +347,7 @@ fun HomeScreen(
                             DrinkCard(
                                 drink = itemsDrink[it]!!, onDrinkClick = {
                                     onDrinkClick(it)
-                                }
-                            ) {
+                                }) {
                                 event(HomeEvent.QuickOderClickEvent(it))
                             }
                         }
@@ -397,9 +384,6 @@ fun HomeScreenPreview() {
                 flowOf(mockCategoryPagingData),
                 flowOf(mockDrinkPagingData),
                 User(1, "Linh", "", "", "", "")
-            ),
-            event = {},
-            onSearchClick = {}
-        ) {}
+            ), event = {}, onSearchClick = {}) {}
     }
 }

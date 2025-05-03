@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class CreateTempOrderUseCase @Inject constructor(private val mainRepository: MainRepository) {
     operator fun invoke(
+        id:Int,
         picture: String,
         name: String,
         size: String?,
@@ -17,6 +18,7 @@ class CreateTempOrderUseCase @Inject constructor(private val mainRepository: Mai
         totalPrice: Float,
     ): Flow<UniqueResult<DrinkOrder>> {
         return mainRepository.createTempOrder(
+            id,
             picture,
             name,
             size,

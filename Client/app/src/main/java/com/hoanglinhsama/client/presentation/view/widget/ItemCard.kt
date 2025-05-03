@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,14 +15,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,11 +46,13 @@ import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
-import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkSlateGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
+import com.kevinnzou.compose.swipebox.SwipeBox
+import com.kevinnzou.compose.swipebox.SwipeDirection
+import kotlinx.coroutines.DelicateCoroutinesApi
 import java.text.DecimalFormat
 
 @Composable
@@ -277,90 +284,161 @@ fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit)
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DrinkOrderCard(modifier: Modifier = Modifier, drinkOrder: DrinkOrder) {
-    val formatter = DecimalFormat("#,###")
-    Row(
-        modifier = modifier.background(Cultured), verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(
-                    top = Dimens.smallMargin,
-                    bottom = Dimens.smallMargin,
-                    start = Dimens.mediumMargin,
-                )
-                .weight(1f)
-        ) {
+fun DrinkOrderCard(
+    modifier: Modifier = Modifier,
+    drinkOrder: DrinkOrder,
+    currentIndexSwipe: Int,
+    index: Int,
+    onSwipeStarted: (Int) -> Unit,
+    onDeleteClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+) {
+    SwipeBox(
+        modifier = modifier.background(Color.White),
+        swipeDirection = SwipeDirection.EndToStart,
+        endContentWidth = 130.dp,
+        endContent = { swipeAbleState, endSwipeProgress ->
+            LaunchedEffect(currentIndexSwipe != index) {
+                swipeAbleState.animateTo(0)
+            }
+            LaunchedEffect(endSwipeProgress) {
+                if (endSwipeProgress > 0.1f) {
+                    onSwipeStarted(index)
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = Dimens.smallMargin / 2)
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(
+                        end = Dimens.mediumMargin,
+                        top = Dimens.smallMargin,
+                        bottom = Dimens.smallMargin
+                    )
             ) {
-                Text(
-                    text = "${drinkOrder.count}x ",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = DarkCharcoal2
-                )
-                Text(
-                    text = drinkOrder.name,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = DarkCharcoal2
-                )
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = Dimens.smallMargin)
+                        .background(
+                            SpanishGray,
+                            shape = RoundedCornerShape(Dimens.roundedCornerSize / 2)
+                        )
+                        .size(40.dp)
+                        .clickable {
+                            onDeleteClick()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.White
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .background(CopperRed, RoundedCornerShape(Dimens.roundedCornerSize / 2))
+                        .size(40.dp)
+                        .clickable {
+                            onUpdateClick()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit",
+                        tint = Color.White
+                    )
+                }
             }
-            if (drinkOrder.listTopping != null) {
-                repeat(drinkOrder.listTopping.size) {
+        }) { _, _, _ ->
+        val formatter = DecimalFormat("#,###")
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(
+                        top = Dimens.smallMargin,
+                        bottom = Dimens.smallMargin,
+                        start = Dimens.mediumMargin,
+                    )
+                    .weight(1f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = Dimens.smallMargin / 2)
+                ) {
                     Text(
-                        text = drinkOrder.listTopping[it],
+                        text = "${drinkOrder.count}x ",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = DarkCharcoal2
+                    )
+                    Text(
+                        text = drinkOrder.name,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = DarkCharcoal2
+                    )
+                }
+                if (drinkOrder.listTopping != null) {
+                    repeat(drinkOrder.listTopping.size) {
+                        Text(
+                            text = drinkOrder.listTopping[it],
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            color = SpanishGray,
+                        )
+                    }
+                }
+                if (drinkOrder.note != "") {
+                    Text(
+                        text = drinkOrder.note,
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Normal
                         ),
                         color = SpanishGray,
+                        modifier = Modifier.padding(top = Dimens.smallMargin / 2)
                     )
                 }
             }
-            if (drinkOrder.note != "") {
+            if (drinkOrder.size != null) {
                 Text(
-                    text = drinkOrder.note,
+                    text = drinkOrder.size,
                     style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Normal
                     ),
                     color = SpanishGray,
-                    modifier = Modifier.padding(top = Dimens.smallMargin / 2)
+                    modifier = Modifier.padding(start = Dimens.smallMargin)
                 )
             }
-        }
-        if (drinkOrder.size != null) {
             Text(
-                text = drinkOrder.size,
+                text = drinkOrder.price.let { formatter.format(it) } + "đ",
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 12.sp,
                     fontWeight = FontWeight.Normal
                 ),
-                color = SpanishGray,
-                modifier = Modifier.padding(start = Dimens.smallMargin)
+                color = DarkCharcoal2,
+                modifier = Modifier.padding(
+                    top = Dimens.smallMargin,
+                    bottom = Dimens.smallMargin,
+                    start = Dimens.smallMargin,
+                    end = Dimens.mediumMargin
+                )
             )
         }
-        Text(
-            text = drinkOrder.price.let { formatter.format(it) } + "đ",
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.Normal
-            ),
-            color = DarkCharcoal2,
-            modifier = Modifier.padding(
-                top = Dimens.smallMargin,
-                bottom = Dimens.smallMargin,
-                start = Dimens.smallMargin,
-                end = Dimens.mediumMargin
-            )
-        )
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Preview(showBackground = true)
 @Composable
 fun DrinkOrderCardPreview() {
     ClientTheme(dynamicColor = false) {
         val drinkOrder = DrinkOrder(
+            1,
             "", "Bạc xỉu", "Nhỏ", listOf(
                 "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
             ), "Bỏ ít đá", 1, 59000F
@@ -368,8 +446,7 @@ fun DrinkOrderCardPreview() {
         DrinkOrderCard(
             Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), drinkOrder
-        )
+                .wrapContentHeight(), drinkOrder, 1, 1, {}, {}) {}
     }
 }
 

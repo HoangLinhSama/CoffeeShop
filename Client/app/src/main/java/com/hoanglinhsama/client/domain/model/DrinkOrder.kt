@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.domain.model
 
 data class DrinkOrder(
+    private val _id: Int,
     private val _picture: String,
     private val _name: String,
     private val _size: String?,
@@ -9,6 +10,7 @@ data class DrinkOrder(
     private val _count: Int,
     private val _price: Float,
 ) {
+    val id = _id
     val picture = _picture
     val name = _name
     val size = _size

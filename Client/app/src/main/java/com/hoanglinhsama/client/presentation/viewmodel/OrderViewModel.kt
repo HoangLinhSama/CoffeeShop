@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetUserUseCase
+import com.hoanglinhsama.client.presentation.view.screen.BottomSheetContent
 import com.hoanglinhsama.client.presentation.viewmodel.common.TempOrderHolder
+import com.hoanglinhsama.client.presentation.viewmodel.common.UpdateDrinkOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OrderState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,12 +20,37 @@ class OrderViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getPhoneUseCase: GetPhoneUseCase,
 ) : ViewModel() {
+
     private val _state = mutableStateOf(OrderState())
     val state = _state
 
     init {
         getInfoDelivery()
         getTempOrder()
+        receiveUpdateDrinkOrder()
+    }
+
+    private fun receiveUpdateDrinkOrder() {
+        viewModelScope.launch {
+            UpdateDrinkOrderHolder.updateDrinkOrder.collect { drink ->
+                val listUpdateDrinkOrder = _state.value.listUpdateDrinkOrder?.toMutableList()
+                if (_state.value.listUpdateDrinkOrder?.isNotEmpty() == true) {
+                    val index = listUpdateDrinkOrder?.indexOfFirst {
+                        it.id == drink?.id
+                    }
+                    if (index == -1) {
+                        drink?.let {
+                            listUpdateDrinkOrder.add(it)
+                        }
+                    }
+                } else {
+                    drink?.let {
+                        listUpdateDrinkOrder?.add(it)
+                    }
+                }
+                _state.value = _state.value.copy(_listUpdateDrinkOrder = listUpdateDrinkOrder)
+            }
+        }
     }
 
     private fun getTempOrder() {
@@ -103,9 +130,9 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.FocusChangeEvent -> {
-                val listFocus = _state.value.listTextFieldFocus.toMutableList()
+                val listFocus = _state.value.listInfoDeliveryFocus.toMutableList()
                 listFocus[event.index] = event.isFocus
-                _state.value = _state.value.copy(_listTextFieldFocus = listFocus)
+                _state.value = _state.value.copy(_listInfoDeliveryFocus = listFocus)
             }
 
             is OrderEvent.UpdateSelectModeEvent -> {
@@ -118,6 +145,106 @@ class OrderViewModel @Inject constructor(
                     _shopScreenIsSelectMode = event.isSelectMode,
                     _shopId = event.shop.id
                 )
+            }
+
+            is OrderEvent.UpdateCurrentlySwipedIndexEvent -> {
+                _state.value = _state.value.copy(_currentlySwipedIndex = event.newIndex)
+            }
+
+            is OrderEvent.DeleteDrinkOrderEvent -> {
+                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
+                listDrinkOrder?.removeAt(event.index)
+                _state.value =
+                    _state.value.copy(_listDrinkOrder = listDrinkOrder, _currentlySwipedIndex = -1)
+            }
+
+            is OrderEvent.UpdateTempOrderEvent -> {
+                _state.value =
+                    _state.value.copy(
+                        _bottomSheet = BottomSheetContent.BottomSheetUpdateTempOrder,
+                        _showBottomSheet = true,
+                        _indexUpdateOrderDrink = event.indexDinkOrder,
+                        _currentlySwipedIndex = -1
+                    )
+            }
+
+            is OrderEvent.UpdateNoteFocusChangeEvent -> {
+                _state.value = _state.value.copy(_updateNoteFocus = event.isFocus)
+            }
+
+            is OrderEvent.UpdateNoteEvent -> {
+                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
+                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
+                updateDrinkOrder = updateDrinkOrder?.copy(_note = event.note)
+                updateDrinkOrder.let {
+                    it?.let { element ->
+                        listDrinkOrder?.set(
+                            state.value.indexUpdateOrderDrink,
+                            element
+                        )
+                    }
+                }
+                _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+            }
+
+            is OrderEvent.UpdateSizeEvent -> {
+                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
+                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
+                val priceSizeOld =
+                    event.drink.priceSize?.get(updateDrinkOrder?.size)!!
+                val priceSizeNew = event.drink.priceSize[event.size]!!
+                val newPrice =
+                    (priceSizeNew - priceSizeOld) * updateDrinkOrder!!.count + updateDrinkOrder.price
+                updateDrinkOrder =
+                    updateDrinkOrder.copy(_size = event.size, _price = newPrice)
+                updateDrinkOrder.let {
+                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
+                }
+                _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+            }
+
+            is OrderEvent.UpdateToppingEvent -> {
+                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
+                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
+                val listUpdateTopping = updateDrinkOrder?.listTopping?.toMutableList()
+                val listTopping = event.drink.toppingPrice?.keys?.toList()
+                val topping = listTopping?.get(event.index)
+                val totalToppingPriceOld = updateDrinkOrder?.listTopping?.sumOf {
+                    event.drink.toppingPrice?.get(it) ?: 0
+                } ?: 0
+                if (event.isSelect) {
+                    listUpdateTopping?.add(topping.toString())
+                } else {
+                    listUpdateTopping?.remove(topping.toString())
+                }
+                updateDrinkOrder =
+                    updateDrinkOrder?.copy(_listTopping = listUpdateTopping)
+                val totalToppingPriceNew = updateDrinkOrder?.listTopping?.sumOf {
+                    event.drink.toppingPrice?.get(it) ?: 0
+                } ?: 0
+                val price =
+                    (totalToppingPriceNew.minus(totalToppingPriceOld)).times(
+                        updateDrinkOrder?.count
+                            ?: 1
+                    )
+                        .plus(updateDrinkOrder!!.price)
+                updateDrinkOrder = updateDrinkOrder.copy(_price = price)
+                updateDrinkOrder.let {
+                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
+                }
+                _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+            }
+
+            is OrderEvent.UpdateCountDrinkEvent -> {
+                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
+                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
+                val price =
+                    (updateDrinkOrder!!.price / updateDrinkOrder.count) * event.quantity
+                updateDrinkOrder = updateDrinkOrder.copy(_price = price, _count = event.quantity)
+                updateDrinkOrder.let {
+                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
+                }
+                _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
             }
         }
     }

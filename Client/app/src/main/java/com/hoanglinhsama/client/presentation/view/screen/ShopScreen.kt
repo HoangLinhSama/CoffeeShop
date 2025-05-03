@@ -123,7 +123,9 @@ fun ShopScreen(
                 width = Dimension.fillToConstraints
             }) {
                 itemsShop?.let {
-                    if (handlePagingResult(it, Modifier.fillMaxWidth()) {
+                    if (handlePagingResult(it, Modifier
+                            .padding(bottom = 250.dp)
+                            .fillMaxSize()) {
                             Column {
                                 repeat(5) {
                                     ShopCardShimmerEffect(

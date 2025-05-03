@@ -1,5 +1,6 @@
 package com.hoanglinhsama.client.presentation.view.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,13 +46,19 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.widget.BottomSheetUpdateInfoDelivery
+import com.hoanglinhsama.client.presentation.view.widget.BottomSheetUpdateTempOrder
 import com.hoanglinhsama.client.presentation.view.widget.DrinkOrderCard
 import com.hoanglinhsama.client.presentation.view.widget.EmptyCart
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
+import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent.*
 import com.hoanglinhsama.client.presentation.viewmodel.state.OrderState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun OrderScreen(
     state: OrderState,
@@ -109,8 +117,7 @@ fun OrderScreen(
                             width = Dimension.fillToConstraints
                         }
                         .height(Dimens.smallMargin)
-                        .background(GainsBoro)
-                )
+                        .background(GainsBoro))
                 Row(
                     modifier = Modifier.constrainAs(rowOrderType) {
                         top.linkTo(barDivide1.bottom, Dimens.mediumMargin)
@@ -121,7 +128,7 @@ fun OrderScreen(
                 ) {
                     Button(
                         onClick = {
-                            event(OrderEvent.OrderTypeClickEvent(true))
+                            event(OrderTypeClickEvent(true))
                         },
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.weight(1f),
@@ -137,7 +144,7 @@ fun OrderScreen(
                     }
                     Button(
                         onClick = {
-                            event(OrderEvent.OrderTypeClickEvent(false))
+                            event(OrderTypeClickEvent(false))
                         },
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.weight(1f),
@@ -168,7 +175,7 @@ fun OrderScreen(
                             .padding(top = Dimens.smallMargin)
                             .clickable {
                                 if (state.isDelivery) {
-                                    event(OrderEvent.SelectBottomSheetShowEvent(BottomSheetContent.BottomSheetUpdateInfoDelivery))
+                                    event(SelectBottomSheetShowEvent(BottomSheetContent.BottomSheetUpdateInfoDelivery))
                                 }
                             }) {
                         if (state.isDelivery) {
@@ -200,9 +207,8 @@ fun OrderScreen(
                                 color = SpanishGray,
                                 modifier = Modifier.clickable {
                                     onShopSelect()
-                                    event(OrderEvent.UpdateSelectModeEvent(true))
-                                }
-                            )
+                                    event(UpdateSelectModeEvent(true))
+                                })
                         }
                     }
                 }
@@ -215,21 +221,17 @@ fun OrderScreen(
                             width = Dimension.fillToConstraints
                         }
                         .height(Dimens.smallMargin)
-                        .background(GainsBoro)
-                )
+                        .background(GainsBoro))
                 Column(
                     modifier = Modifier.constrainAs(columnSelectedDrink) {
                         top.linkTo(barDivide2.bottom, Dimens.mediumMargin)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
-                    }
-                ) {
+                    }) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(
-                            start = Dimens.mediumMargin,
-                            end = Dimens.mediumMargin
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                            start = Dimens.mediumMargin, end = Dimens.mediumMargin
                         )
                     ) {
                         Text(
@@ -248,8 +250,7 @@ fun OrderScreen(
                             ),
                             modifier = Modifier.clickable {
                                 onAddMoreDrinkClick()
-                            }
-                        )
+                            })
                     }
                     Column(
                         modifier = Modifier.padding(top = Dimens.mediumMargin)
@@ -259,8 +260,16 @@ fun OrderScreen(
                                 DrinkOrderCard(
                                     Modifier
                                         .fillMaxWidth()
-                                        .wrapContentHeight(), listDrinkOrder[index]
-                                )
+                                        .wrapContentHeight(),
+                                    listDrinkOrder[index],
+                                    state.currentlySwipedItemId,
+                                    index, { newIndex ->
+                                        event(UpdateCurrentlySwipedIndexEvent(newIndex))
+                                    }, {
+                                        event(DeleteDrinkOrderEvent(index))
+                                    }) {
+                                    event(UpdateTempOrderEvent(index))
+                                }
                                 if (index != listDrinkOrder.size - 1) {
                                     Box(
                                         modifier = Modifier
@@ -282,8 +291,7 @@ fun OrderScreen(
                             width = Dimension.fillToConstraints
                         }
                         .height(Dimens.smallMargin)
-                        .background(GainsBoro)
-                )
+                        .background(GainsBoro))
             } else {
                 EmptyCart(
                     Modifier
@@ -295,8 +303,7 @@ fun OrderScreen(
                             width = Dimension.fillToConstraints
                             height = Dimension.fillToConstraints
                         }
-                        .fillMaxSize(), "Đặt đồ uống ngay thôi nào"
-                ) {
+                        .fillMaxSize(), "Đặt đồ uống ngay thôi nào") {
                     onBackClick()
                 }
             }
@@ -308,8 +315,9 @@ fun OrderScreen(
             sheetState = bottomSheetState,
             containerColor = Color.White,
             onDismissRequest = {
-                event(OrderEvent.UpdateShowBottomSheetEvent(false))
+                event(UpdateShowBottomSheetEvent(false))
             },
+            dragHandle = null,
             content = {
                 when (state.bottomSheet) {
                     is BottomSheetContent.BottomSheetUpdateInfoDelivery -> {
@@ -318,17 +326,19 @@ fun OrderScreen(
                                 Modifier
                                     .fillMaxWidth()
                                     .height(630.dp),
-                                it, state.listTextFieldFocus,
+                                it,
+                                state.listInfoDeliveryFocus,
                                 { index, value ->
-                                    event(OrderEvent.UpdateInfoDeliveryEvent(index, value))
-                                }, { index, isFocus ->
-                                    event(OrderEvent.FocusChangeEvent(index, isFocus))
+                                    event(UpdateInfoDeliveryEvent(index, value))
+                                },
+                                { index, isFocus ->
+                                    event(FocusChangeEvent(index, isFocus))
                                 }) {
                                 coroutineScope.launch {
                                     bottomSheetState.hide()
                                 }.invokeOnCompletion {
                                     if (!bottomSheetState.isVisible) {
-                                        event(OrderEvent.UpdateShowBottomSheetEvent(false))
+                                        event(UpdateShowBottomSheetEvent(false))
                                     }
                                 }
                             }
@@ -339,10 +349,45 @@ fun OrderScreen(
 
                     }
 
+                    is BottomSheetContent.BottomSheetUpdateTempOrder -> {
+                        state.listDrinkOrder?.get(state.indexUpdateOrderDrink)
+                            ?.let { drinkOrder ->
+                                val drink =
+                                    state.listUpdateDrinkOrder?.find { it.id == drinkOrder.id }
+                                drink?.let { drink ->
+                                    BottomSheetUpdateTempOrder(
+                                        drink,
+                                        drinkOrder,
+                                        Modifier.fillMaxWidth(),
+                                        state.updateNoteFocus,
+                                        {
+                                            event(UpdateNoteFocusChangeEvent(it))
+                                        },
+                                        {
+                                            event(UpdateNoteEvent(it))
+                                        },
+                                        {
+                                            event(UpdateSizeEvent(it,drink))
+                                        }, { index, isSelected ->
+                                            event(UpdateToppingEvent(index, isSelected,drink))
+                                        }, {
+                                            event(UpdateCountDrinkEvent(it))
+                                        }) {
+                                        coroutineScope.launch {
+                                            bottomSheetState.hide()
+                                        }.invokeOnCompletion {
+                                            if (!bottomSheetState.isVisible) {
+                                                event(UpdateShowBottomSheetEvent(false))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+
                     null -> {}
                 }
-            }
-        )
+            })
     }
 }
 
@@ -351,6 +396,7 @@ fun OrderScreen(
 fun OrderScreenPreview() {
     ClientTheme(dynamicColor = false) {
         val drinkOrder = DrinkOrder(
+            1,
             "", "Bạc xỉu", "Nhỏ", listOf(
                 "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
             ), "Bỏ ít đá", 1, 59000F
@@ -358,15 +404,16 @@ fun OrderScreenPreview() {
         val listDrinkOrder = listOf<DrinkOrder>(drinkOrder, drinkOrder)
         OrderScreen(
             OrderState(
-                _listDrinkOrder = listDrinkOrder,
-                _listInformation = listOf(
+                _listDrinkOrder = listDrinkOrder, _listInformation = listOf(
                     "Linh Hoàng", "+84968674274", "Quận 12, Hồ Chí Minh"
                 )
             ), {}, {}, {}) {}
     }
 }
 
+
 sealed class BottomSheetContent {
     object BottomSheetUpdateInfoDelivery : BottomSheetContent()
     object BottomSheetPaymentMethod : BottomSheetContent()
+    object BottomSheetUpdateTempOrder : BottomSheetContent()
 }

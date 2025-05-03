@@ -124,5 +124,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     // Add the dependency for the Firebase Authentication library
-     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth")
+
+    //  Swipe Box
+    implementation("io.github.kevinnzou:compose-swipebox:1.4.0")
 }

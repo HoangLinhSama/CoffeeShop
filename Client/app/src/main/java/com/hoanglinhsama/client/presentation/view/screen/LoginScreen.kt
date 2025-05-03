@@ -82,6 +82,7 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     BottomSheetScaffold(
+        sheetDragHandle = null,
         modifier = Modifier.imePadding(),
         scaffoldState = bottomSheetState,
         sheetContainerColor = Color.White,

@@ -67,7 +67,7 @@ fun ErrorContent(modifier: Modifier, alphaAnim: Float, message: String) {
         )
         Text(
             modifier = Modifier
-                .padding(Dimens.mediumMargin)
+                .padding(10.dp)
                 .alpha(alphaAnim),
             text = message,
             style = MaterialTheme.typography.labelMedium

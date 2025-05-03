@@ -64,7 +64,7 @@ fun EmptyContent(modifier: Modifier, alphaAnim: Float, message: String, onClick:
         )
         Text(
             modifier = Modifier
-                .padding(Dimens.mediumMargin)
+                .padding(5.dp)
                 .alpha(alphaAnim),
             text = message,
             style = MaterialTheme.typography.labelMedium

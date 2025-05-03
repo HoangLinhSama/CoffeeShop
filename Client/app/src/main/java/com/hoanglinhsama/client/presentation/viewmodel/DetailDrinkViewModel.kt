@@ -1,12 +1,11 @@
 package com.hoanglinhsama.client.presentation.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.domain.usecase.main.CreateTempOrderUseCase
 import com.hoanglinhsama.client.presentation.viewmodel.common.TempOrderHolder
+import com.hoanglinhsama.client.presentation.viewmodel.common.UpdateDrinkOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.DetailDrinkEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.DetailDrinkState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +55,7 @@ class DetailDrinkViewModel @Inject constructor(
             is DetailDrinkEvent.OrderEvent -> {
                 viewModelScope.launch {
                     createTempOrderUseCase(
+                        event.id,
                         event.picture,
                         event.name,
                         event.size,
@@ -75,6 +75,10 @@ class DetailDrinkViewModel @Inject constructor(
 
             is DetailDrinkEvent.ReviewClickEvent -> {
 
+            }
+
+            is DetailDrinkEvent.SendUpdateDrinkOrderEvent -> {
+                UpdateDrinkOrderHolder.setUpdateDrinkOrder(event.drink)
             }
         }
     }
