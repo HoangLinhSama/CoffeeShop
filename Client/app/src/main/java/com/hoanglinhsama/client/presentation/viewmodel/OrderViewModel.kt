@@ -28,7 +28,35 @@ class OrderViewModel @Inject constructor(
         getInfoDelivery()
         getTempOrder()
         receiveUpdateDrinkOrder()
+//        calcFee()
     }
+
+//    private fun calcFee() {
+//        if (_state.value.listDrinkOrder?.isNotEmpty() == true && _state.value.listInformation != null) {
+//            val address = state.value.listInformation?.get(2)?.lowercase()
+//            val shippingFee = (if (!state.value.isDelivery) {
+//                0
+//            } else {
+//                if (
+//                    address?.contains("hồ chí minh") == true ||
+//                    address?.contains("ho chi minh") == true ||
+//                    address?.contains("hochiminh") == true ||
+//                    address?.contains("hcm") == true
+//                ) {
+//                    15000
+//                } else {
+//                    30000
+//                }
+//            }).toFloat()
+//            val disCount: Float = _state.value.disCount ?: 0F
+//            val totalPayment = subTotal?.plus(shippingFee)?.minus(disCount)
+//            _state.value = _state.value.copy(
+//                _subTotal = subTotal,
+//                _shippingFee = shippingFee,
+//                _totalPayment = totalPayment
+//            )
+//        }
+//    }
 
     private fun receiveUpdateDrinkOrder() {
         viewModelScope.launch {
@@ -61,11 +89,10 @@ class OrderViewModel @Inject constructor(
                     val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
                     if (_state.value.listDrinkOrder?.isNotEmpty() == true) {
                         val index = listDrinkOrder?.indexOfFirst { drinkOrder ->
-                            drinkOrder.name == data.name
+                            drinkOrder.id == data.id
                                     && drinkOrder.size == data.size
                                     && drinkOrder.listTopping == data.listTopping
                                     && drinkOrder.note == data.note
-                                    && drinkOrder.picture == data.picture
                         }
                         index?.let { index ->
                             if (index != -1) {
@@ -83,6 +110,7 @@ class OrderViewModel @Inject constructor(
                         listDrinkOrder?.add(data)
                     }
                     _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+                    updateSubTotal()
                 }
             }
         }
@@ -101,6 +129,7 @@ class OrderViewModel @Inject constructor(
                                     it.data.address
                                 )
                             )
+                            updateDeliveryFee()
                         }
                     }
                 }
@@ -108,10 +137,39 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    private fun updateSubTotal() {
+        val subTotal = _state.value.listDrinkOrder?.sumOf {
+            it.price.toInt()
+        }?.toFloat()
+        _state.value = _state.value.copy(_subTotal = subTotal)
+    }
+
+    private fun updateDeliveryFee() {
+        val address = state.value.listInformation?.get(2)?.lowercase()
+        val shippingFee = (if (!state.value.isDelivery) {
+            0
+        } else {
+            if (
+                address?.contains("hồ chí minh") == true ||
+                address?.contains("ho chi minh") == true ||
+                address?.contains("hochiminh") == true ||
+                address?.contains("hcm") == true
+            ) {
+                15000
+            } else {
+                30000
+            }
+        }).toFloat()
+        _state.value = _state.value.copy(
+            _shippingFee = shippingFee
+        )
+    }
+
     fun onEvent(event: OrderEvent) {
         when (event) {
             is OrderEvent.OrderTypeClickEvent -> {
                 _state.value = _state.value.copy(_isDelivery = event.isDelivery)
+                updateDeliveryFee()
             }
 
             is OrderEvent.SelectBottomSheetShowEvent -> {
@@ -123,6 +181,9 @@ class OrderViewModel @Inject constructor(
                 val listInformation = _state.value.listInformation?.toMutableList()
                 listInformation?.set(event.index, event.value)
                 _state.value = _state.value.copy(_listInformation = listInformation)
+                if (event.index == 2) {
+                    updateDeliveryFee()
+                }
             }
 
             is OrderEvent.UpdateShowBottomSheetEvent -> {
@@ -156,6 +217,7 @@ class OrderViewModel @Inject constructor(
                 listDrinkOrder?.removeAt(event.index)
                 _state.value =
                     _state.value.copy(_listDrinkOrder = listDrinkOrder, _currentlySwipedIndex = -1)
+                updateSubTotal()
             }
 
             is OrderEvent.UpdateTempOrderEvent -> {
@@ -201,6 +263,7 @@ class OrderViewModel @Inject constructor(
                     listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
                 }
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+                updateSubTotal()
             }
 
             is OrderEvent.UpdateToppingEvent -> {
@@ -233,6 +296,7 @@ class OrderViewModel @Inject constructor(
                     listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
                 }
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+                updateSubTotal()
             }
 
             is OrderEvent.UpdateCountDrinkEvent -> {
@@ -245,6 +309,7 @@ class OrderViewModel @Inject constructor(
                     listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
                 }
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+                updateSubTotal()
             }
         }
     }

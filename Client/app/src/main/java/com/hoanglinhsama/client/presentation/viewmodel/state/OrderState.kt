@@ -18,6 +18,10 @@ data class OrderState(
     private val _updateNoteFocus: Boolean = false,
     private val _indexUpdateOrderDrink: Int = -1,
     private val _listUpdateDrinkOrder: List<Drink>? = emptyList<Drink>(),
+    private val _subTotal: Float? = null,
+    private val _totalPayment: Float? = null,
+    private val _shippingFee: Float? = null,
+    private val _disCount: Float? = null,
 ) {
     val listDrinkOrder = _listDrinkOrder
     val isDelivery = _isDelivery
@@ -32,4 +36,8 @@ data class OrderState(
     val updateNoteFocus = _updateNoteFocus
     val indexUpdateOrderDrink = _indexUpdateOrderDrink
     val listUpdateDrinkOrder = _listUpdateDrinkOrder
+    val subTotal = _subTotal
+    val totalPayment = _totalPayment
+    val shippingFee = _shippingFee
+    val disCount = _disCount
 }

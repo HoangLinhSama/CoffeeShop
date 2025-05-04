@@ -556,124 +556,123 @@ fun BottomSheetUpdateTempOrder(
                             .background(GainsBoro)
                             .fillMaxWidth()
                     )
-                    if (drink.toppingPrice != null) {
-                        Text(
-                            text = "Topping",
-                            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
-                            color = DarkCharcoal2,
-                            modifier = Modifier
-                                .padding(
-                                    top = Dimens.mediumMargin,
-                                    start = Dimens.mediumMargin,
-                                    end = Dimens.mediumMargin
-                                )
-                        )
-                        Column(
-                            modifier = Modifier.padding(
-                                top = Dimens.smallMargin,
+                }
+                if (drink.toppingPrice != null && drink.toppingPrice.isNotEmpty()) {
+                    Text(
+                        text = "Topping",
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
+                        color = DarkCharcoal2,
+                        modifier = Modifier
+                            .padding(
+                                top = Dimens.mediumMargin,
                                 start = Dimens.mediumMargin,
                                 end = Dimens.mediumMargin
                             )
-                        ) {
-                            repeat(drink.toppingPrice.size) { index ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Checkbox(
-                                        checked = drinkOrder.listTopping?.contains(drink.toppingPrice.keys.toList()[index]) == true,
-                                        onCheckedChange = { isChecked ->
-                                            onUpdateTopping(index, isChecked)
-                                        },
-                                        colors = CheckboxDefaults.colors(
-                                            checkedColor = CopperRed,
-                                            uncheckedColor = SpanishGray
+                    )
+                    Column(
+                        modifier = Modifier.padding(
+                            top = Dimens.smallMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        repeat(drink.toppingPrice.size) { index ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = drinkOrder.listTopping?.contains(drink.toppingPrice.keys.toList()[index]) == true,
+                                    onCheckedChange = { isChecked ->
+                                        onUpdateTopping(index, isChecked)
+                                    },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = CopperRed,
+                                        uncheckedColor = SpanishGray
+                                    )
+                                )
+                                Text(
+                                    text = drink.toppingPrice.keys.toList()[index],
+                                    modifier = Modifier.weight(1f),
+                                    color = DarkCharcoal2,
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
+                                )
+                                Text(
+                                    text = drink.toppingPrice.values.toList()[index].let {
+                                        formatter.format(
+                                            it
                                         )
-                                    )
-                                    Text(
-                                        text = drink.toppingPrice.keys.toList()[index],
-                                        modifier = Modifier.weight(1f),
-                                        color = DarkCharcoal2,
-                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
-                                    )
-                                    Text(
-                                        text = drink.toppingPrice.values.toList()[index].let {
-                                            formatter.format(
-                                                it
-                                            )
-                                        } + " đ",
-                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                                        color = DarkCharcoal2
-                                    )
-                                }
-                                if (index != drink.priceSize.size - 1) {
-                                    Box(
-                                        modifier = Modifier
-                                            .height(1.dp)
-                                            .background(GainsBoro)
-                                            .fillMaxWidth()
-                                    )
-                                }
+                                    } + " đ",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                                    color = DarkCharcoal2
+                                )
+                            }
+                            if (index != drink.priceSize.size - 1) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(1.dp)
+                                        .background(GainsBoro)
+                                        .fillMaxWidth()
+                                )
                             }
                         }
-                        Box(
-                            modifier = Modifier
-                                .padding(top = Dimens.mediumMargin)
-                                .height(Dimens.smallMargin)
-                                .background(GainsBoro)
-                                .fillMaxWidth()
-                        )
-                        TextField(
-                            value = drinkOrder.note,
-                            onValueChange = {
-                                onValueChange(it)
-                            },
-                            maxLines = 3,
-                            modifier = Modifier
-                                .padding(
-                                    top = Dimens.mediumMargin,
-                                    start = Dimens.mediumMargin,
-                                    end = Dimens.mediumMargin,
-                                    bottom = 150.dp
-                                )
-                                .clip(RoundedCornerShape(Dimens.roundedCornerSize))
-                                .border(
-                                    width = 1.dp,
-                                    color = if (isFocus) CopperRed else GainsBoro,
-                                    shape = RoundedCornerShape(Dimens.roundedCornerSize)
-                                )
-                                .onFocusChanged {
-                                    focusChangeEvent(it.isFocused)
-                                }
-                                .fillMaxWidth(),
-                            textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                            placeholder = {
-                                Text(
-                                    text = "Thêm ghi chú"
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(painterResource(R.drawable.ic_note), contentDescription = null)
-                            },
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = DarkCharcoal2,
-                                unfocusedTextColor = DarkCharcoal2,
-                                focusedPlaceholderColor = SpanishGray,
-                                unfocusedPlaceholderColor = SpanishGray,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                cursorColor = CopperRed,
-                                focusedContainerColor = LightCopperRed,
-                                unfocusedContainerColor = GainsBoro,
-                                focusedLeadingIconColor = CopperRed,
-                                unfocusedLeadingIconColor = SpanishGray
-                            ), keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(onDone = {
-                                focusManager.clearFocus()
-                            })
-                        )
                     }
-
+                    Box(
+                        modifier = Modifier
+                            .padding(top = Dimens.mediumMargin)
+                            .height(Dimens.smallMargin)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
                 }
+                TextField(
+                    value = drinkOrder.note,
+                    onValueChange = {
+                        onValueChange(it)
+                    },
+                    maxLines = 3,
+                    modifier = Modifier
+                        .padding(
+                            top = Dimens.mediumMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin,
+                            bottom = 150.dp
+                        )
+                        .clip(RoundedCornerShape(Dimens.roundedCornerSize))
+                        .border(
+                            width = 1.dp,
+                            color = if (isFocus) CopperRed else GainsBoro,
+                            shape = RoundedCornerShape(Dimens.roundedCornerSize)
+                        )
+                        .onFocusChanged {
+                            focusChangeEvent(it.isFocused)
+                        }
+                        .fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                    placeholder = {
+                        Text(
+                            text = "Thêm ghi chú"
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(painterResource(R.drawable.ic_note), contentDescription = null)
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = DarkCharcoal2,
+                        unfocusedTextColor = DarkCharcoal2,
+                        focusedPlaceholderColor = SpanishGray,
+                        unfocusedPlaceholderColor = SpanishGray,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = CopperRed,
+                        focusedContainerColor = LightCopperRed,
+                        unfocusedContainerColor = GainsBoro,
+                        focusedLeadingIconColor = CopperRed,
+                        unfocusedLeadingIconColor = SpanishGray
+                    ), keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        focusManager.clearFocus()
+                    })
+                )
             }
         }
         Row(
@@ -760,6 +759,7 @@ fun BottomSheetUpdateTempOrder(
             Spacer(modifier = Modifier.padding(end = Dimens.mediumMargin))
         }
     }
+
 }
 
 @Composable

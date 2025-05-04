@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,6 +54,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent.*
 import com.hoanglinhsama.client.presentation.viewmodel.state.OrderState
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -69,12 +71,13 @@ fun OrderScreen(
 ) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val formatter = DecimalFormat("#,###")
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(Cultured)
     ) {
-        val (emptyCard, constraintLayout1, barDivide1, barDivide2, barDivide3, rowTitle, columnSelectedDrink, rowOrderType, columnDeliveryInformation) = createRefs()
+        val (emptyCard, constraintLayout1, barDivide1, barDivide2, barDivide3, rowTitle, columnSelectedDrink, rowOrderType, columnDeliveryInformation, columnTotalPrice) = createRefs()
         Row(
             modifier = Modifier.constrainAs(rowTitle) {
                 top.linkTo(parent.top, Dimens.mediumMargin)
@@ -253,7 +256,7 @@ fun OrderScreen(
                             })
                     }
                     Column(
-                        modifier = Modifier.padding(top = Dimens.mediumMargin)
+                        modifier = Modifier.padding(top = Dimens.smallMargin)
                     ) {
                         state.listDrinkOrder.let { listDrinkOrder ->
                             repeat(listDrinkOrder.size) { index ->
@@ -263,9 +266,11 @@ fun OrderScreen(
                                         .wrapContentHeight(),
                                     listDrinkOrder[index],
                                     state.currentlySwipedItemId,
-                                    index, { newIndex ->
+                                    index,
+                                    { newIndex ->
                                         event(UpdateCurrentlySwipedIndexEvent(newIndex))
-                                    }, {
+                                    },
+                                    {
                                         event(DeleteDrinkOrderEvent(index))
                                     }) {
                                     event(UpdateTempOrderEvent(index))
@@ -292,6 +297,160 @@ fun OrderScreen(
                         }
                         .height(Dimens.smallMargin)
                         .background(GainsBoro))
+                Column(modifier = Modifier.constrainAs(columnTotalPrice) {
+                    top.linkTo(barDivide3.bottom, Dimens.mediumMargin)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }) {
+                    Text(
+                        text = "Tổng cộng",
+                        color = DarkCharcoal2,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = Dimens.sizeSubTitle
+                        ),
+                        modifier = Modifier.padding(
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            top = Dimens.smallMargin,
+                            bottom = Dimens.smallMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        Text(
+                            text = "Thành tiền",
+                            color = DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .padding(end = Dimens.smallMargin)
+                                .weight(1f)
+                        )
+                        state.subTotal?.let {
+                            Text(
+                                text = formatter.format(it).toString() + " đ",
+                                color = DarkCharcoal2,
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Normal
+                                )
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            top = Dimens.smallMargin,
+                            bottom = Dimens.smallMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        Text(
+                            text = "Phí giao hàng",
+                            color = DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .padding(end = Dimens.smallMargin)
+                                .weight(1f)
+                        )
+                        state.shippingFee?.let {
+                            Text(
+                                text = if (state.listInformation?.get(2) != "") formatter.format(it)
+                                    .toString() + " đ" else "Chưa chọn địa chỉ giao hàng",
+                                color = if (state.listInformation?.get(2) != "") DarkCharcoal2 else CopperRed,
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Normal
+                                )
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(
+                                top = Dimens.smallMargin,
+                                bottom = Dimens.smallMargin,
+                                start = Dimens.mediumMargin,
+                                end = Dimens.mediumMargin
+                            )
+                            .clickable {
+
+                            }
+                    ) {
+                        Text(
+                            text = "Chọn khuyến mãi/đổi bean",
+                            color = CopperRed,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .padding(end = Dimens.smallMargin)
+                                .weight(1f)
+                        )
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_right),
+                            modifier = Modifier.size(12.dp),
+                            contentDescription = null,
+                            tint = DarkCharcoal2
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            top = Dimens.smallMargin,
+                            bottom = Dimens.smallMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
+                    ) {
+                        Text(
+                            text = "Số tiền thanh toán",
+                            color = DarkCharcoal2,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .padding(end = Dimens.smallMargin)
+                                .weight(1f)
+                        )
+                        state.totalPayment?.let {
+                            Text(
+                                text = formatter.format(it).toString() + " đ",
+                                color = DarkCharcoal2,
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Normal
+                                )
+                            )
+                        }
+                    }
+                }
             } else {
                 EmptyCart(
                     Modifier
@@ -350,39 +509,40 @@ fun OrderScreen(
                     }
 
                     is BottomSheetContent.BottomSheetUpdateTempOrder -> {
-                        state.listDrinkOrder?.get(state.indexUpdateOrderDrink)
-                            ?.let { drinkOrder ->
-                                val drink =
-                                    state.listUpdateDrinkOrder?.find { it.id == drinkOrder.id }
-                                drink?.let { drink ->
-                                    BottomSheetUpdateTempOrder(
-                                        drink,
-                                        drinkOrder,
-                                        Modifier.fillMaxWidth(),
-                                        state.updateNoteFocus,
-                                        {
-                                            event(UpdateNoteFocusChangeEvent(it))
-                                        },
-                                        {
-                                            event(UpdateNoteEvent(it))
-                                        },
-                                        {
-                                            event(UpdateSizeEvent(it,drink))
-                                        }, { index, isSelected ->
-                                            event(UpdateToppingEvent(index, isSelected,drink))
-                                        }, {
-                                            event(UpdateCountDrinkEvent(it))
-                                        }) {
-                                        coroutineScope.launch {
-                                            bottomSheetState.hide()
-                                        }.invokeOnCompletion {
-                                            if (!bottomSheetState.isVisible) {
-                                                event(UpdateShowBottomSheetEvent(false))
-                                            }
+                        state.listDrinkOrder?.get(state.indexUpdateOrderDrink)?.let { drinkOrder ->
+                            val drink =
+                                state.listUpdateDrinkOrder?.find { it.id == drinkOrder.id }
+                            drink?.let { drink ->
+                                BottomSheetUpdateTempOrder(
+                                    drink,
+                                    drinkOrder,
+                                    Modifier.fillMaxWidth(),
+                                    state.updateNoteFocus,
+                                    {
+                                        event(UpdateNoteFocusChangeEvent(it))
+                                    },
+                                    {
+                                        event(UpdateNoteEvent(it))
+                                    },
+                                    {
+                                        event(UpdateSizeEvent(it, drink))
+                                    },
+                                    { index, isSelected ->
+                                        event(UpdateToppingEvent(index, isSelected, drink))
+                                    },
+                                    {
+                                        event(UpdateCountDrinkEvent(it))
+                                    }) {
+                                    coroutineScope.launch {
+                                        bottomSheetState.hide()
+                                    }.invokeOnCompletion {
+                                        if (!bottomSheetState.isVisible) {
+                                            event(UpdateShowBottomSheetEvent(false))
                                         }
                                     }
                                 }
                             }
+                        }
                     }
 
                     null -> {}
@@ -396,8 +556,7 @@ fun OrderScreen(
 fun OrderScreenPreview() {
     ClientTheme(dynamicColor = false) {
         val drinkOrder = DrinkOrder(
-            1,
-            "", "Bạc xỉu", "Nhỏ", listOf(
+            1, "", "Bạc xỉu", "Nhỏ", listOf(
                 "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
             ), "Bỏ ít đá", 1, 59000F
         )
@@ -406,7 +565,7 @@ fun OrderScreenPreview() {
             OrderState(
                 _listDrinkOrder = listDrinkOrder, _listInformation = listOf(
                     "Linh Hoàng", "+84968674274", "Quận 12, Hồ Chí Minh"
-                )
+                ), _subTotal = 118000F, _shippingFee = 15000F, _totalPayment = 133000F
             ), {}, {}, {}) {}
     }
 }

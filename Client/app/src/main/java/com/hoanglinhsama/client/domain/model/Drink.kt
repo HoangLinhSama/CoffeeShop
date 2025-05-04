@@ -8,7 +8,7 @@ data class Drink(
     private val _star: Float?,
     private val _description: String,
     private val _toppingPrice: Map<String, Int>?,
-    private val _countReview: Int
+    private val _countReview: Int,
 ) {
     val id = _id
     val name = _name
