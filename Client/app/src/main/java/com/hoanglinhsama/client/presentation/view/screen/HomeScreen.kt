@@ -175,7 +175,15 @@ fun HomeScreen(
                         width = Dimension.fillToConstraints
 
                     }
-                    .wrapContentHeight(), onSearchClick, "", "Tìm đồ uống", true, {}, {}
+                    .wrapContentHeight(),
+                onSearchClick,
+                "",
+                DarkCharcoal1,
+                Color.White,
+                "Tìm đồ uống",
+                true,
+                {},
+                {}
             ) {
 
             }
@@ -373,7 +381,7 @@ fun HomeScreenPreview() {
     )
     val priceSize = mapOf("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
     val toppingPrice = mapOf("Shot Espresso" to 10000, "Trân châu trắng" to 10000)
-    val drink = Drink("Bạc Sỉu", priceSize, "", 4.9F, "", toppingPrice)
+    val drink = Drink(1, "Bạc Sỉu", priceSize, "", 5F, "", toppingPrice, 1)
     val listDrink = listOf(drink, drink, drink)
     val drinkCategory = DrinkCategory("Cafe")
     val listDrinkCategory = listOf(drinkCategory, drinkCategory, drinkCategory)

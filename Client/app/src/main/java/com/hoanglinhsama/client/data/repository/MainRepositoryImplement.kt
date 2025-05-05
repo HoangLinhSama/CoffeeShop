@@ -10,11 +10,13 @@ import com.hoanglinhsama.client.data.mapper.toUserDomain
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.data.source.paging.DrinkCategoryPagingSource
 import com.hoanglinhsama.client.data.source.paging.DrinkPagingSource
+import com.hoanglinhsama.client.data.source.paging.ShopPagingSource
 import com.hoanglinhsama.client.data.source.paging.VoucherPagingSource
-import com.hoanglinhsama.client.data.source.preferences.PreferenceKey
+import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
+import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.domain.repository.MainRepository
@@ -91,6 +93,14 @@ class MainRepositoryImplement @Inject constructor(
         userSettingDataStore.edit {
             it[PreferenceKey.LOGGED_IN] = false
         }
+    }
+
+    override fun getShop(): Flow<PagingData<Shop>> {
+        return Pager(
+            config = PagingConfig(initialLoadSize = 5, pageSize = 5),
+            pagingSourceFactory = {
+                ShopPagingSource(mainApi = mainApi)
+            }).flow
     }
 
 }

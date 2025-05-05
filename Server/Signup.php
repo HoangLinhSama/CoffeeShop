@@ -7,8 +7,18 @@ $lastName = $_POST["lastName"];
 $phone = $_POST["phone"];
 $address = $_POST["address"];
 $image = $_POST["image"];
-if ($image == "") $image = null;
-$query = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,3,null,'$image')";
+$storeId = $_POST["storeId"];
+if ($image == "") {
+    $image = 'null';
+} else {
+    $image = "'" . mysqli_real_escape_string($connect, $image) . "'";
+}
+if ($storeId == "") {
+    $storeId = 'null';
+} else {
+    $storeId = "'" . mysqli_real_escape_string($connect, $storeId) . "'";
+}
+$query = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,3,$storeId,$image)";
 $result = array();
 try {
     $data = mysqli_query($connect, $query);

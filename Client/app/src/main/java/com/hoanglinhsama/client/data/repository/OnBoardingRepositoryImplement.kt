@@ -7,7 +7,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.hoanglinhsama.client.data.source.paging.OnboardingPagingSource
-import com.hoanglinhsama.client.data.source.preferences.PreferenceKey
+import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Onboarding
 import com.hoanglinhsama.client.domain.repository.OnboardingRepository

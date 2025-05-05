@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.paging.Pager
@@ -22,7 +21,7 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.data.source.paging.PolicyPagingSource
-import com.hoanglinhsama.client.data.source.preferences.PreferenceKey
+import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.ApiUtil
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Policies
@@ -195,7 +194,7 @@ class AuthRepositoryImplement @Inject constructor(
         return flow {
             emit(Result.Loading)
             try {
-                val response = mainApi.signup(firstName, lastName, phone, address, image)
+                val response = mainApi.signup(firstName, lastName, phone, address, image, "")
                 if (response.isSuccessful) {
                     if (response.body() == "success") {
                         emit(Result.Success(Unit))

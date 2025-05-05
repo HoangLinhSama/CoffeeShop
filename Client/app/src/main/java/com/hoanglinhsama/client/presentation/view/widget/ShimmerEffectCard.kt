@@ -105,8 +105,6 @@ fun DrinkCardShimmerEffect(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .clip(
                     RoundedCornerShape(
-                        topStart = 0.dp,
-                        topEnd = 0.dp,
                         bottomStart = Dimens.mediumMargin,
                         bottomEnd = Dimens.mediumMargin
                     )
@@ -154,6 +152,60 @@ fun DrinkCardShimmerEffect(modifier: Modifier = Modifier) {
                         .align(Alignment.Center)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ShopCardShimmerEffect(modifier: Modifier) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(size = Dimens.roundedCornerSize))
+            .background(Color.White),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .aspectRatio(1f)
+                .clip(
+                    RoundedCornerShape(
+                        topEnd = Dimens.roundedCornerSize,
+                        bottomEnd = Dimens.roundedCornerSize
+                    )
+                )
+                .shimmerEffect()
+        )
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = Dimens.smallMargin,
+                    bottom = Dimens.smallMargin,
+                    start = Dimens.smallMargin,
+                    end = Dimens.smallMargin
+                )
+                .weight(1f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .fillMaxWidth()
+                    .shimmerEffect()
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = Dimens.smallMargin)
+                    .height(15.dp)
+                    .fillMaxWidth()
+                    .shimmerEffect()
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = Dimens.smallMargin / 2)
+                    .height(15.dp)
+                    .fillMaxWidth()
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -211,6 +263,18 @@ fun DrinkCardShimmerEffectPreview() {
             modifier = Modifier
                 .height(240.dp)
                 .width(150.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShopCardShimmerEffectPreview() {
+    ClientTheme(dynamicColor = false) {
+        ShopCardShimmerEffect(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
         )
     }
 }

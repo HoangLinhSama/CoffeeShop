@@ -245,6 +245,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateFirstNameEvent(it))
                 },
+                maxLines = 1,
                 modifier = Modifier
                     .constrainAs(textFieldFirstName) {
                         top.linkTo(imageAvatar.bottom, Dimens.mediumMargin)
@@ -295,6 +296,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateLastNameEvent(it))
                 },
+                maxLines = 1,
                 modifier = Modifier
                     .constrainAs(textFieldLastName) {
                         top.linkTo(textFieldFirstName.bottom, Dimens.mediumMargin)
@@ -345,6 +347,7 @@ fun SignupScreen(
                 onValueChange = {
                     event(SignupEvent.UpdateAddressEvent(it))
                 },
+                maxLines = 2,
                 modifier = Modifier
                     .constrainAs(textFieldAddress) {
                         top.linkTo(textFieldLastName.bottom, Dimens.mediumMargin)
@@ -410,14 +413,13 @@ fun SignupScreen(
                         text = "Tôi đồng ý với các ",
                         color = DarkCharcoal2,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Normal, fontSize = Dimens.sizeNormalText
+                            fontWeight = FontWeight.Normal
                         )
                     )
                     Text(
                         text = "Điều khoản và điều kiện của Coffee Shop",
                         color = CopperRed,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = Dimens.sizeNormalText,
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier.clickable {
@@ -451,9 +453,9 @@ fun SignupScreen(
                 )
             ) {
                 Text(
-                    text = "Đăng ký", style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = Dimens.sizeNormalText
-                    ), color = Color.White
+                    text = "Đăng ký",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White
                 )
             }
         }
