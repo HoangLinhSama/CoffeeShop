@@ -1,7 +1,7 @@
 package com.hoanglinhsama.client.presentation.viewmodel.state
 
+import com.hoanglinhsama.client.domain.model.FeatureItem
 import com.hoanglinhsama.client.domain.model.User
-import com.hoanglinhsama.client.presentation.viewmodel.FeatureItem
 
 data class OtherState(
     private val _user: User? = null,

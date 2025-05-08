@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetPromotionUseCase @Inject constructor(private val mainRepository: MainRepository) {
-    operator fun invoke(): Flow<PagingData<Voucher>> {
-        return mainRepository.getPromotion()
+    operator fun invoke(phone: String): Flow<PagingData<Voucher>> {
+        return mainRepository.getPromotion(phone)
     }
 }

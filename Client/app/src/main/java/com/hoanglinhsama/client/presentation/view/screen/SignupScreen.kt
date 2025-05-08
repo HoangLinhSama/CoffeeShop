@@ -93,7 +93,6 @@ fun SignupScreen(
     val coroutineScope = rememberCoroutineScope()
     val itemsPolicy = state.itemsPolicy?.collectAsLazyPagingItems()
     BottomSheetScaffold(
-        sheetDragHandle = null,
         modifier = Modifier.imePadding(),
         scaffoldState = bottomSheetState,
         sheetContainerColor = Color.White,

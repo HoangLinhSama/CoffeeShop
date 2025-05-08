@@ -59,9 +59,8 @@ import java.text.DecimalFormat
 fun PromotionCard(
     modifier: Modifier = Modifier,
     voucher: Voucher,
-    pageSize: Int,
-    selectedPage: Int,
     onVoucherClick: () -> Unit,
+    pageIndicator: (@Composable () -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -121,7 +120,7 @@ fun PromotionCard(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            PagerIndicator(pageSize = pageSize, selectedPage = selectedPage)
+            pageIndicator?.invoke()
         }
     }
 }
@@ -478,9 +477,22 @@ fun ShopCardPreview() {
 fun PromotionCardPreview() {
     ClientTheme(dynamicColor = false) {
         val voucher = Voucher(
-            "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
+            "TUNGBUNG30",
+            "01.07",
+            "31.07",
+            "Giảm 30K Đơn 99K",
+            "Giảm 30K cho đơn từ 99K\n" +
+                    "1/ Áp dụng dịch vụ Giao hàng (Delivery) khi đặt hàng qua App/Web Coffee Shop trên toàn quốc.\n" +
+                    "2/ Áp dụng cho coffee, trà trái cây, trà sữa.\n" +
+                    "3/ Không áp dụng song song các chương trình khác.\n" +
+                    "4/ Chương trình có thể kết thúc sớm hơn dự kiến nếu hết số lượng ưu đãi.",
+            30000F, "delivery", false, 99000,
+            listOf("Trà sữa", "Cafe"),
+            "", ""
         )
-        PromotionCard(Modifier.height(140.dp), voucher, 3, 1) {}
+        PromotionCard(Modifier.height(140.dp), voucher, {}) {
+            PagerIndicator(pageSize = 3, selectedPage = 1)
+        }
     }
 }
 

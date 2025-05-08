@@ -53,14 +53,18 @@ import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.screen.OrderScreen
 import com.hoanglinhsama.client.presentation.view.screen.OtherScreen
+import com.hoanglinhsama.client.presentation.view.screen.PromotionScreen
 import com.hoanglinhsama.client.presentation.view.screen.ShopScreen
+import com.hoanglinhsama.client.presentation.view.screen.VoucherScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OrderViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.PromotionViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.ShopViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.VoucherViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -89,7 +93,7 @@ fun MainNavigator() {
     }
     val isBottomBarVisible = remember(key1 = currentBackStackEntry) {
         currentBackStackEntry?.destination?.route == Route.HomeScreen.route ||
-                (currentBackStackEntry?.destination?.route == Route.ShopScreen.route && !orderViewModel.state.value.shopScreenIsSelectMode) ||
+                currentBackStackEntry?.destination?.route == Route.ShopScreen.route ||
                 currentBackStackEntry?.destination?.route == Route.PromotionScreen.route ||
                 currentBackStackEntry?.destination?.route == Route.OtherScreen.route
     }
@@ -231,7 +235,9 @@ fun MainNavigator() {
             }
             composable(route = Route.OtherScreen.route) {
                 val otherViewModel: OtherViewModel = hiltViewModel()
-                OtherScreen(otherViewModel.state.value, otherViewModel::onEvent)
+                OtherScreen(otherViewModel.state.value, otherViewModel::onEvent){
+
+                }
             }
             composable(route = Route.OrderScreen.route) {
                 val result =
@@ -263,6 +269,18 @@ fun MainNavigator() {
                     } else {
                         // TODO ("Deploy DetailShopScreen)
                     }
+                }
+            }
+            composable(route = Route.VoucherScreen.route) {
+                val voucherViewModel: VoucherViewModel = hiltViewModel()
+                VoucherScreen(voucherViewModel.state.value, voucherViewModel::onEvent) {
+                    navController.popBackStack()
+                }
+            }
+            composable(route = Route.PromotionScreen.route) {
+                val promotionViewmodel: PromotionViewModel = hiltViewModel()
+                PromotionScreen(promotionViewmodel.state.value, {}) {
+
                 }
             }
         }

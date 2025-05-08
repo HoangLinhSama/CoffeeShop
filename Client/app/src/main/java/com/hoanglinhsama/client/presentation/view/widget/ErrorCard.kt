@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,12 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
-import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
+import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 @Composable
-fun ErrorCard(error: LoadState.Error, modifier: Modifier = Modifier) {
+fun ErrorCard(error: LoadState.Error, modifier: Modifier = Modifier, color: Color) {
     var message by remember { mutableStateOf(parseErrorMessage(error = error)) }
     var startAnimation by remember {
         mutableStateOf(false)
@@ -46,15 +44,13 @@ fun ErrorCard(error: LoadState.Error, modifier: Modifier = Modifier) {
     LaunchedEffect(key1 = true) {
         startAnimation = true
     }
-    ErrorContent(modifier, alphaAnimation, message)
+    ErrorContent(modifier, alphaAnimation, message, color)
 }
 
 @Composable
-fun ErrorContent(modifier: Modifier, alphaAnim: Float, message: String) {
+fun ErrorContent(modifier: Modifier, alphaAnim: Float, message: String, color: Color) {
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(Dimens.roundedCornerSize))
-            .background(Color.White),
+        modifier = modifier.background(Color.Transparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -63,14 +59,16 @@ fun ErrorContent(modifier: Modifier, alphaAnim: Float, message: String) {
             contentDescription = null,
             modifier = Modifier
                 .alpha(alphaAnim)
-                .size(96.dp)
+                .size(96.dp),
+            tint = color
         )
         Text(
             modifier = Modifier
                 .padding(10.dp)
                 .alpha(alphaAnim),
             text = message,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
+            color = color
         )
     }
 }
@@ -103,7 +101,7 @@ fun parseErrorMessage(error: LoadState.Error?): String {
 fun ErrorCardPreview() {
     ClientTheme(dynamicColor = false) {
         ErrorContent(
-            Modifier.fillMaxWidth(), 0.3f, "Không có kết nối Internet"
+            Modifier.fillMaxWidth(), 0.3f, "Không có kết nối Internet", DarkCharcoal2
         )
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,6 +35,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.hoanglinhsama.client.R
+import com.hoanglinhsama.client.domain.model.FeatureItem
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
@@ -41,7 +43,6 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.GainsBoro
-import com.hoanglinhsama.client.presentation.viewmodel.FeatureItem
 import com.hoanglinhsama.client.presentation.viewmodel.event.OtherEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OtherState
 
@@ -49,6 +50,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.state.OtherState
 fun OtherScreen(
     state: OtherState,
     event: (OtherEvent) -> Unit,
+    onFeatureItemClick: (Int) -> Unit
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -107,12 +109,12 @@ fun OtherScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable {
-                            event(OtherEvent.FeatureItemClickEvent(it))
+                            onFeatureItemClick(it)
                         }) {
                         Icon(
                             painter = painterResource(listFeatureItem[it].icon),
                             contentDescription = null,
-                            tint = if (it != listFeatureItem.size - 1) CopperRed else Color.Red,
+                            tint = CopperRed,
                             modifier = Modifier
                                 .padding(end = Dimens.smallMargin)
                                 .size(24.dp)
@@ -120,20 +122,44 @@ fun OtherScreen(
                         Text(
                             text = listFeatureItem[it].title,
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Normal,
-                                fontSize = Dimens.sizeSubTitle
+                                fontWeight = FontWeight.Normal
                             ),
-                            color = if (it != listFeatureItem.size - 1) DarkCharcoal2 else Color.Red
+                            color = DarkCharcoal2
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        listFeatureItem[it].trailing.invoke()
+                        listFeatureItem[it].trailing?.invoke()
                     }
                     if (it != listFeatureItem.size - 1) {
                         Spacer(modifier = Modifier.size(Dimens.mediumMargin))
-                    } else {
-                        Spacer(modifier = Modifier.size(80.dp))
                     }
                 }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        event(OtherEvent.LogoutEvent)
+                    }
+                    .padding(
+                        top = Dimens.mediumMargin,
+                        bottom = 80.dp
+                    )) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_log_out),
+                    contentDescription = null,
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .padding(end = Dimens.smallMargin)
+                        .size(24.dp)
+                )
+                Text(
+                    text = "Đăng xuất",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Normal
+                    ),
+                    color = Color.Red
+                )
             }
         }
     }
@@ -144,21 +170,21 @@ fun OtherScreen(
 fun OtherScreenPreview() {
     ClientTheme(dynamicColor = false) {
         val listFeatureItem = listOf(
-            FeatureItem(R.drawable.ic_profile, "Thông tin cá nhân", {
+            FeatureItem(R.drawable.ic_profile, "Thông tin cá nhân", null, {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = DarkCharcoal2
                 )
             }),
-            FeatureItem(R.drawable.ic_order, "Lịch sử đơn hàng", {
+            FeatureItem(R.drawable.ic_order, "Lịch sử đơn hàng", null, {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = DarkCharcoal2
                 )
             }),
-            FeatureItem(R.drawable.ic_language, "Ngôn ngữ", {
+            FeatureItem(R.drawable.ic_language, "Ngôn ngữ", null, {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Tiếng Việt",
@@ -175,7 +201,7 @@ fun OtherScreenPreview() {
                     )
                 }
             }),
-            FeatureItem(R.drawable.ic_dark_mode, "Dark Mode", {
+            FeatureItem(R.drawable.ic_dark_mode, "Dark Mode", null, {
                 Switch(
                     checked = true, onCheckedChange = {},
                     colors = SwitchDefaults.colors(
@@ -187,16 +213,12 @@ fun OtherScreenPreview() {
                         uncheckedBorderColor = Color.Transparent
                     )
                 )
-            }),
-            FeatureItem(R.drawable.ic_log_out, "Đăng xuất", {})
+            })
         )
         OtherScreen(
             OtherState(
                 _listFeatureItem = listFeatureItem,
-                _user = User(1, "Linh", "Hoàng", "", "", "")
-            )
-        ) {
-
-        }
+                _user = User(1, "Linh", "Hoàng", "", "", "", 3, 0, 0)
+            ), {}) {}
     }
 }

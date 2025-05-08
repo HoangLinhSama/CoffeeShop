@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -78,21 +80,37 @@ fun ShopScreen(
                 SearchBar(
                     Modifier
                         .weight(1f)
-                        .wrapContentHeight(),
-                    {},
+                        .wrapContentHeight(), null,
                     state.searchShop.toString(),
                     GainsBoro,
                     DarkCharcoal2,
                     "Tìm kiếm cửa hàng",
-                    false,
+                    false, {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(
+                                Dimens.smallIcon
+                            )
+                        )
+                    }, {
+                        Icon(
+                            painterResource(id = R.drawable.ic_filter),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(Dimens.smallIcon)
+                        )
+                    },
                     {
                         event(ShopEvent.OnFilterClickEvent)
                     },
                     {
                         event(ShopEvent.OnSearchClickEvent(state.searchShop.toString()))
-                    }) {
-                    event(ShopEvent.UpdateSearchShopEvent(it))
-                }
+                    }, {
+                        event(ShopEvent.UpdateSearchShopEvent(it))
+                    }, null
+                )
                 Icon(
                     painterResource(R.drawable.ic_map),
                     contentDescription = null,
@@ -123,9 +141,11 @@ fun ShopScreen(
                 width = Dimension.fillToConstraints
             }) {
                 itemsShop?.let {
-                    if (handlePagingResult(it, Modifier
-                            .padding(bottom = 250.dp)
-                            .fillMaxSize()) {
+                    if (handlePagingResult(
+                            it, Modifier
+                                .padding(bottom = 250.dp)
+                                .fillMaxSize(), DarkCharcoal2
+                        ) {
                             Column {
                                 repeat(5) {
                                     ShopCardShimmerEffect(
@@ -138,7 +158,8 @@ fun ShopScreen(
                                     }
                                 }
                             }
-                        }) {
+                        }
+                    ) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
                             contentPadding = PaddingValues(

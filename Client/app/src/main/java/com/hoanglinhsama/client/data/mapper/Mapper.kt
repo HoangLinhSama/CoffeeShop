@@ -10,13 +10,18 @@ import com.hoanglinhsama.client.data.model.Voucher
 
 fun Voucher.toVoucherDomain(): com.hoanglinhsama.client.domain.model.Voucher {
     return com.hoanglinhsama.client.domain.model.Voucher(
+        this.code,
         this.startDate,
         this.expirationDate,
         this.name,
+        this.description,
+        this.value,
+        this.type,
+        this.freeShip,
         this.conditions,
         this.categoryDrink,
         this.picture,
-        this.freeShip
+        this.qrCode
     )
 }
 
@@ -67,7 +72,10 @@ fun User.toUserDomain(): com.hoanglinhsama.client.domain.model.User {
         this.lastName,
         this.phone,
         this.address,
-        this.image
+        this.image,
+        this.memberShip,
+        this.currentBean,
+        this.collectedBean
     )
 }
 

@@ -11,6 +11,7 @@ import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetPromotionUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetUserUseCase
 import com.hoanglinhsama.client.domain.usecase.main.UpdateStateLoginUseCase
+import com.hoanglinhsama.client.presentation.viewmodel.common.VoucherHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.HomeEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.HomeState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,11 +31,11 @@ class HomeViewModel @Inject constructor(
     val state = _state
 
     init {
+        getUser()
+        updateStateLogin()
         getPromotion()
         getDrinkCategory()
         getDrink()
-        getUser()
-        updateStateLogin()
     }
 
     private fun updateStateLogin() {
@@ -68,8 +69,18 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun getPromotion() {
-        val itemsVoucher = getPromotionUseCase().cachedIn(viewModelScope)
-        _state.value = _state.value.copy(_itemsVoucher = itemsVoucher)
+        viewModelScope.launch {
+            getPhoneUseCase().collect {
+                if (it != "") {
+                    val itemsVoucher =
+                        getPromotionUseCase(it).cachedIn(viewModelScope)
+                    _state.value = _state.value.copy(_itemsVoucher = itemsVoucher)
+                    itemsVoucher.collect {
+                        VoucherHolder.setVoucher(it)
+                    }
+                }
+            }
+        }
     }
 
     // TODO ("Deploy events on HomeScreen)

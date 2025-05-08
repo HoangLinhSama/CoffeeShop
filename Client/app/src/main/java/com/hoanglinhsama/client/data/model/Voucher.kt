@@ -12,4 +12,5 @@ data class Voucher(
     val conditions: Int,
     val categoryDrink: List<String>,
     val picture: String,
+    val qrCode:String
 )

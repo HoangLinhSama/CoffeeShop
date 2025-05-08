@@ -18,7 +18,7 @@ if ($storeId == "") {
 } else {
     $storeId = "'" . mysqli_real_escape_string($connect, $storeId) . "'";
 }
-$query = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,3,$storeId,$image)";
+$query = "INSERT INTO user VALUES (null, '$firstName', '$lastName', '$phone','$address',0,0,1,$storeId,$image)";
 $result = array();
 try {
     $data = mysqli_query($connect, $query);

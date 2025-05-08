@@ -3,7 +3,7 @@ ini_set('display_errors', 0);
 error_reporting(0);
 include "Connect.php";
 $phone = $_POST["phone"];
-$query = "SELECT id, first_name AS firstName,last_name AS lastName, phone, address, image FROM user WHERE phone ='$phone'";
+$query = "SELECT id, first_name AS firstName,last_name AS lastName, phone, address, image, membership AS memberShip, current_bean AS currentBean, collected_bean AS collectBean FROM user WHERE phone ='$phone'";
 try {
     $data = mysqli_query($connect, $query);
     if ($data) {
