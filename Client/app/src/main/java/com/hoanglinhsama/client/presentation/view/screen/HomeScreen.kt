@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
@@ -61,11 +62,13 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.view.ui.theme.Cultured
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal1
+import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkSlateGray
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
 import com.hoanglinhsama.client.presentation.view.widget.DrinkCard
 import com.hoanglinhsama.client.presentation.view.widget.DrinkCardShimmerEffect
+import com.hoanglinhsama.client.presentation.view.widget.PagerIndicator
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCard
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCardShimmerEffect
 import com.hoanglinhsama.client.presentation.view.widget.SearchBar
@@ -118,8 +121,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(
-                            onClick = { state.user?.let { event(HomeEvent.AvatarClickEvent(it)) } }
-                        )
+                            onClick = { state.user?.let { event(HomeEvent.AvatarClickEvent(it)) } })
                 ) {
                     AsyncImage(
                         modifier = Modifier.size(40.dp),
@@ -136,8 +138,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                    onClick = { event(HomeEvent.NotificationClickEvent) }
-                ) {
+                    onClick = { event(HomeEvent.NotificationClickEvent) }) {
                     Icon(
                         Icons.Outlined.Notifications,
                         contentDescription = null,
@@ -156,8 +157,7 @@ fun HomeScreen(
                                 )
                             }
                         }
-                    }
-                ) {
+                    }) {
                     Icon(
                         Icons.Outlined.FavoriteBorder,
                         contentDescription = null,
@@ -182,25 +182,34 @@ fun HomeScreen(
                 Color.White,
                 "Tìm đồ uống",
                 true,
+                {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(
+                            Dimens.smallIcon
+                        )
+                    )
+                },
+                null,
                 {},
-                {}
-            ) {
-
-            }
+                {},
+                {},
+                null
+            )
             Box(
-                modifier = Modifier
-                    .constrainAs(promotionCard) {
-                        top.linkTo(rowSearch.bottom, Dimens.mediumMargin)
-                        start.linkTo(parent.start, Dimens.mediumMargin)
-                        end.linkTo(parent.end, Dimens.mediumMargin)
-                        width = Dimension.fillToConstraints
-                    }) {
-                itemsVoucher?.let {
+                modifier = Modifier.constrainAs(promotionCard) {
+                    top.linkTo(rowSearch.bottom, Dimens.mediumMargin)
+                    start.linkTo(parent.start, Dimens.mediumMargin)
+                    end.linkTo(parent.end, Dimens.mediumMargin)
+                    width = Dimension.fillToConstraints
+                }) {
+                itemsVoucher?.let { itemsVoucher ->
                     if (handlePagingResult(
-                            items = it,
-                            Modifier
+                            items = itemsVoucher, Modifier
                                 .height(140.dp)
-                                .fillMaxWidth()
+                                .fillMaxWidth(), Cultured
                         ) {
                             PromotionCardShimmerEffect(
                                 Modifier.height(140.dp)
@@ -223,19 +232,20 @@ fun HomeScreen(
                                     PromotionCard(
                                         modifier = Modifier.height(140.dp),
                                         voucher = it,
-                                        pageSize = itemsVoucher.itemCount,
-                                        selectedPage = currentIndex,
                                         onVoucherClick = {
                                             event(HomeEvent.VoucherClickEvent)
-                                        }
-                                    )
+                                        }) {
+                                        PagerIndicator(
+                                            pageSize = itemsVoucher.itemCount,
+                                            selectedPage = currentIndex
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-
             Spacer(modifier = Modifier.constrainAs(spacer) {
                 top.linkTo(promotionCard.bottom, Dimens.mediumMargin)
                 start.linkTo(parent.start)
@@ -258,110 +268,110 @@ fun HomeScreen(
                 end.linkTo(parent.end, Dimens.mediumMargin)
                 width = Dimension.fillToConstraints
             }) {
-                if (handlePagingResult(itemsDrinkCategory!!) {
-                        Row(
-                            modifier = Modifier
-                                .padding(top = Dimens.mediumMargin)
-                                .fillMaxWidth(),
+                itemsDrinkCategory?.let { itemsDrinkCategory ->
+                    if (handlePagingResult(itemsDrinkCategory, color = Cultured) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(top = Dimens.mediumMargin)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                repeat(3) {
+                                    Box(
+                                        modifier = Modifier
+                                            .width(109.dp)
+                                            .height(38.dp)
+                                            .clip(RoundedCornerShape(size = Dimens.smallMargin))
+                                            .background(color = Color.White)
+                                            .shimmerEffect()
+
+                                    )
+                                }
+                            }
+                        }) {
+                        LazyRow(
+                            modifier = Modifier.padding(top = Dimens.mediumMargin),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            repeat(3) {
-                                Box(
+                            items(count = itemsDrinkCategory.itemCount) {
+                                val isSelected = state.selectedDrinkCategory == it
+                                Button(
+                                    onClick = {
+                                        event(
+                                            HomeEvent.DrinkCategoryClickEvent(
+                                                itemsDrinkCategory[it]!!.name, it
+                                            )
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        contentColor = if (isSelected) Color.White else DarkSlateGray,
+                                        containerColor = if (isSelected) CopperRed else Color.White
+                                    ),
+                                    shape = RoundedCornerShape(size = Dimens.smallMargin),
                                     modifier = Modifier
                                         .width(109.dp)
                                         .height(38.dp)
-                                        .clip(RoundedCornerShape(size = Dimens.smallMargin))
-                                        .background(color = Color.White)
-                                        .shimmerEffect()
-
-                                )
-                            }
-                        }
-                    }) {
-                    LazyRow(
-                        modifier = Modifier.padding(top = Dimens.mediumMargin),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(count = itemsDrinkCategory.itemCount) {
-                            val isSelected = state.selectedDrinkCategory == it
-                            Button(
-                                onClick = {
-                                    event(
-                                        HomeEvent.DrinkCategoryClickEvent(
-                                            itemsDrinkCategory[it]!!.name,
-                                            it
-                                        )
+                                ) {
+                                    Text(
+                                        text = itemsDrinkCategory[it]!!.name,
+                                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp),
+                                        maxLines = 1
                                     )
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    contentColor = if (isSelected) Color.White else DarkSlateGray,
-                                    containerColor = if (isSelected) CopperRed else Color.White
-                                ),
-                                shape = RoundedCornerShape(size = Dimens.smallMargin),
-                                modifier = Modifier
-                                    .width(109.dp)
-                                    .height(38.dp)
-                            ) {
-                                Text(
-                                    text = itemsDrinkCategory[it]!!.name,
-                                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp),
-                                    maxLines = 1
-                                )
+                                }
                             }
                         }
                     }
                 }
             }
             Column(
-                modifier = Modifier
-                    .constrainAs(drinkLazyVerticalGrid) {
-                        top.linkTo(drinkCategoryLazyRow.bottom, Dimens.mediumMargin)
-                        start.linkTo(parent.start, Dimens.mediumMargin)
-                        end.linkTo(parent.end, Dimens.mediumMargin)
-                        width = Dimension.fillToConstraints
-                    }) {
-                if (handlePagingResult(
-                        itemsDrink!!,
-                        Modifier.aspectRatio(1f)
-                    ) {
-                        Column {
-                            repeat(2) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    repeat(2) {
-                                        DrinkCardShimmerEffect(
-                                            modifier = Modifier
-                                                .height(250.dp)
-                                                .width(160.dp)
-                                        )
+                modifier = Modifier.constrainAs(drinkLazyVerticalGrid) {
+                    top.linkTo(drinkCategoryLazyRow.bottom, Dimens.mediumMargin)
+                    start.linkTo(parent.start, Dimens.mediumMargin)
+                    end.linkTo(parent.end, Dimens.mediumMargin)
+                    width = Dimension.fillToConstraints
+                }) {
+                itemsDrink?.let { itemsDrink ->
+                    if (handlePagingResult(
+                            itemsDrink, Modifier.aspectRatio(1f), DarkCharcoal2
+                        ) {
+                            Column {
+                                repeat(2) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        repeat(2) {
+                                            DrinkCardShimmerEffect(
+                                                modifier = Modifier
+                                                    .height(250.dp)
+                                                    .width(160.dp)
+                                            )
+                                        }
                                     }
-                                }
-                                if (it < 2) {
-                                    Spacer(Modifier.size(Dimens.mediumMargin))
+                                    if (it < 2) {
+                                        Spacer(Modifier.size(Dimens.mediumMargin))
+                                    }
                                 }
                             }
                         }
-                    }
-                ) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
-                        horizontalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
-                        contentPadding = PaddingValues(
-                            bottom = 530.dp
-                        )
                     ) {
-                        items(itemsDrink.itemCount) {
-                            DrinkCard(
-                                drink = itemsDrink[it]!!, onDrinkClick = {
-                                    onDrinkClick(it)
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
+                            contentPadding = PaddingValues(
+                                bottom = 530.dp
+                            )
+                        ) {
+                            items(itemsDrink.itemCount) {
+                                DrinkCard(
+                                    drink = itemsDrink[it]!!, onDrinkClick = {
+                                        onDrinkClick(it)
+                                    }) {
+                                    event(HomeEvent.QuickOderClickEvent(it))
                                 }
-                            ) {
-                                event(HomeEvent.QuickOderClickEvent(it))
                             }
                         }
                     }
@@ -376,7 +386,18 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     val listVoucher = listOf(
         Voucher(
-            "01.07", "31.07", "Giảm 30K", 50, listOf("Trà sữa", "Cafe"), "", true
+            "TUNGBUNG30",
+            "01.07",
+            "31.07",
+            "Giảm 30K Đơn 99K",
+            "Giảm 30K cho đơn từ 99K\n" + "1/ Áp dụng dịch vụ Giao hàng (Delivery) khi đặt hàng qua App/Web Coffee Shop trên toàn quốc.\n" + "2/ Áp dụng cho coffee, trà trái cây, trà sữa.\n" + "3/ Không áp dụng song song các chương trình khác.\n" + "4/ Chương trình có thể kết thúc sớm hơn dự kiến nếu hết số lượng ưu đãi.",
+            30000F,
+            "delivery",
+            false,
+            99000,
+            listOf("Trà sữa", "Cafe"),
+            "",
+            ""
         )
     )
     val priceSize = mapOf("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
@@ -396,10 +417,7 @@ fun HomeScreenPreview() {
                 flowOf(mockVoucherPagingData),
                 flowOf(mockCategoryPagingData),
                 flowOf(mockDrinkPagingData),
-                User(1, "Linh", "", "", "", "")
-            ),
-            event = {},
-            onSearchClick = {}
-        ) {}
+                User(1, "Linh", "", "", "", "", 3, 0, 0)
+            ), event = {}, onSearchClick = {}) {}
     }
 }

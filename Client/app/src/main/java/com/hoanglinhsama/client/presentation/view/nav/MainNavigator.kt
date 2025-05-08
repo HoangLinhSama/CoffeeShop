@@ -49,12 +49,16 @@ import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.presentation.view.screen.DetailDrinkScreen
 import com.hoanglinhsama.client.presentation.view.screen.HomeScreen
 import com.hoanglinhsama.client.presentation.view.screen.OtherScreen
+import com.hoanglinhsama.client.presentation.view.screen.PromotionScreen
 import com.hoanglinhsama.client.presentation.view.screen.ShopScreen
+import com.hoanglinhsama.client.presentation.view.screen.VoucherScreen
 import com.hoanglinhsama.client.presentation.view.ui.theme.CopperRed
 import com.hoanglinhsama.client.presentation.viewmodel.DetailDrinkViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.HomeViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OtherViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.PromotionViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.ShopViewModel
+import com.hoanglinhsama.client.presentation.viewmodel.VoucherViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -202,11 +206,25 @@ fun MainNavigator() {
             }
             composable(route = Route.OtherScreen.route) {
                 val otherViewModel: OtherViewModel = hiltViewModel()
-                OtherScreen(otherViewModel.state.value, otherViewModel::onEvent)
+                OtherScreen(otherViewModel.state.value, otherViewModel::onEvent) {
+
+                }
             }
             composable(route = Route.ShopScreen.route) {
                 val shopViewModel: ShopViewModel = hiltViewModel()
                 ShopScreen(shopViewModel.state.value, shopViewModel::onEvent, {}) {
+
+                }
+            }
+            composable(route = Route.VoucherScreen.route) {
+                val voucherViewModel: VoucherViewModel = hiltViewModel()
+                VoucherScreen(voucherViewModel.state.value, voucherViewModel::onEvent) {
+                    navController.popBackStack()
+                }
+            }
+            composable(route = Route.PromotionScreen.route) {
+                val promotionViewmodel: PromotionViewModel = hiltViewModel()
+                PromotionScreen(promotionViewmodel.state.value, {}) {
 
                 }
             }

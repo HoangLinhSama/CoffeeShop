@@ -29,11 +29,11 @@ class MainRepositoryImplement @Inject constructor(
     private val mainApi: MainApi,
     private val userSettingDataStore: DataStore<Preferences>,
 ) : MainRepository {
-    override fun getPromotion(): Flow<PagingData<Voucher>> {
+    override fun getPromotion(phone: String): Flow<PagingData<Voucher>> {
         return Pager(
-            config = PagingConfig(initialLoadSize = 6, pageSize = 6),
+            config = PagingConfig(initialLoadSize = 3, pageSize = 3),
             pagingSourceFactory = {
-                VoucherPagingSource(mainApi = mainApi)
+                VoucherPagingSource(mainApi = mainApi, phone)
             }).flow
     }
 
@@ -101,6 +101,30 @@ class MainRepositoryImplement @Inject constructor(
             pagingSourceFactory = {
                 ShopPagingSource(mainApi = mainApi)
             }).flow
+    }
+
+    override fun getRequiredBean(phone: String): Flow<Result<Int>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = mainApi.getRequiredBean(phone)
+                if (response.isSuccessful) {
+                    if (response.body()?.status == "success") {
+                        response.body()?.result?.get(0)?.let {
+                            emit(Result.Success(it))
+                        }
+                    } else if (response.body()?.status == "fail: no data found") {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    } else {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    }
+                } else {
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
     }
 
 }

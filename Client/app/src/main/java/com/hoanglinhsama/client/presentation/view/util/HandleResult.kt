@@ -3,6 +3,7 @@ package com.hoanglinhsama.client.presentation.view.util
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -15,6 +16,7 @@ import java.net.SocketTimeoutException
 fun <T : Any> handlePagingResult(
     items: LazyPagingItems<T>,
     modifier: Modifier? = null,
+    color: Color,
     shimmerEffect: @Composable () -> Unit,
 ): Boolean {
     val context = LocalContext.current
@@ -33,7 +35,7 @@ fun <T : Any> handlePagingResult(
 
         error != null -> {
             if (modifier != null) {
-                ErrorCard(error = error, modifier = modifier)
+                ErrorCard(error = error, modifier = modifier, color)
             } else {
                 Toast.makeText(
                     context, when (error.error) {

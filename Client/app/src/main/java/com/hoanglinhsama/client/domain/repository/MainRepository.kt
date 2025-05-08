@@ -10,7 +10,7 @@ import com.hoanglinhsama.client.domain.model.Voucher
 import kotlinx.coroutines.flow.Flow
 
 interface MainRepository {
-    fun getPromotion(): Flow<PagingData<Voucher>>
+    fun getPromotion(phone: String): Flow<PagingData<Voucher>>
     fun getDrinkCategory(): Flow<PagingData<DrinkCategory>>
     fun getDrink(): Flow<PagingData<Drink>>
     fun getUser(phone: String): Flow<Result<User>>
@@ -18,4 +18,5 @@ interface MainRepository {
     suspend fun updateStateLogIn()
     suspend fun logOut()
     fun getShop(): Flow<PagingData<Shop>>
+    fun getRequiredBean(phone: String): Flow<Result<Int>>
 }

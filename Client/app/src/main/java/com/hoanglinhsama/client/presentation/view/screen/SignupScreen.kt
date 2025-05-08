@@ -112,7 +112,7 @@ fun SignupScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 itemsPolicy?.let {
-                    if (handlePagingResult(itemsPolicy, Modifier.fillMaxSize()) {
+                    if (handlePagingResult(itemsPolicy, Modifier.fillMaxSize(), DarkCharcoal2) {
                             Box(
                                 modifier = Modifier
                                     .height(30.dp)
