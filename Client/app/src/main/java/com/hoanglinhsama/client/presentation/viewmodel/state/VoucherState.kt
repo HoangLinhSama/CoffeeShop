@@ -13,8 +13,6 @@ data class VoucherState(
     private val _showBottomSheet: Boolean = false,
     private val _currentVoucherClick: Voucher? = null,
     private val _showDialog: Boolean = false,
-    private val _coffeeBean: Int? = null,
-    private val _typeOrder: String? = null,
 ) {
     val listTab = _listTab
     val selectedTabIndex = _selectedTabIndex
@@ -23,7 +21,5 @@ data class VoucherState(
     val showBottomSheet = _showBottomSheet
     val currentVoucherClick = _currentVoucherClick
     val showDialog = _showDialog
-    val coffeeBean = _coffeeBean
-    val typeOrder = _typeOrder
 }
 

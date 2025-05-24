@@ -29,7 +29,25 @@ interface MainRepository {
         noteOrder: String,
         countDrink: Int,
         totalPrice: Float,
+        drinkCategory: String,
     ): Flow<UniqueResult<DrinkOrder>>
 
     fun getRequiredBean(phone: String): Flow<Result<Int>>
+    fun insertOrder(
+        userId: Int,
+        name: String?,
+        phone: String?,
+        address: String?,
+        dateTime: String,
+        quantityBeanUse: Int?,
+        paymentMethod: String,
+        shopId: Int?,
+        isDelivery: Boolean,
+        deliveryFee: Float,
+        subTotal: Float,
+        totalPrice: Float,
+        voucherId: Int?,
+        paymentBillId: String?,
+        listDrinkOrder: List<com.hoanglinhsama.client.data.model.DrinkOrder>,
+    ): Flow<Result<Int>>
 }

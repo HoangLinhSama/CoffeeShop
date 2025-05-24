@@ -15,4 +15,6 @@ sealed class Route(var route: String) {
     object DetailDrinkScreen : Route("detailDrinkScreen")
     object OrderScreen : Route("orderScreen")
     object VoucherScreen : Route("voucherScreen")
+    object SettingScreen : Route("settingScreen")
+    object OrderStatusScreen : Route("orderStatusScreen")
 }

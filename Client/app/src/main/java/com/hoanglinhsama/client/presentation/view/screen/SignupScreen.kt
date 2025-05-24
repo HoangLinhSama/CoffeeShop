@@ -94,6 +94,7 @@ fun SignupScreen(
     val itemsPolicy = state.itemsPolicy?.collectAsLazyPagingItems()
     BottomSheetScaffold(
         modifier = Modifier.imePadding(),
+        sheetDragHandle = null,
         scaffoldState = bottomSheetState,
         sheetContainerColor = Color.White,
         sheetContent = {

@@ -1,5 +1,6 @@
 package com.hoanglinhsama.client.presentation.view.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +25,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,9 +50,11 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
 import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 import com.hoanglinhsama.client.presentation.view.util.handlePagingResult
+import com.hoanglinhsama.client.presentation.view.widget.EmptyCard
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCard
 import com.hoanglinhsama.client.presentation.view.widget.PromotionCardShimmerEffect
 import com.hoanglinhsama.client.presentation.view.widget.SearchBar
+import com.hoanglinhsama.client.presentation.view.widget.UseBeanDialog
 import com.hoanglinhsama.client.presentation.view.widget.VoucherDetailBottomSheet
 import com.hoanglinhsama.client.presentation.viewmodel.TabRowItem
 import com.hoanglinhsama.client.presentation.viewmodel.event.VoucherEvent
@@ -59,17 +62,27 @@ import com.hoanglinhsama.client.presentation.viewmodel.event.VoucherEvent.Update
 import com.hoanglinhsama.client.presentation.viewmodel.state.VoucherState
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoucherScreen(
     state: VoucherState,
+    typeOrder: String,
+    currentBean: Int,
+    subTotal: Float,
+    quantity: Int,
+    listDrinkCategory: List<String>,
     event: (VoucherEvent) -> Unit,
     onBackClick: () -> Unit,
+    onEmptyVoucher: () -> Unit,
+    onUseVoucher: (Voucher) -> Unit,
+    onUseBean: (Boolean) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        event(VoucherEvent.ReceiveInfoEvent("delivery", 5))
+        event(VoucherEvent.ReceiveInfoEvent(typeOrder))
     }
+    val context = LocalContext.current
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val itemsVoucher = state.itemsVoucher?.collectAsLazyPagingItems()
@@ -180,47 +193,66 @@ fun VoucherScreen(
                 }
                 when (state.selectedTabIndex) {
                     0 -> {
-                        itemsVoucher?.let { itemsVoucher ->
-                            if (handlePagingResult(
-                                    itemsVoucher, Modifier
-                                        .fillMaxWidth()
-                                        .height(140.dp), DarkCharcoal2
-                                ) {
-                                    Column {
-                                        repeat(4) {
-                                            PromotionCardShimmerEffect(
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .height(140.dp)
+                        itemsVoucher?.itemCount?.let {
+                            if (it > 0) {
+                                itemsVoucher.let { itemsVoucher ->
+                                    if (handlePagingResult(
+                                            itemsVoucher,
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .height(140.dp),
+                                            DarkCharcoal2
+                                        ) {
+                                            Column {
+                                                repeat(4) {
+                                                    PromotionCardShimmerEffect(
+                                                        Modifier
+                                                            .fillMaxWidth()
+                                                            .height(140.dp)
+                                                    )
+                                                    if (it < 4) {
+                                                        Spacer(Modifier.size(Dimens.mediumMargin))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        LazyColumn(
+                                            verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
+                                            contentPadding = PaddingValues(
+                                                bottom = 200.dp
                                             )
-                                            if (it < 4) {
-                                                Spacer(Modifier.size(Dimens.mediumMargin))
+                                        ) {
+                                            items(count = itemsVoucher.itemCount) {
+                                                itemsVoucher[it]?.let { voucher ->
+                                                    PromotionCard(
+                                                        Modifier
+                                                            .fillMaxWidth()
+                                                            .height(140.dp),
+                                                        voucher,
+                                                        {
+                                                            event(
+                                                                VoucherEvent.ShowBottomSheetEvent(
+                                                                    voucher
+                                                                )
+                                                            )
+                                                        },
+                                                        null
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            ) {
-                                LazyColumn(
-                                    verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
-                                    contentPadding = PaddingValues(
-                                        bottom = Dimens.mediumMargin
-                                    )
+                            } else {
+                                EmptyCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f)
+                                        .background(Cultured),
+                                    "Không có voucher nào phù hợp"
                                 ) {
-                                    items(count = itemsVoucher.itemCount) {
-                                        itemsVoucher[it]?.let { voucher ->
-                                            PromotionCard(
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .height(140.dp), voucher, {
-                                                    event(
-                                                        VoucherEvent.ShowBottomSheetEvent(
-                                                            voucher
-                                                        )
-                                                    )
-                                                }, null
-                                            )
-                                        }
-                                    }
+                                    onEmptyVoucher()
                                 }
                             }
                         }
@@ -233,7 +265,15 @@ fun VoucherScreen(
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .clickable {
-                                    event(VoucherEvent.UpdateShowDialog(true))
+                                    if (currentBean > 0) {
+                                        event(VoucherEvent.UpdateShowDialog(true))
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Không đủ bean để đổi",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }) {
                             Image(
                                 painterResource(R.drawable.img_coffee_bean),
@@ -253,7 +293,7 @@ fun VoucherScreen(
                                     color = DarkCharcoal2
                                 )
                                 Text(
-                                    text = "${state.coffeeBean} BEAN",
+                                    text = "$currentBean BEAN",
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                                     color = CopperRed,
                                     modifier = Modifier.padding(top = Dimens.smallMargin)
@@ -275,18 +315,70 @@ fun VoucherScreen(
             },
             dragHandle = null,
             content = {
-                state.currentVoucherClick?.let {
+                state.currentVoucherClick?.let { voucher ->
                     VoucherDetailBottomSheet(
                         Modifier
                             .fillMaxWidth()
                             .wrapContentHeight(),
-                        voucher = it,
+                        voucher = voucher,
+                        false
                     ) {
-                        coroutineScope.launch {
-                            bottomSheetState.hide()
-                        }.invokeOnCompletion {
-                            if (!bottomSheetState.isVisible) {
-                                event(UpdateShowBottomSheetEvent(false))
+                        var quantityCondition by Delegates.notNull<Int>()
+                        var priceCondition by Delegates.notNull<Int>()
+                        val drinkCategoryCondition = listDrinkCategory.any {
+                            it in voucher.categoryDrink
+                        }
+                        if (voucher.conditions.toString().length < 4) {
+                            quantityCondition = voucher.conditions.toString().toInt()
+                            if (quantity >= quantityCondition && drinkCategoryCondition) {
+                                onUseVoucher(voucher)
+                            } else {
+                                coroutineScope.launch {
+                                    bottomSheetState.hide()
+                                }.invokeOnCompletion {
+                                    if (!bottomSheetState.isVisible) {
+                                        event(UpdateShowBottomSheetEvent(false))
+                                    }
+                                }
+                                if (!drinkCategoryCondition) {
+                                    Toast.makeText(
+                                        context,
+                                        "Voucher chỉ áp dụng cho các đồ uống thuộc loại ${voucher.categoryDrink.joinToString()}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Đơn hàng cần có đủ từ $quantityCondition ly",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        } else {
+                            priceCondition = voucher.conditions.toString().toInt()
+                            if (subTotal >= priceCondition && drinkCategoryCondition) {
+                                onUseVoucher(voucher)
+                            } else {
+                                coroutineScope.launch {
+                                    bottomSheetState.hide()
+                                }.invokeOnCompletion {
+                                    if (!bottomSheetState.isVisible) {
+                                        event(UpdateShowBottomSheetEvent(false))
+                                    }
+                                }
+                                if (!drinkCategoryCondition) {
+                                    Toast.makeText(
+                                        context,
+                                        "Voucher chỉ áp dụng cho các đồ uống thuộc loại ${voucher.categoryDrink.joinToString()}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Đơn hàng cần có tổng giá trị từ $priceCondition đ",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
                             }
                         }
                     }
@@ -294,30 +386,11 @@ fun VoucherScreen(
             })
     }
     if (state.showDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-                Text(
-                    text = "Đổi bean",
-                )
-            },
-            text = {
-                Text(
-                    text = "Bạn có muốn đổi ${state.coffeeBean} bean không ?",
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    event(VoucherEvent.UseBeanEvent)
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { event(VoucherEvent.UpdateShowDialog(false)) }) {
-                    Text("Huỷ")
-                }
-            })
+        UseBeanDialog("Đổi bean", "Bạn có muốn đổi $currentBean bean không ?", {
+            onUseBean(true)
+        }) {
+            event(VoucherEvent.UpdateShowDialog(false))
+        }
     }
 }
 
@@ -330,6 +403,7 @@ fun VoucherScreenPreview() {
             TabRowItem("Coffee Bean", R.drawable.ic_coffee_bean)
         )
         val voucher = Voucher(
+            1,
             "TUNGBUNG30",
             "01.07",
             "31.07",
@@ -347,8 +421,9 @@ fun VoucherScreenPreview() {
         val mockVoucherPagingData = PagingData.from(listVoucher)
         VoucherScreen(
             VoucherState(
-                _listTab = listTabRow, _itemsVoucher = flowOf(mockVoucherPagingData),
-                _coffeeBean = 5
-            ), {}) {}
+                _listTab = listTabRow, _itemsVoucher = flowOf(mockVoucherPagingData)
+            ), "delivery", 5, 150000F, 3, listOf("Trà sữa", "Cafe"), {}, {}, {}, {}) {
+
+        }
     }
 }

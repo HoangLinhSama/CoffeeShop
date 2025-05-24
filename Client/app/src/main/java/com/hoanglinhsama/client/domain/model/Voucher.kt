@@ -1,6 +1,9 @@
 package com.hoanglinhsama.client.domain.model
 
+import java.io.Serializable
+
 data class Voucher(
+    private val _id: Int,
     private val _code: String,
     private val _startDate: String,
     private val _expirationDate: String,
@@ -13,7 +16,8 @@ data class Voucher(
     private val _categoryDrink: List<String>,
     private val _picture: String,
     private val _qrCode: String,
-) {
+) : Serializable {
+    val id = _id
     val code = _code
     val startDate = _startDate
     val expirationDate = _expirationDate

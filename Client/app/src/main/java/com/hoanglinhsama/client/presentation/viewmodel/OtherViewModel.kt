@@ -61,7 +61,11 @@ class OtherViewModel @Inject constructor(
     }
 
     private fun initDataFeatureItem() {
-        val listFeatureItem = listOf(
+        val listUtilitiesFeatureItem = listOf(
+            FeatureItem(R.drawable.ic_order, "Lịch sử đơn hàng", Color.Red, null),
+            FeatureItem(R.drawable.ic_devide, "Quản lý đăng nhập", Color.Blue, null)
+        )
+        val listAccountFeatureItem = listOf(
             FeatureItem(R.drawable.ic_profile, "Thông tin cá nhân", null, {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -69,47 +73,42 @@ class OtherViewModel @Inject constructor(
                     tint = DarkCharcoal2
                 )
             }),
-            FeatureItem(R.drawable.ic_order, "Lịch sử đơn hàng", null, {
+            FeatureItem(R.drawable.ic_mark, "Địa chỉ đã lưu", null, {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = DarkCharcoal2
                 )
             }),
-            FeatureItem(R.drawable.ic_language, "Ngôn ngữ",null,{
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = state.value.language,
-                        color = DarkCharcoal2,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Normal
-                        ),
-                        modifier = Modifier.padding(end = Dimens.smallMargin)
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = DarkCharcoal2
-                    )
-                }
-            }),
-            FeatureItem(R.drawable.ic_dark_mode, "Dark Mode", null,{
-                Switch(
-                    checked = state.value.isDarkMode, onCheckedChange = {
-                        _state.value = _state.value.copy(_isDarkMode = it)
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        uncheckedThumbColor = Color.White,
-                        checkedTrackColor = CopperRed,
-                        uncheckedTrackColor = GainsBoro,
-                        checkedBorderColor = Color.Transparent,
-                        uncheckedBorderColor = Color.Transparent
-                    )
+            FeatureItem(R.drawable.ic_language, "Cài đặt", null, {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = DarkCharcoal2
                 )
-            })
+            }),
         )
-        _state.value = _state.value.copy(_listFeatureItem = listFeatureItem)
+        val listSupportFeatureItem = listOf(
+            FeatureItem(R.drawable.ic_mail, "Liên hệ góp ý", null, {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = DarkCharcoal2
+                )
+            }),
+            FeatureItem(R.drawable.ic_info, "Về chúng tôi", null, {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = DarkCharcoal2
+                )
+            }),
+        )
+        _state.value = _state.value.copy(
+            _listAccountFeatureItem = listAccountFeatureItem,
+            _listUtilitiesFeatureItem = listUtilitiesFeatureItem,
+            _listSupportFeatureItem = listSupportFeatureItem,
+        )
     }
 
     fun onEvent(event: OtherEvent) {
@@ -118,6 +117,10 @@ class OtherViewModel @Inject constructor(
                 viewModelScope.launch {
                     logOutUseCase()
                 }
+            }
+
+            OtherEvent.ShowQrCodeEvent -> {
+
             }
         }
     }

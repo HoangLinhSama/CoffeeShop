@@ -7,6 +7,7 @@ $limit = $_POST["pageSize"];
 $offset = ($page - 1) * $limit;
 $query = "SELECT drink.id,
     drink.name,
+    drink_category.name AS drinkCategory,
     picture,
     ROUND(AVG(feedback.star), 1) AS star,
     COUNT(DISTINCT feedback.id) AS countReview,
@@ -21,12 +22,12 @@ $query = "SELECT drink.id,
     GROUP_CONCAT(DISTINCT CONCAT(topping.name, ':', topping.price)) AS toppingPrice
 FROM drink 
 JOIN drink_price ON drink.id = drink_price.drink_id
+JOIN drink_category ON drink.category_id=drink_category.id
 LEFT JOIN drink_topping ON drink.id = drink_topping.drink_id
 LEFT JOIN topping ON drink_topping.topping_id = topping.id
 LEFT JOIN feedback ON drink.id = feedback.drink_id
 GROUP BY drink.id
-LIMIT $limit OFFSET $offset;
-";
+LIMIT $limit OFFSET $offset";
 try {
     $data = mysqli_query($connect, $query);
     if ($data) {

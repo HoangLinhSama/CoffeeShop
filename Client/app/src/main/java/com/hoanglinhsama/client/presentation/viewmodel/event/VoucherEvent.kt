@@ -10,6 +10,5 @@ sealed class VoucherEvent {
     data class UpdateShowBottomSheetEvent(val showBottomSheet: Boolean) : VoucherEvent()
     data class ShowBottomSheetEvent(val voucher: Voucher) : VoucherEvent()
     data class UpdateShowDialog(val showDialog: Boolean) : VoucherEvent()
-    object UseBeanEvent : VoucherEvent()
-    data class ReceiveInfoEvent(val typeOrder: String, val coffeeBean: Int) : VoucherEvent()
+    data class ReceiveInfoEvent(val typeOrder: String) : VoucherEvent()
 }

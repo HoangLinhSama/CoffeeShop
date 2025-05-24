@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.gson.Gson
 import com.hoanglinhsama.client.data.mapper.toUserDomain
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.data.model.UniqueResult
@@ -105,6 +106,7 @@ class MainRepositoryImplement @Inject constructor(
                 ShopPagingSource(mainApi = mainApi)
             }).flow
     }
+
     override fun createTempOrder(
         id: Int,
         picture: String,
@@ -114,12 +116,21 @@ class MainRepositoryImplement @Inject constructor(
         noteOrder: String,
         countDrink: Int,
         totalPrice: Float,
+        drinkCategory: String,
     ): Flow<UniqueResult<DrinkOrder>> {
         return flow {
             emit(UniqueResult(result = Result.Loading))
             try {
                 val order = DrinkOrder(
-                    id, picture, name, size, listTopping, noteOrder, countDrink, totalPrice
+                    id,
+                    picture,
+                    name,
+                    size,
+                    listTopping,
+                    noteOrder,
+                    countDrink,
+                    totalPrice,
+                    drinkCategory
                 )
                 emit(UniqueResult(result = Result.Success(order)))
             } catch (e: Exception) {
@@ -127,6 +138,7 @@ class MainRepositoryImplement @Inject constructor(
             }
         }
     }
+
     override fun getRequiredBean(phone: String): Flow<Result<Int>> {
         return flow {
             emit(Result.Loading)
@@ -138,6 +150,62 @@ class MainRepositoryImplement @Inject constructor(
                             emit(Result.Success(it))
                         }
                     } else if (response.body()?.status == "fail: no data found") {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    } else {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    }
+                } else {
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
+    }
+
+    override fun insertOrder(
+        userId: Int,
+        name: String?,
+        phone: String?,
+        address: String?,
+        dateTime: String,
+        quantityBeanUse: Int?,
+        paymentMethod: String,
+        shopId: Int?,
+        isDelivery: Boolean,
+        deliveryFee: Float,
+        subTotal: Float,
+        totalPrice: Float,
+        voucherId: Int?,
+        paymentBillId: String?,
+        listDrinkOrder: List<com.hoanglinhsama.client.data.model.DrinkOrder>,
+    ): Flow<Result<Int>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = mainApi.insertOrder(
+                    userId,
+                    name,
+                    phone,
+                    address,
+                    dateTime,
+                    quantityBeanUse,
+                    paymentMethod,
+                    shopId,
+                    isDelivery,
+                    deliveryFee,
+                    subTotal,
+                    totalPrice,
+                    voucherId,
+                    paymentBillId,
+                    Gson().toJson(listDrinkOrder)
+                )
+                if (response.isSuccessful) {
+                    if (response.body()?.status == "success") {
+                        response.body()?.result?.get(0)?.let {
+                            emit(Result.Success(it))
+                        }
+                    } else if (response.body()?.status == "fail: unknown error") {
                         emit(Result.Error(Exception(response.body()?.status)))
                     } else {
                         emit(Result.Error(Exception(response.body()?.status)))

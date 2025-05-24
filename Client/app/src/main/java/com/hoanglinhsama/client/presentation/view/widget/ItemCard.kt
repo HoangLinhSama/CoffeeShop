@@ -83,7 +83,7 @@ fun PromotionCard(
         ) {
             Row(verticalAlignment = Alignment.Top) {
                 Text(
-                    text = voucher.name + if (voucher.freeShip) " + Freeship" else "",
+                    text = voucher.name,
                     style = MaterialTheme.typography.labelMedium.copy(fontSize = 25.sp),
                     color = Color.White,
                     modifier = Modifier.weight(0.6f),
@@ -392,7 +392,7 @@ fun DrinkOrderCard(
                         )
                     }
                 }
-                if (drinkOrder.note != "") {
+                if (drinkOrder.note != null) {
                     Text(
                         text = drinkOrder.note,
                         style = MaterialTheme.typography.labelMedium.copy(
@@ -440,7 +440,7 @@ fun DrinkOrderCardPreview() {
             1,
             "", "Bạc xỉu", "Nhỏ", listOf(
                 "Shot Espresso", "Trân châu trắng", "Sốt Caramel"
-            ), "Bỏ ít đá", 1, 59000F
+            ), "Bỏ ít đá", 1, 59000F, "Cafe"
         )
         DrinkOrderCard(
             Modifier
@@ -477,6 +477,7 @@ fun ShopCardPreview() {
 fun PromotionCardPreview() {
     ClientTheme(dynamicColor = false) {
         val voucher = Voucher(
+            1,
             "TUNGBUNG30",
             "01.07",
             "31.07",
@@ -503,7 +504,7 @@ val toppingPrice = mapOf<String, Int>(
     "Sốt Caramel" to 10000
 )
 val drink = Drink(
-    1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1
+    1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1, "Cafe"
 )
 
 @Preview(showBackground = true)

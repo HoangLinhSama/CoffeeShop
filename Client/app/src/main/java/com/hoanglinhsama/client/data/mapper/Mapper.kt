@@ -10,6 +10,7 @@ import com.hoanglinhsama.client.data.model.Voucher
 
 fun Voucher.toVoucherDomain(): com.hoanglinhsama.client.domain.model.Voucher {
     return com.hoanglinhsama.client.domain.model.Voucher(
+        this.id,
         this.code,
         this.startDate,
         this.expirationDate,
@@ -46,7 +47,8 @@ fun Drink.toDrinkDomain(): com.hoanglinhsama.client.domain.model.Drink {
         }, valueMapper = {
             it.toInt()
         }),
-        this.countReview
+        this.countReview,
+        this.drinkCategory
     )
 }
 

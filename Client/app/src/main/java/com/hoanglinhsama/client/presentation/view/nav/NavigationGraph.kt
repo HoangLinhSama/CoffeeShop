@@ -2,7 +2,9 @@ package com.hoanglinhsama.client.presentation.view.nav
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -20,6 +22,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.LoginViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.OnBoardingViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.SignupViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationGraph(
     startDestination: String,

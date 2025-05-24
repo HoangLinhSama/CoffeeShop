@@ -228,7 +228,7 @@ fun PromotionScreen(
                     text = "Voucher của bạn",
                     color = DarkCharcoal2,
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = Dimens.sizeSubtitle
+                        fontSize = Dimens.sizeSubTitle
                     ),
                     modifier = Modifier
                         .padding(end = Dimens.mediumMargin)
@@ -308,6 +308,7 @@ fun PromotionScreenPreview() {
             FeatureItem(R.drawable.ic_benefit, "Quyền lơi của bạn", Color.Blue, null)
         )
         val voucher = Voucher(
+            1,
             "TUNGBUNG30",
             "01.07",
             "31.07",

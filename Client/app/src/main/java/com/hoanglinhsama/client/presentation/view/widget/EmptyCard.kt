@@ -27,10 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
-import com.hoanglinhsama.client.presentation.view.ui.theme.Dimens
 
 @Composable
-fun EmptyCart(modifier: Modifier, message: String, onClick: () -> Unit) {
+fun EmptyCard(modifier: Modifier, message: String, onClick: () -> Unit) {
     var startAnimation by remember {
         mutableStateOf(false)
     }
@@ -45,10 +44,14 @@ fun EmptyCart(modifier: Modifier, message: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun EmptyContent(modifier: Modifier, alphaAnim: Float, message: String, onClick: () -> Unit) {
+fun EmptyContent(
+    modifier: Modifier,
+    alphaAnim: Float,
+    message: String,
+    onClick: () -> Unit,
+) {
     Column(
         modifier = modifier
-            .background(Color.White)
             .clickable {
                 onClick()
             },
@@ -56,7 +59,7 @@ fun EmptyContent(modifier: Modifier, alphaAnim: Float, message: String, onClick:
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painter = painterResource(R.drawable.ic_empty_cart),
+            painter = painterResource(R.drawable.ic_empty),
             contentDescription = null,
             modifier = Modifier
                 .alpha(alphaAnim)
@@ -76,7 +79,13 @@ fun EmptyContent(modifier: Modifier, alphaAnim: Float, message: String, onClick:
 @Composable
 fun EmptyCartPreview() {
     ClientTheme(dynamicColor = false) {
-        EmptyContent(Modifier.fillMaxSize(), 0.3f, "Đặt đồ uống ngay thôi !") {
+        EmptyContent(
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
+            0.3f,
+            "Đặt đồ uống ngay thôi !"
+        ) {
 
         }
     }

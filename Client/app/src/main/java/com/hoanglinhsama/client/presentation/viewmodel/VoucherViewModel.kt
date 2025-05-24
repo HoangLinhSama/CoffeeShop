@@ -25,9 +25,8 @@ class VoucherViewModel @Inject constructor(
         initListTabRow()
     }
 
-    private fun receiveInfo(typeOrder: String, coffeeBean: Int) {
-        _state.value = _state.value.copy(_typeOrder = typeOrder, _coffeeBean = coffeeBean)
-        _state.value.typeOrder?.let { getVoucher(it) }
+    private fun receiveInfo(typeOrder: String) {
+        getVoucher(typeOrder)
     }
 
     private fun getVoucher(typeOrder: String) {
@@ -82,12 +81,8 @@ class VoucherViewModel @Inject constructor(
                 _state.value = _state.value.copy(_showDialog = event.showDialog)
             }
 
-            VoucherEvent.UseBeanEvent -> {
-                _state.value = _state.value.copy(_showDialog = false)
-            }
-
             is VoucherEvent.ReceiveInfoEvent -> {
-                receiveInfo(event.typeOrder, event.coffeeBean)
+                receiveInfo(event.typeOrder)
             }
         }
     }

@@ -392,7 +392,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     val listVoucher = listOf(
-        Voucher(
+        Voucher(1,
             "TUNGBUNG30",
             "01.07",
             "31.07",
@@ -409,7 +409,7 @@ fun HomeScreenPreview() {
     )
     val priceSize = mapOf("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
     val toppingPrice = mapOf("Shot Espresso" to 10000, "Trân châu trắng" to 10000)
-    val drink = Drink(1, "Bạc Sỉu", priceSize, "", 5F, "", toppingPrice, 1)
+    val drink = Drink(1, "Bạc Sỉu", priceSize, "", 5F, "", toppingPrice, 1, "Cafe")
     val listDrink = listOf(drink, drink, drink)
     val drinkCategory = DrinkCategory("Cafe")
     val listDrinkCategory = listOf(drinkCategory, drinkCategory, drinkCategory)

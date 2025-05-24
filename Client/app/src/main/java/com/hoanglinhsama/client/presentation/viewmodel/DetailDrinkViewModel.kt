@@ -62,7 +62,8 @@ class DetailDrinkViewModel @Inject constructor(
                         event.listTopping,
                         _state.value.noteOrder,
                         _state.value.countDrink,
-                        event.totalPrice
+                        event.totalPrice,
+                        event.drinkCategory
                     ).collect {
                         TempOrderHolder.setTempOrder(it)
                     }

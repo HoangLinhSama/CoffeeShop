@@ -9,6 +9,7 @@ data class Drink(
     private val _description: String,
     private val _toppingPrice: Map<String, Int>?,
     private val _countReview: Int,
+    private val _drinkCategory: String,
 ) {
     val id = _id
     val name = _name
@@ -18,4 +19,5 @@ data class Drink(
     val description = _description
     val toppingPrice = _toppingPrice
     val countReview = _countReview
+    val drinkCategory = _drinkCategory
 }

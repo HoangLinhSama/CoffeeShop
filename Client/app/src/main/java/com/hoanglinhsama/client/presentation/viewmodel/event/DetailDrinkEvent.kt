@@ -17,6 +17,7 @@ sealed class DetailDrinkEvent {
         val totalPrice: Float,
         val size: String?,
         val listTopping: List<String>?,
+        val drinkCategory: String,
     ) :
         DetailDrinkEvent()
 

@@ -79,9 +79,8 @@ fun DetailDrinkScreen(
             .fillMaxSize()
             .background(Cultured)
     ) {
-        val priceSize =
-            if (drink.priceSize!!.keys.toList()[0] == " ") drink.priceSize[" "]
-            else drink.priceSize[drink.priceSize.keys.toList()[state.indexSizeSelected]]
+        val priceSize = if (drink.priceSize!!.keys.toList()[0] == " ") drink.priceSize[" "]
+        else drink.priceSize[drink.priceSize.keys.toList()[state.indexSizeSelected]]
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (columnMain, rowActionBar1, textFieldNote, columnTopping, rowSize, rowDescription, rowNamePrice, barDivide, imageDrink, rowActionBar2) = createRefs()
             Row(
@@ -90,8 +89,7 @@ fun DetailDrinkScreen(
                     start.linkTo(parent.start, Dimens.mediumMargin)
                     end.linkTo(parent.end, Dimens.mediumMargin)
                     width = Dimension.fillToConstraints
-                },
-                verticalAlignment = Alignment.CenterVertically
+                }, verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painterResource(R.drawable.ic_arrow_back),
@@ -101,7 +99,8 @@ fun DetailDrinkScreen(
                     })
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "Chi tiết", color = DarkCharcoal2,
+                    text = "Chi tiết",
+                    color = DarkCharcoal2,
                     style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle)
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -114,8 +113,7 @@ fun DetailDrinkScreen(
                         end.linkTo(parent.end, Dimens.mediumMargin)
                         width = Dimension.fillToConstraints
                     }
-                    .verticalScroll(rememberScrollState())
-            ) {
+                    .verticalScroll(rememberScrollState())) {
                 ConstraintLayout(modifier = Modifier.fillMaxSize()) {
                     AsyncImage(
                         model = drink.picture,
@@ -130,16 +128,14 @@ fun DetailDrinkScreen(
                             }
                             .aspectRatio(1f)
                             .clip(RoundedCornerShape(Dimens.roundedCornerSize)),
-                        error = painterResource(R.drawable.img_not_found)
-                    )
+                        error = painterResource(R.drawable.img_not_found))
                     Row(
                         modifier = Modifier.constrainAs(rowNamePrice) {
                             top.linkTo(imageDrink.bottom, Dimens.mediumMargin)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                             width = Dimension.fillToConstraints
-                        },
-                        verticalAlignment = Alignment.CenterVertically
+                        }, verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = drink.name,
@@ -179,8 +175,7 @@ fun DetailDrinkScreen(
                                     .clickable {
                                         event(DetailDrinkEvent.ReviewClickEvent(drink.id))
                                     }
-                                    .padding(start = Dimens.smallMargin)
-                            )
+                                    .padding(start = Dimens.smallMargin))
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Icon(
@@ -192,8 +187,7 @@ fun DetailDrinkScreen(
                                 .size(Dimens.mediumMargin)
                                 .clickable {
                                     event(DetailDrinkEvent.FavoriteClickEvent(!state.isFavorite))
-                                }
-                        )
+                                })
                         Icon(
                             Icons.Outlined.Share,
                             contentDescription = null,
@@ -202,8 +196,7 @@ fun DetailDrinkScreen(
                                 .size(Dimens.mediumMargin)
                                 .clickable {
                                     event(DetailDrinkEvent.ShareClickEvent)
-                                }
-                        )
+                                })
                     }
                     Box(
                         modifier = Modifier
@@ -215,8 +208,7 @@ fun DetailDrinkScreen(
                             }
                             .padding(0.dp)
                             .height(1.dp)
-                            .background(GainsBoro)
-                    )
+                            .background(GainsBoro))
                     val maxLines = 3
                     Column(modifier = Modifier.constrainAs(rowDescription) {
                         top.linkTo(barDivide.bottom, Dimens.smallMargin)
@@ -246,8 +238,7 @@ fun DetailDrinkScreen(
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier.clickable {
                                     event(DetailDrinkEvent.ReadMoreDescriptionClickEvent(!state.isExpanded))
-                                }
-                            )
+                                })
                         }
                     }
                     Row(
@@ -256,7 +247,8 @@ fun DetailDrinkScreen(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                             width = Dimension.fillToConstraints
-                        }, verticalAlignment = Alignment.CenterVertically,
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         if (drink.priceSize.keys.toList()[0] != " ") {
@@ -270,8 +262,7 @@ fun DetailDrinkScreen(
                                         .background(if (isSelected) CopperRed else Color.White)
                                         .clickable {
                                             event(DetailDrinkEvent.SizeSelectedEvent(it))
-                                        },
-                                    contentAlignment = Alignment.Center
+                                        }, contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         color = if (isSelected) Color.White else DarkCharcoal2,
@@ -283,13 +274,12 @@ fun DetailDrinkScreen(
                         }
                     }
                     Column(
-                        modifier = Modifier
-                            .constrainAs(columnTopping) {
-                                top.linkTo(rowSize.bottom, Dimens.mediumMargin)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                width = Dimension.fillToConstraints
-                            }) {
+                        modifier = Modifier.constrainAs(columnTopping) {
+                            top.linkTo(rowSize.bottom, Dimens.mediumMargin)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.fillToConstraints
+                        }) {
                         if (drink.toppingPrice != null) {
                             repeat(drink.toppingPrice.size) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -299,8 +289,7 @@ fun DetailDrinkScreen(
                                             event(DetailDrinkEvent.ToppingCheckEvent(it, isChecked))
                                         },
                                         colors = CheckboxDefaults.colors(
-                                            checkedColor = CopperRed,
-                                            uncheckedColor = SpanishGray
+                                            checkedColor = CopperRed, uncheckedColor = SpanishGray
                                         )
                                     )
                                     Text(
@@ -322,9 +311,11 @@ fun DetailDrinkScreen(
                     }
                     val focusManager = LocalFocusManager.current
                     TextField(
-                        value = state.noteOrder, onValueChange = {
+                        value = state.noteOrder,
+                        onValueChange = {
                             event(DetailDrinkEvent.NoteOrderEvent(it))
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .constrainAs(textFieldNote) {
                                 top.linkTo(columnTopping.bottom, Dimens.mediumMargin)
                                 start.linkTo(parent.start)
@@ -349,8 +340,7 @@ fun DetailDrinkScreen(
                         },
                         leadingIcon = {
                             Icon(
-                                painterResource(R.drawable.ic_note),
-                                contentDescription = null
+                                painterResource(R.drawable.ic_note), contentDescription = null
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -368,11 +358,11 @@ fun DetailDrinkScreen(
                         ),
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done
-                        ), keyboardActions = KeyboardActions(
+                        ),
+                        keyboardActions = KeyboardActions(
                             onDone = {
                                 focusManager.clearFocus()
-                            }
-                        )
+                            })
                     )
                 }
             }
@@ -382,23 +372,18 @@ fun DetailDrinkScreen(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(
-                        topStart = Dimens.mediumMargin,
-                        topEnd = Dimens.mediumMargin
+                        topStart = Dimens.mediumMargin, topEnd = Dimens.mediumMargin
                     )
                 )
                 .height(100.dp)
                 .align(Alignment.BottomCenter)
                 .background(Color.White)
                 .shadow(
-                    elevation = 24.dp,
-                    spotColor = Platinum,
-                    ambientColor = Platinum
-                ),
-            verticalAlignment = Alignment.CenterVertically
+                    elevation = 24.dp, spotColor = Platinum, ambientColor = Platinum
+                ), verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier.weight(0.5f),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.weight(0.5f), verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painterResource(R.drawable.ic_minus),
@@ -407,9 +392,7 @@ fun DetailDrinkScreen(
                         .padding(start = Dimens.mediumMargin)
                         .size(Dimens.mediumMargin)
                         .border(
-                            width = 1.dp,
-                            color = GainsBoro,
-                            shape = RoundedCornerShape(3.dp)
+                            width = 1.dp, color = GainsBoro, shape = RoundedCornerShape(3.dp)
                         )
                         .clickable {
                             if (state.countDrink > 1) event(DetailDrinkEvent.DrinkCountEvent(state.countDrink - 1))
@@ -429,9 +412,7 @@ fun DetailDrinkScreen(
                     modifier = Modifier
                         .size(Dimens.mediumMargin)
                         .border(
-                            width = 1.dp,
-                            color = GainsBoro,
-                            shape = RoundedCornerShape(3.dp)
+                            width = 1.dp, color = GainsBoro, shape = RoundedCornerShape(3.dp)
                         )
                         .clickable {
                             event(DetailDrinkEvent.DrinkCountEvent(state.countDrink + 1))
@@ -445,14 +426,14 @@ fun DetailDrinkScreen(
                     if (isChecked) drink.toppingPrice.values.toList()[index] else 0
                 }.sum()
             } else 0
-            val totalPrice: Float = (priceSize!! + totalToppingPrice).times(state.countDrink).toFloat()
+            val totalPrice: Float =
+                (priceSize!! + totalToppingPrice).times(state.countDrink).toFloat()
             IconButton(
                 onClick = {
                     val size =
                         if (drink.priceSize.keys.toList()[0] == " ") null else drink.priceSize.keys.toList()[state.indexSizeSelected]
-                    val listToppingChecked: List<String>? = drink.toppingPrice?.keys
-                        ?.toList()
-                        ?.filterIndexed { index, _ ->
+                    val listToppingChecked: List<String>? =
+                        drink.toppingPrice?.keys?.toList()?.filterIndexed { index, _ ->
                             state.listToppingChecked[index]
                         }
                     event(
@@ -463,6 +444,7 @@ fun DetailDrinkScreen(
                             totalPrice,
                             size,
                             listToppingChecked,
+                            drink.drinkCategory
                         )
                     )
                     event(DetailDrinkEvent.SendUpdateDrinkOrderEvent(drink))
@@ -490,9 +472,7 @@ fun DetailDrinkScreen(
 fun DetailDrinkScreenPreview() {
     val priceSize = mapOf<String, Int>("Nhỏ" to 49000, "Vừa" to 55000, "Lớn" to 65000)
     val toppingPrice = mapOf<String, Int>(
-        "Shot Espresso" to 10000,
-        "Trân châu trắng" to 10000,
-        "Sốt Caramel" to 10000
+        "Shot Espresso" to 10000, "Trân châu trắng" to 10000, "Sốt Caramel" to 10000
     )
     val drink = Drink(
         1,
@@ -501,7 +481,9 @@ fun DetailDrinkScreenPreview() {
         "",
         5F,
         "Tỉnh tức thì cùng cà phê Robusta pha phin đậm đà và bánh flan núng nính. Uống là tỉnh, ăn là dính, xứng đáng là highlight trong ngày của bạn.",
-        toppingPrice, 1
+        toppingPrice,
+        1,
+        "Cafe"
     )
     ClientTheme(dynamicColor = false) {
         DetailDrinkScreen(drink, DetailDrinkState(), {}) {

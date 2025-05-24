@@ -13,13 +13,13 @@ try {
         $row1 = mysqli_fetch_assoc($data1);
         $memberShipId = $row1["membership"];
         if ($memberShipId != null) {
-            $query2 = "SELECT code,
+            $query2 = "SELECT voucher.id, code,
         DATE_FORMAT(start_date, '%e/%c') AS startDate,
         DATE_FORMAT(expiration_date, '%e/%c') AS expirationDate,
         voucher.name,
         description,
         value,
-        freeship,
+        freeship AS freeShip,
         conditions,
         picture,
         type,
@@ -29,7 +29,7 @@ try {
     JOIN voucher_drink_category ON voucher.id = voucher_drink_category.voucher_id
     JOIN voucher_membership  ON voucher.id = voucher_membership.voucher_id
     JOIN drink_category ON voucher_drink_category.drink_category_id = drink_category.id
-    WHERE CURDATE() BETWEEN start_date AND expiration_date AND voucher_membership.membership_id=$memberShipId
+    WHERE CURDATE() BETWEEN start_date AND expiration_date AND voucher_membership.membership_id=$memberShipId AND remain_quantity>0
     GROUP BY voucher.id
     LIMIT $limit OFFSET $offset";
             $data2 = mysqli_query($connect, $query2);
@@ -37,6 +37,7 @@ try {
                 $result = array();
                 while ($row = mysqli_fetch_assoc($data2)) {
                     $row['categoryDrink'] = $row['categoryDrink'] ? explode(',', $row['categoryDrink']) : [];
+                    $row['freeShip'] = (bool)$row['freeShip'];
                     $result[] = $row;
                 }
                 if (!empty($result)) {

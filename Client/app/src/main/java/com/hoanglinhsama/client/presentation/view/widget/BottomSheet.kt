@@ -68,6 +68,7 @@ import coil.compose.AsyncImage
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkOrder
+import com.hoanglinhsama.client.domain.model.FeatureItem
 import com.hoanglinhsama.client.domain.model.Policies
 import com.hoanglinhsama.client.domain.model.Voucher
 import com.hoanglinhsama.client.presentation.view.ui.anim.shimmerEffect
@@ -229,7 +230,7 @@ fun BottomSheetPolicy(itemsPolicy: LazyPagingItems<Policies>?, modifier: Modifie
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         itemsPolicy?.let {
-            if (handlePagingResult(itemsPolicy, Modifier.fillMaxSize(),DarkCharcoal2) {
+            if (handlePagingResult(itemsPolicy, Modifier.fillMaxSize(), DarkCharcoal2) {
                     Box(
                         modifier = Modifier
                             .height(30.dp)
@@ -337,7 +338,8 @@ fun BottomSheetUpdateInfoDelivery(
                 unfocusedContainerColor = GainsBoro,
                 focusedLeadingIconColor = CopperRed,
                 unfocusedLeadingIconColor = SpanishGray
-            ), keyboardOptions = KeyboardOptions(
+            ),
+            keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = {
@@ -383,7 +385,8 @@ fun BottomSheetUpdateInfoDelivery(
                 unfocusedContainerColor = GainsBoro,
                 focusedLeadingIconColor = CopperRed,
                 unfocusedLeadingIconColor = SpanishGray
-            ), keyboardOptions = KeyboardOptions(
+            ),
+            keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = {
@@ -429,7 +432,8 @@ fun BottomSheetUpdateInfoDelivery(
                 unfocusedContainerColor = GainsBoro,
                 focusedLeadingIconColor = CopperRed,
                 unfocusedLeadingIconColor = SpanishGray
-            ), keyboardOptions = KeyboardOptions(
+            ),
+            keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = {
@@ -463,22 +467,20 @@ fun BottomSheetUpdateInfoDelivery(
 fun VoucherDetailBottomSheet(
     modifier: Modifier = Modifier,
     voucher: Voucher,
-    onVoucherUse: () -> Unit,
+    usedVoucher: Boolean,
+    onVoucherClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .background(Color.White)
             .padding(
-                top = Dimens.mediumMargin,
-                start = Dimens.mediumMargin,
-                end = Dimens.mediumMargin
+                top = Dimens.mediumMargin, start = Dimens.mediumMargin, end = Dimens.mediumMargin
             )
     ) {
         Text(
             text = voucher.name,
             style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             color = DarkCharcoal2
         )
         AsyncImage(
@@ -496,10 +498,9 @@ fun VoucherDetailBottomSheet(
         Text(
             text = voucher.code,
             style = MaterialTheme.typography.labelMedium,
-            modifier =
-                Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = Dimens.mediumMargin),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = Dimens.mediumMargin),
             color = CopperRed
         )
         Box(
@@ -514,20 +515,14 @@ fun VoucherDetailBottomSheet(
             modifier = Modifier.padding(top = Dimens.smallMargin)
         ) {
             Text(
-                text = "Ngày hết hạn: ",
-                style = MaterialTheme.typography.labelMedium.copy(
+                text = "Ngày hết hạn: ", style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Normal
-                ),
-                modifier = Modifier.weight(1f),
-                color = DarkCharcoal2
+                ), modifier = Modifier.weight(1f), color = DarkCharcoal2
             )
             Text(
-                text = voucher.expirationDate,
-                style = MaterialTheme.typography.labelMedium.copy(
+                text = voucher.expirationDate, style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Normal
-                ),
-                modifier = Modifier.padding(start = Dimens.mediumMargin),
-                color = CopperRed
+                ), modifier = Modifier.padding(start = Dimens.mediumMargin), color = CopperRed
             )
         }
         Box(
@@ -538,12 +533,9 @@ fun VoucherDetailBottomSheet(
                 .fillMaxWidth()
         )
         Text(
-            text = voucher.description,
-            style = MaterialTheme.typography.labelMedium.copy(
+            text = voucher.description, style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = FontWeight.Normal
-            ),
-            modifier = Modifier.padding(top = Dimens.smallMargin),
-            color = DarkCharcoal2
+            ), modifier = Modifier.padding(top = Dimens.smallMargin), color = DarkCharcoal2
         )
         Button(
             modifier = Modifier
@@ -552,17 +544,90 @@ fun VoucherDetailBottomSheet(
                 .height(Dimens.buttonHeight),
             shape = RoundedCornerShape(Dimens.roundedCornerSize),
             onClick = {
-                onVoucherUse()
+                onVoucherClick()
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = CopperRed
             )
         ) {
             Text(
-                text = "Sử dụng ngay",
+                text = if (usedVoucher) "Sử dụng sau" else "Sử dụng ngay",
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White
             )
+        }
+    }
+}
+
+@Composable
+fun BottomSheetPaymentMethod(
+    modifier: Modifier = Modifier,
+    listMethodPayment: List<FeatureItem>,
+    indexSelected: Int,
+    onUpdatePaymentSelected: (Int) -> Unit,
+) {
+    Column(modifier = modifier.background(Color.White)) {
+        Text(
+            text = "Phương thức thanh toán",
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeTitle),
+            color = DarkCharcoal2,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(
+                    top = Dimens.mediumMargin,
+                    start = Dimens.mediumMargin,
+                    end = Dimens.mediumMargin
+                )
+        )
+        Box(
+            modifier = Modifier
+                .padding(top = Dimens.mediumMargin)
+                .height(Dimens.smallMargin)
+                .background(GainsBoro)
+                .fillMaxWidth()
+        )
+        Column(
+            modifier = Modifier
+                .padding(start = Dimens.mediumMargin, end = Dimens.mediumMargin)
+                .fillMaxWidth()
+        ) {
+            repeat(listMethodPayment.size) { index ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = indexSelected == index,
+                        onClick = {
+                            onUpdatePaymentSelected(index)
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = CopperRed,
+                            unselectedColor = SpanishGray,
+                        )
+                    )
+                    Icon(
+                        painterResource(listMethodPayment[index].icon),
+                        modifier = Modifier
+                            .padding(
+                                start = Dimens.smallMargin, end = Dimens.smallMargin
+                            )
+                            .size(24.dp),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = listMethodPayment[index].title,
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                        color = DarkCharcoal2,
+                    )
+                }
+                if (index != listMethodPayment.size - 1) {
+                    Box(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .background(GainsBoro)
+                            .fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -609,12 +674,11 @@ fun BottomSheetUpdateTempOrder(
                         text = "Size",
                         style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
                         color = DarkCharcoal2,
-                        modifier = Modifier
-                            .padding(
-                                top = Dimens.mediumMargin,
-                                start = Dimens.mediumMargin,
-                                end = Dimens.mediumMargin
-                            )
+                        modifier = Modifier.padding(
+                            top = Dimens.mediumMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
                     )
                     Column(
                         modifier = Modifier.padding(
@@ -641,15 +705,13 @@ fun BottomSheetUpdateTempOrder(
                                     color = DarkCharcoal2,
                                     modifier = Modifier.weight(1f)
                                 )
-                                Text(
-                                    text = drink.priceSize.values.toList()[index].let {
-                                        formatter.format(
-                                            it
-                                        )
-                                    } + "đ",
+                                Text(text = drink.priceSize.values.toList()[index].let {
+                                    formatter.format(
+                                        it
+                                    )
+                                } + "đ",
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                                    color = DarkCharcoal2
-                                )
+                                    color = DarkCharcoal2)
                             }
                             if (index != drink.priceSize.size - 1) {
                                 Box(
@@ -674,12 +736,11 @@ fun BottomSheetUpdateTempOrder(
                         text = "Topping",
                         style = MaterialTheme.typography.labelMedium.copy(fontSize = Dimens.sizeSubTitle),
                         color = DarkCharcoal2,
-                        modifier = Modifier
-                            .padding(
-                                top = Dimens.mediumMargin,
-                                start = Dimens.mediumMargin,
-                                end = Dimens.mediumMargin
-                            )
+                        modifier = Modifier.padding(
+                            top = Dimens.mediumMargin,
+                            start = Dimens.mediumMargin,
+                            end = Dimens.mediumMargin
+                        )
                     )
                     Column(
                         modifier = Modifier.padding(
@@ -696,8 +757,7 @@ fun BottomSheetUpdateTempOrder(
                                         onUpdateTopping(index, isChecked)
                                     },
                                     colors = CheckboxDefaults.colors(
-                                        checkedColor = CopperRed,
-                                        uncheckedColor = SpanishGray
+                                        checkedColor = CopperRed, uncheckedColor = SpanishGray
                                     )
                                 )
                                 Text(
@@ -706,15 +766,13 @@ fun BottomSheetUpdateTempOrder(
                                     color = DarkCharcoal2,
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
                                 )
-                                Text(
-                                    text = drink.toppingPrice.values.toList()[index].let {
-                                        formatter.format(
-                                            it
-                                        )
-                                    } + " đ",
+                                Text(text = drink.toppingPrice.values.toList()[index].let {
+                                    formatter.format(
+                                        it
+                                    )
+                                } + " đ",
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                                    color = DarkCharcoal2
-                                )
+                                    color = DarkCharcoal2)
                             }
                             if (index != drink.priceSize.size - 1) {
                                 Box(
@@ -734,57 +792,60 @@ fun BottomSheetUpdateTempOrder(
                             .fillMaxWidth()
                     )
                 }
-                TextField(
-                    value = drinkOrder.note,
-                    onValueChange = {
-                        onValueChange(it)
-                    },
-                    maxLines = 3,
-                    modifier = Modifier
-                        .padding(
-                            top = Dimens.mediumMargin,
-                            start = Dimens.mediumMargin,
-                            end = Dimens.mediumMargin,
-                            bottom = 150.dp
-                        )
-                        .clip(RoundedCornerShape(Dimens.roundedCornerSize))
-                        .border(
-                            width = 1.dp,
-                            color = if (isFocus) CopperRed else GainsBoro,
-                            shape = RoundedCornerShape(Dimens.roundedCornerSize)
-                        )
-                        .onFocusChanged {
-                            focusChangeEvent(it.isFocused)
-                        }
-                        .fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                    placeholder = {
-                        Text(
-                            text = "Thêm ghi chú"
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(painterResource(R.drawable.ic_note), contentDescription = null)
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = DarkCharcoal2,
-                        unfocusedTextColor = DarkCharcoal2,
-                        focusedPlaceholderColor = SpanishGray,
-                        unfocusedPlaceholderColor = SpanishGray,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = CopperRed,
-                        focusedContainerColor = LightCopperRed,
-                        unfocusedContainerColor = GainsBoro,
-                        focusedLeadingIconColor = CopperRed,
-                        unfocusedLeadingIconColor = SpanishGray
-                    ), keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                    })
-                )
+                drinkOrder.note?.let { drinkOrder ->
+                    TextField(
+                        value = drinkOrder,
+                        onValueChange = {
+                            onValueChange(it)
+                        },
+                        maxLines = 3,
+                        modifier = Modifier
+                            .padding(
+                                top = Dimens.mediumMargin,
+                                start = Dimens.mediumMargin,
+                                end = Dimens.mediumMargin,
+                                bottom = 150.dp
+                            )
+                            .clip(RoundedCornerShape(Dimens.roundedCornerSize))
+                            .border(
+                                width = 1.dp,
+                                color = if (isFocus) CopperRed else GainsBoro,
+                                shape = RoundedCornerShape(Dimens.roundedCornerSize)
+                            )
+                            .onFocusChanged {
+                                focusChangeEvent(it.isFocused)
+                            }
+                            .fillMaxWidth(),
+                        textStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                        placeholder = {
+                            Text(
+                                text = "Thêm ghi chú"
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.ic_note), contentDescription = null)
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = DarkCharcoal2,
+                            unfocusedTextColor = DarkCharcoal2,
+                            focusedPlaceholderColor = SpanishGray,
+                            unfocusedPlaceholderColor = SpanishGray,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = CopperRed,
+                            focusedContainerColor = LightCopperRed,
+                            unfocusedContainerColor = GainsBoro,
+                            focusedLeadingIconColor = CopperRed,
+                            unfocusedLeadingIconColor = SpanishGray
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
+                            focusManager.clearFocus()
+                        })
+                    )
+                }
             }
         }
         Row(
@@ -792,23 +853,18 @@ fun BottomSheetUpdateTempOrder(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(
-                        topStart = Dimens.mediumMargin,
-                        topEnd = Dimens.mediumMargin
+                        topStart = Dimens.mediumMargin, topEnd = Dimens.mediumMargin
                     )
                 )
                 .height(100.dp)
                 .align(Alignment.BottomCenter)
                 .background(Color.White)
                 .shadow(
-                    elevation = 24.dp,
-                    spotColor = Platinum,
-                    ambientColor = Platinum
-                ),
-            verticalAlignment = Alignment.CenterVertically
+                    elevation = 24.dp, spotColor = Platinum, ambientColor = Platinum
+                ), verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier.weight(0.5f),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.weight(0.5f), verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painterResource(R.drawable.ic_minus),
@@ -817,9 +873,7 @@ fun BottomSheetUpdateTempOrder(
                         .padding(start = Dimens.mediumMargin)
                         .size(Dimens.mediumMargin)
                         .border(
-                            width = 1.dp,
-                            color = GainsBoro,
-                            shape = RoundedCornerShape(3.dp)
+                            width = 1.dp, color = GainsBoro, shape = RoundedCornerShape(3.dp)
                         )
                         .clickable {
                             if (drinkOrder.count > 1) {
@@ -841,9 +895,7 @@ fun BottomSheetUpdateTempOrder(
                     modifier = Modifier
                         .size(Dimens.mediumMargin)
                         .border(
-                            width = 1.dp,
-                            color = GainsBoro,
-                            shape = RoundedCornerShape(3.dp)
+                            width = 1.dp, color = GainsBoro, shape = RoundedCornerShape(3.dp)
                         )
                         .clickable {
                             onUpdateDrinkCount(drinkOrder.count + 1)
@@ -874,24 +926,42 @@ fun BottomSheetUpdateTempOrder(
 
 }
 
+@Preview(showBackground = true)
+@Composable
+fun BottomSheetPaymentMethodPreview() {
+    ClientTheme(dynamicColor = false) {
+        val listMethodPayment = listOf(
+            FeatureItem(R.drawable.ic_cash, "Tiền mặt", null, null),
+            FeatureItem(R.drawable.ic_zalopay, "ZaloPay", null, null),
+            FeatureItem(R.drawable.ic_momo, "MoMo", null, null),
+            FeatureItem(R.drawable.ic_vnpay, "VNPay", null, null),
+            FeatureItem(R.drawable.ic_shopeepay, "ShopeePay", null, null),
+            FeatureItem(R.drawable.ic_bank_card, "Thẻ ngân hàng", null, null),
+            FeatureItem(R.drawable.ic_paypal, "PayPal", null, null),
+        )
+        BottomSheetPaymentMethod(
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(), listMethodPayment, 1
+        ) {}
+    }
+}
+
 @Composable
 @Preview(showBackground = true)
 fun BottomSheetUpdateTempOrderPreview() {
     ClientTheme(dynamicColor = false) {
         val priceSize = mapOf<String, Int>("Nhỏ" to 29000, "Vừa" to 39000, "Lớn" to 45000)
         val toppingPrice = mapOf<String, Int>(
-            "Shot Espresso" to 10000,
-            "Trân châu trắng" to 10000,
-            "Sốt Caramel" to 10000
+            "Shot Espresso" to 10000, "Trân châu trắng" to 10000, "Sốt Caramel" to 10000
         )
         val drink = Drink(
-            1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1
+            1, "Bạc Xỉu", priceSize, "", 5F, "", toppingPrice, 1, "Cafe"
         )
         val drinkOrder = DrinkOrder(
-            1,
-            "", "Bạc xỉu", "Nhỏ", listOf(
+            1, "", "Bạc xỉu", "Nhỏ", listOf(
                 "Shot Espresso", "Sốt Caramel"
-            ), "", 2, 98000F
+            ), "", 2, 98000F, "Cafe"
         )
         BottomSheetUpdateTempOrder(
             drink,
@@ -901,7 +971,8 @@ fun BottomSheetUpdateTempOrderPreview() {
             {},
             {},
             {},
-            { index, isSelect -> }, {}) {}
+            { index, isSelect -> },
+            {}) {}
     }
 }
 
@@ -947,8 +1018,7 @@ fun BottomSheetPolicyPreview() {
                 "Ứng dụng thu thập thông tin như họ tên, số điện thoại, email, địa chỉ khi khách hàng đăng ký tài khoản hoặc đặt hàng.\n" + "Các thông tin này chỉ được sử dụng để phục vụ nhu cầu mua hàng, giao hàng, chăm sóc khách hàng và cải thiện dịch vụ.\n" + "Dữ liệu cá nhân của khách hàng được mã hóa và lưu trữ an toàn.\n" + "Ứng dụng không chia sẻ thông tin người dùng với bên thứ ba mà không có sự đồng ý của họ."
             )
         )
-        val mockPolicyPagingData =
-            flowOf(PagingData.from(listPolicy)).collectAsLazyPagingItems()
+        val mockPolicyPagingData = flowOf(PagingData.from(listPolicy)).collectAsLazyPagingItems()
         BottomSheetPolicy(mockPolicyPagingData, Modifier.fillMaxWidth())
     }
 }
@@ -958,23 +1028,24 @@ fun BottomSheetPolicyPreview() {
 fun VoucherDetailBottomSheetPreview() {
     ClientTheme(dynamicColor = false) {
         val voucher = Voucher(
+            1,
             "TUNGBUNG30",
             "01.07",
             "31.07",
             "Giảm 30K Đơn 99K",
-            "Giảm 30K cho đơn từ 99K\n" +
-                    "1/ Áp dụng dịch vụ Giao hàng (Delivery) khi đặt hàng qua App/Web Coffee Shop trên toàn quốc.\n" +
-                    "2/ Áp dụng cho coffee, trà trái cây, trà sữa.\n" +
-                    "3/ Không áp dụng song song các chương trình khác.\n" +
-                    "4/ Chương trình có thể kết thúc sớm hơn dự kiến nếu hết số lượng ưu đãi.",
-            30000F, "delivery", false, 99000,
+            "Giảm 30K cho đơn từ 99K\n" + "1/ Áp dụng dịch vụ Giao hàng (Delivery) khi đặt hàng qua App/Web Coffee Shop trên toàn quốc.\n" + "2/ Áp dụng cho coffee, trà trái cây, trà sữa.\n" + "3/ Không áp dụng song song các chương trình khác.\n" + "4/ Chương trình có thể kết thúc sớm hơn dự kiến nếu hết số lượng ưu đãi.",
+            30000F,
+            "delivery",
+            false,
+            99000,
             listOf("Trà sữa", "Cafe"),
-            "", ""
+            "",
+            ""
         )
         VoucherDetailBottomSheet(
             Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), voucher
+                .wrapContentHeight(), voucher, false
         ) {}
     }
 }

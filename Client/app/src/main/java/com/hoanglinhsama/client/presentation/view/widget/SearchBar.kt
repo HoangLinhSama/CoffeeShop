@@ -106,7 +106,7 @@ fun SearchBar(
                             shape = RoundedCornerShape(Dimens.smallMargin)
                         )
                     ) {
-                        trailingIcon?.invoke()
+                        trailingIcon.invoke()
                     }
                 }
             }
