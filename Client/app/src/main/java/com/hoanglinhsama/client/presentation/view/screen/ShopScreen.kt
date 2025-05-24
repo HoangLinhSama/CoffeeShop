@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,10 +47,11 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun ShopScreen(
+    isSelectMode: Boolean,
     state: ShopState,
     event: (ShopEvent) -> Unit,
     onMapClick: () -> Unit,
-    onShopClick: () -> Unit,
+    onShopClick: (Boolean, Shop) -> Unit,
 ) {
     val itemsShop = state.itemsShop?.collectAsLazyPagingItems()
     ConstraintLayout(
@@ -77,21 +80,37 @@ fun ShopScreen(
                 SearchBar(
                     Modifier
                         .weight(1f)
-                        .wrapContentHeight(),
-                    {},
+                        .wrapContentHeight(), null,
                     state.searchShop.toString(),
                     GainsBoro,
                     DarkCharcoal2,
                     "Tìm kiếm cửa hàng",
-                    false,
+                    false, {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(
+                                Dimens.smallIcon
+                            )
+                        )
+                    }, {
+                        Icon(
+                            painterResource(id = R.drawable.ic_filter),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(Dimens.smallIcon)
+                        )
+                    },
                     {
                         event(ShopEvent.OnFilterClickEvent)
                     },
                     {
                         event(ShopEvent.OnSearchClickEvent(state.searchShop.toString()))
-                    }) {
-                    event(ShopEvent.UpdateSearchShopEvent(it))
-                }
+                    }, {
+                        event(ShopEvent.UpdateSearchShopEvent(it))
+                    }, null
+                )
                 Icon(
                     painterResource(R.drawable.ic_map),
                     contentDescription = null,
@@ -122,7 +141,11 @@ fun ShopScreen(
                 width = Dimension.fillToConstraints
             }) {
                 itemsShop?.let {
-                    if (handlePagingResult(it, Modifier.fillMaxWidth()) {
+                    if (handlePagingResult(
+                            it, Modifier
+                                .padding(bottom = 250.dp)
+                                .fillMaxSize(), DarkCharcoal2
+                        ) {
                             Column {
                                 repeat(5) {
                                     ShopCardShimmerEffect(
@@ -135,7 +158,8 @@ fun ShopScreen(
                                     }
                                 }
                             }
-                        }) {
+                        }
+                    ) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(Dimens.mediumMargin),
                             contentPadding = PaddingValues(
@@ -144,9 +168,11 @@ fun ShopScreen(
                         ) {
                             items(itemsShop.itemCount) {
                                 itemsShop[it]?.let { shop ->
-                                    ShopCard(Modifier.height(140.dp), shop) {
-                                        onShopClick()
-                                    }
+                                    ShopCard(
+                                        Modifier.height(140.dp),
+                                        shop,
+                                        onShopClick = { onShopClick(isSelectMode, shop) }
+                                    )
                                 }
                             }
                         }
@@ -162,6 +188,7 @@ fun ShopScreen(
 fun ShopScreenPreview() {
     ClientTheme(dynamicColor = false) {
         val shop = Shop(
+            1,
             "HCM Nguyễn Ảnh Thủ",
             "",
             "93/5 Nguyễn Ảnh Thủ, Huyện Hóc Môn, Hồ Chí Minh, Việt Nam",
@@ -170,6 +197,11 @@ fun ShopScreenPreview() {
         )
         val listShop = listOf(shop, shop, shop)
         val mockShopPagingData = PagingData.from(listShop)
-        ShopScreen(ShopState(_itemsShop = flowOf(mockShopPagingData)), {}, {}) {}
+        ShopScreen(
+            false,
+            ShopState(_itemsShop = flowOf(mockShopPagingData)),
+            {},
+            {}) { isSelectMode, idShop ->
+        }
     }
 }

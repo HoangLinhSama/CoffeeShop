@@ -6,7 +6,7 @@ import com.hoanglinhsama.client.data.mapper.toVoucherDomain
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Voucher
 
-class VoucherPagingSource(private val mainApi: MainApi) :
+class VoucherPagingSource(private val mainApi: MainApi, private val phone: String) :
     PagingSource<Int, Voucher>() {
     override fun getRefreshKey(state: PagingState<Int, Voucher>): Int? {
         return state.anchorPosition?.let { it ->
@@ -18,7 +18,7 @@ class VoucherPagingSource(private val mainApi: MainApi) :
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Voucher> {
         val page = params.key ?: 1
         try {
-            val response = mainApi.getPromotion(page, params.loadSize)
+            val response = mainApi.getPromotion(page, params.loadSize, phone)
             if (response.isSuccessful) {
                 if (response.body()?.status == "success") {
                     val listVoucher: List<Voucher>? =

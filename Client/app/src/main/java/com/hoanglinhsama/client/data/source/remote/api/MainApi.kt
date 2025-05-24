@@ -22,6 +22,7 @@ interface MainApi {
     suspend fun getPromotion(
         @Field("page") page: Int,
         @Field("pageSize") pageSize: Int,
+        @Field("phone") phone: String,
     ): Response<MainResponse<Voucher>>
 
     @FormUrlEncoded
@@ -81,4 +82,28 @@ interface MainApi {
         @Field("page") page: Int,
         @Field("pageSize") pageSize: Int,
     ): Response<MainResponse<Shop>>
+
+    @POST("GetRequiredBean.php")
+    @FormUrlEncoded
+    suspend fun getRequiredBean(@Field("phone") phone: String): Response<MainResponse<Int>>
+
+    @POST("InsertOrder.php")
+    @FormUrlEncoded
+    suspend fun insertOrder(
+        @Field("userId") userId: Int,
+        @Field("name") name: String?,
+        @Field("phone") phone: String?,
+        @Field("address") address: String?,
+        @Field("dateTime") dateTime: String,
+        @Field("quantityBeanUse") quantityBeanUse: Int?,
+        @Field("paymentMethod") paymentMethod: String,
+        @Field("shopId") shopId: Int?,
+        @Field("isDelivery") isDelivery: Boolean,
+        @Field("deliveryFee") deliveryFee: Float,
+        @Field("subTotal") subTotal: Float,
+        @Field("totalPrice") totalPrice: Float,
+        @Field("voucherId") voucherId: Int?,
+        @Field("paymentBillId") paymentBillId: String?,
+        @Field("listDrinkOrder") listDrinkOrder: String,
+    ): Response<MainResponse<Int>>
 }

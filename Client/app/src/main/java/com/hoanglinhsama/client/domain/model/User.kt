@@ -7,6 +7,9 @@ data class User(
     private val _phone: String,
     private val _address: String,
     private val _image: String?,
+    private val _memberShip: Int,
+    private val _currentBean: Int,
+    private val _collectedBean: Int,
 ) {
     val id = _id
     val firstName = _firstName
@@ -14,4 +17,7 @@ data class User(
     val phone = _phone
     val address = _address
     val image = _image
+    val memberShip = _memberShip
+    val currentBean = _currentBean
+    val collectedBean = _collectedBean
 }

@@ -8,5 +8,6 @@ data class Drink(
     val description: String,
     val priceSize: List<String>,
     val toppingPrice: List<String>?,
-    val countReview:Int
+    val countReview:Int,
+    val drinkCategory:String
 )

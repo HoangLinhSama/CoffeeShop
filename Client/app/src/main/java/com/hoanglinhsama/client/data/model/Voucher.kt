@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.data.model
 
 data class Voucher(
+    val id:Int,
     val code: String,
     val startDate: String,
     val expirationDate: String,
@@ -12,4 +13,5 @@ data class Voucher(
     val conditions: Int,
     val categoryDrink: List<String>,
     val picture: String,
+    val qrCode:String
 )

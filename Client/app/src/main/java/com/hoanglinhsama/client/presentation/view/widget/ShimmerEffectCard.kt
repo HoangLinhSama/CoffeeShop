@@ -216,7 +216,7 @@ fun PolicySheetShimmerEffect(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
-                .height(15.dp)
+                .height(21.dp)
                 .shimmerEffect()
         )
         Spacer(modifier = Modifier.size(Dimens.smallMargin))

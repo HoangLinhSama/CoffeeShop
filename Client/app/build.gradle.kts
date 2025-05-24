@@ -125,4 +125,12 @@ dependencies {
 
     // Add the dependency for the Firebase Authentication library
     implementation("com.google.firebase:firebase-auth")
+
+    //  Swipe Box
+    implementation("io.github.kevinnzou:compose-swipebox:1.4.0")
+
+    //  ZXing
+    implementation ("com.google.zxing:core:3.5.2")
+    implementation ("androidx.core:core-ktx:1.12.0")
+
 }

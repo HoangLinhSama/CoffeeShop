@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.gson.Gson
 import com.hoanglinhsama.client.data.mapper.toUserDomain
 import com.hoanglinhsama.client.data.model.Result
+import com.hoanglinhsama.client.data.model.UniqueResult
 import com.hoanglinhsama.client.data.source.paging.DrinkCategoryPagingSource
 import com.hoanglinhsama.client.data.source.paging.DrinkPagingSource
 import com.hoanglinhsama.client.data.source.paging.ShopPagingSource
@@ -16,6 +18,7 @@ import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
+import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
@@ -29,13 +32,14 @@ class MainRepositoryImplement @Inject constructor(
     private val mainApi: MainApi,
     private val userSettingDataStore: DataStore<Preferences>,
 ) : MainRepository {
-    override fun getPromotion(): Flow<PagingData<Voucher>> {
+    override fun getPromotion(phone: String): Flow<PagingData<Voucher>> {
         return Pager(
-            config = PagingConfig(initialLoadSize = 6, pageSize = 6),
+            config = PagingConfig(initialLoadSize = 3, pageSize = 3),
             pagingSourceFactory = {
-                VoucherPagingSource(mainApi = mainApi)
+                VoucherPagingSource(mainApi = mainApi, phone)
             }).flow
     }
+
 
     override fun getDrinkCategory(): Flow<PagingData<DrinkCategory>> {
         return Pager(
@@ -101,6 +105,118 @@ class MainRepositoryImplement @Inject constructor(
             pagingSourceFactory = {
                 ShopPagingSource(mainApi = mainApi)
             }).flow
+    }
+
+    override fun createTempOrder(
+        id: Int,
+        picture: String,
+        name: String,
+        size: String?,
+        listTopping: List<String>?,
+        noteOrder: String,
+        countDrink: Int,
+        totalPrice: Float,
+        drinkCategory: String,
+    ): Flow<UniqueResult<DrinkOrder>> {
+        return flow {
+            emit(UniqueResult(result = Result.Loading))
+            try {
+                val order = DrinkOrder(
+                    id,
+                    picture,
+                    name,
+                    size,
+                    listTopping,
+                    noteOrder,
+                    countDrink,
+                    totalPrice,
+                    drinkCategory
+                )
+                emit(UniqueResult(result = Result.Success(order)))
+            } catch (e: Exception) {
+                emit(UniqueResult(result = Result.Error(e)))
+            }
+        }
+    }
+
+    override fun getRequiredBean(phone: String): Flow<Result<Int>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = mainApi.getRequiredBean(phone)
+                if (response.isSuccessful) {
+                    if (response.body()?.status == "success") {
+                        response.body()?.result?.get(0)?.let {
+                            emit(Result.Success(it))
+                        }
+                    } else if (response.body()?.status == "fail: no data found") {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    } else {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    }
+                } else {
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
+    }
+
+    override fun insertOrder(
+        userId: Int,
+        name: String?,
+        phone: String?,
+        address: String?,
+        dateTime: String,
+        quantityBeanUse: Int?,
+        paymentMethod: String,
+        shopId: Int?,
+        isDelivery: Boolean,
+        deliveryFee: Float,
+        subTotal: Float,
+        totalPrice: Float,
+        voucherId: Int?,
+        paymentBillId: String?,
+        listDrinkOrder: List<com.hoanglinhsama.client.data.model.DrinkOrder>,
+    ): Flow<Result<Int>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = mainApi.insertOrder(
+                    userId,
+                    name,
+                    phone,
+                    address,
+                    dateTime,
+                    quantityBeanUse,
+                    paymentMethod,
+                    shopId,
+                    isDelivery,
+                    deliveryFee,
+                    subTotal,
+                    totalPrice,
+                    voucherId,
+                    paymentBillId,
+                    Gson().toJson(listDrinkOrder)
+                )
+                if (response.isSuccessful) {
+                    if (response.body()?.status == "success") {
+                        response.body()?.result?.get(0)?.let {
+                            emit(Result.Success(it))
+                        }
+                    } else if (response.body()?.status == "fail: unknown error") {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    } else {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    }
+                } else {
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
     }
 
 }

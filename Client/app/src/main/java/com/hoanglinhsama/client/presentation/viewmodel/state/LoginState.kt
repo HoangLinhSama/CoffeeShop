@@ -13,6 +13,7 @@ data class LoginState(
     private val _timeOtpRemaining: Long = 60,
     private val _shouldStartCountdown: Boolean = false,
     private val _tokenResend: PhoneAuthProvider.ForceResendingToken? = null,
+    private val _isShowBottomSheet: Boolean = false,
 ) {
     val listMethodLogin = _listMethodLogin
     val isFocus = _isFocus

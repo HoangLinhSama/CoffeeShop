@@ -38,15 +38,18 @@ import com.hoanglinhsama.client.presentation.view.ui.theme.SpanishGray
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     value: String,
     containerColor: Color,
     textColor: Color,
     placeholder: String,
     isReadOnly: Boolean,
-    onFilterClick: () -> Unit,
+    leadingIcon: (@Composable () -> Unit),
+    trailingIcon: ((@Composable () -> Unit))?,
+    onTrailingIconClick: () -> Unit,
     onSearch: (String) -> Unit,
     onValueChange: (String) -> Unit,
+    onLeadingIconClick: (() -> Unit)?,
 ) {
     val keyBoardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -66,13 +69,10 @@ fun SearchBar(
             )
         },
         leadingIcon = {
-            IconButton(onClick = {}) {
-                Icon(
-                    Icons.Filled.Search,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(Dimens.smallIcon)
-                )
+            IconButton(onClick = {
+                onLeadingIconClick?.invoke()
+            }) {
+                leadingIcon.invoke()
             }
         },
         modifier = modifier
@@ -83,7 +83,7 @@ fun SearchBar(
                 shape = RoundedCornerShape(Dimens.roundedCornerSize)
             )
             .clickable {
-                if (isReadOnly) onClick
+                if (isReadOnly) onClick?.invoke()
             },
         colors = TextFieldDefaults.colors(
             focusedTextColor = textColor,
@@ -97,21 +97,16 @@ fun SearchBar(
             cursorColor = CopperRed
         ),
         trailingIcon = {
-            if (!isReadOnly) {
+            if (!isReadOnly && trailingIcon != null) {
                 Row(modifier = Modifier.padding(end = 4.dp)) {
                     IconButton(
-                        onClick = onFilterClick,
+                        onClick = onTrailingIconClick,
                         modifier = Modifier.background(
                             color = CopperRed,
                             shape = RoundedCornerShape(Dimens.smallMargin)
                         )
                     ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_filter),
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(Dimens.smallIcon)
-                        )
+                        trailingIcon.invoke()
                     }
                 }
             }
@@ -133,8 +128,21 @@ fun SearchBar(
 @Composable
 fun SearchBarPreview() {
     ClientTheme(dynamicColor = false) {
-        SearchBar(Modifier, {}, "", DarkCharcoal1, Color.White, "Tìm đồ uống", false, {}, {}) {
-
-        }
+        SearchBar(
+            Modifier, {}, "", DarkCharcoal1, Color.White, "Tìm đồ uống", false, {
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(Dimens.smallIcon)
+                )
+            }, {
+                Icon(
+                    painterResource(id = R.drawable.ic_filter),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(Dimens.smallIcon)
+                )
+            }, {}, {}, {}) {}
     }
 }

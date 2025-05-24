@@ -10,13 +10,19 @@ import com.hoanglinhsama.client.data.model.Voucher
 
 fun Voucher.toVoucherDomain(): com.hoanglinhsama.client.domain.model.Voucher {
     return com.hoanglinhsama.client.domain.model.Voucher(
+        this.id,
+        this.code,
         this.startDate,
         this.expirationDate,
         this.name,
+        this.description,
+        this.value,
+        this.type,
+        this.freeShip,
         this.conditions,
         this.categoryDrink,
         this.picture,
-        this.freeShip
+        this.qrCode
     )
 }
 
@@ -41,7 +47,8 @@ fun Drink.toDrinkDomain(): com.hoanglinhsama.client.domain.model.Drink {
         }, valueMapper = {
             it.toInt()
         }),
-        this.countReview
+        this.countReview,
+        this.drinkCategory
     )
 }
 
@@ -67,7 +74,10 @@ fun User.toUserDomain(): com.hoanglinhsama.client.domain.model.User {
         this.lastName,
         this.phone,
         this.address,
-        this.image
+        this.image,
+        this.memberShip,
+        this.currentBean,
+        this.collectedBean
     )
 }
 
@@ -81,6 +91,7 @@ fun Onboarding.toOnboardingDomain(): com.hoanglinhsama.client.domain.model.Onboa
 
 fun Shop.toShopDomain(): com.hoanglinhsama.client.domain.model.Shop {
     return com.hoanglinhsama.client.domain.model.Shop(
+        this.id,
         this.name,
         this.picture,
         this.address,

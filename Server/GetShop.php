@@ -5,7 +5,7 @@ include "Connect.php";
 $page = $_POST["page"];
 $limit = $_POST["pageSize"];
 $offset = ($page - 1) * $limit;
-$query = "SELECT name, picture, address, phone, operating_hours AS operatingHour
+$query = "SELECT id, name, picture, address, phone, operating_hours AS operatingHour
 FROM store
 LIMIT $limit OFFSET $offset";
 try {

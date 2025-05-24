@@ -2,13 +2,20 @@ package com.hoanglinhsama.client.presentation.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hoanglinhsama.client.domain.usecase.main.CreateTempOrderUseCase
+import com.hoanglinhsama.client.presentation.viewmodel.common.TempOrderHolder
+import com.hoanglinhsama.client.presentation.viewmodel.common.UpdateDrinkOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.DetailDrinkEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.DetailDrinkState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailDrinkViewModel @Inject constructor() : ViewModel() {
+class DetailDrinkViewModel @Inject constructor(
+    private val createTempOrderUseCase: CreateTempOrderUseCase,
+) : ViewModel() {
     private val _state = mutableStateOf(DetailDrinkState())
     val state = _state
 
@@ -45,8 +52,22 @@ class DetailDrinkViewModel @Inject constructor() : ViewModel() {
                 _state.value = _state.value.copy(_noteOrder = event.noteOrder)
             }
 
-            DetailDrinkEvent.OrderEvent -> {
-
+            is DetailDrinkEvent.OrderEvent -> {
+                viewModelScope.launch {
+                    createTempOrderUseCase(
+                        event.id,
+                        event.picture,
+                        event.name,
+                        event.size,
+                        event.listTopping,
+                        _state.value.noteOrder,
+                        _state.value.countDrink,
+                        event.totalPrice,
+                        event.drinkCategory
+                    ).collect {
+                        TempOrderHolder.setTempOrder(it)
+                    }
+                }
             }
 
             is DetailDrinkEvent.NoteFocusEvent -> {
@@ -55,6 +76,10 @@ class DetailDrinkViewModel @Inject constructor() : ViewModel() {
 
             is DetailDrinkEvent.ReviewClickEvent -> {
 
+            }
+
+            is DetailDrinkEvent.SendUpdateDrinkOrderEvent -> {
+                UpdateDrinkOrderHolder.setUpdateDrinkOrder(event.drink)
             }
         }
     }
