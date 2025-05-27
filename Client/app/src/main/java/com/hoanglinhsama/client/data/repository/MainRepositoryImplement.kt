@@ -1,5 +1,7 @@
 package com.hoanglinhsama.client.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -7,6 +9,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.gson.Gson
+import com.hoanglinhsama.client.data.mapper.toOrderStatusDomain
 import com.hoanglinhsama.client.data.mapper.toUserDomain
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.data.model.UniqueResult
@@ -19,6 +22,7 @@ import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
 import com.hoanglinhsama.client.domain.model.DrinkOrder
+import com.hoanglinhsama.client.domain.model.OrderStatus
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
@@ -219,4 +223,28 @@ class MainRepositoryImplement @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun getOrderStatus(orderId: Int): Flow<Result<OrderStatus>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = mainApi.getOrderStatus(orderId)
+                if (response.isSuccessful) {
+                    if (response.body()?.status == "success") {
+                        response.body()?.result?.get(0)?.let {
+                            emit(Result.Success(it.toOrderStatusDomain()))
+                        }
+                    } else if (response.body()?.status == "fail: unknown error") {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    } else {
+                        emit(Result.Error(Exception(response.body()?.status)))
+                    }
+                } else {
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
+    }
 }

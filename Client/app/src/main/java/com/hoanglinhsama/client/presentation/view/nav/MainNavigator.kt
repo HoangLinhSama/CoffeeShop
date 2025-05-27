@@ -305,8 +305,9 @@ fun MainNavigator() {
                     {
                         navController.popBackStack()
                     }) {
+                    val openFromOrderHistory = false
                     navController.navigate(
-                        "${Route.OrderStatusScreen.route}/$it"
+                        "${Route.OrderStatusScreen.route}/$it/$openFromOrderHistory"
                     )
                 }
             }
@@ -392,16 +393,23 @@ fun MainNavigator() {
                 }
             }
             composable(
-                route = "${Route.OrderStatusScreen.route}/{orderId}", arguments = listOf(
+                route = "${Route.OrderStatusScreen.route}/{orderId}/{openFromOrderHistory}",
+                arguments = listOf(
                     navArgument("orderId") {
                         type = NavType.IntType
+                    },
+                    navArgument("openFromOrderHistory") {
+                        type = NavType.BoolType
                     })
+
             ) {
                 val orderId = it.arguments?.getInt("orderId")
+                val openFromOrderHistory = it.arguments?.getBoolean("openFromOrderHistory")
                 val orderStatusViewModel: OrderStatusViewModel = hiltViewModel()
                 orderId?.let {
                     OrderStatusScreen(
                         it,
+                        openFromOrderHistory == true,
                         orderStatusViewModel.state.value,
                         orderStatusViewModel::onEvent
                     ) {

@@ -286,6 +286,8 @@ fun ShopCard(modifier: Modifier = Modifier, shop: Shop, onShopClick: () -> Unit)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DrinkOrderCard(
+    isSwipeEnabled: Boolean,
+    color: Color,
     modifier: Modifier = Modifier,
     drinkOrder: DrinkOrder,
     currentIndexSwipe: Int,
@@ -295,9 +297,9 @@ fun DrinkOrderCard(
     onUpdateClick: () -> Unit,
 ) {
     SwipeBox(
-        modifier = modifier.background(Color.White),
+        modifier = modifier.background(color),
         swipeDirection = SwipeDirection.EndToStart,
-        endContentWidth = 130.dp,
+        endContentWidth = if (isSwipeEnabled) 130.dp else 0.dp,
         endContent = { swipeAbleState, endSwipeProgress ->
             LaunchedEffect(currentIndexSwipe != index) {
                 swipeAbleState.animateTo(0)
@@ -392,7 +394,7 @@ fun DrinkOrderCard(
                         )
                     }
                 }
-                if (drinkOrder.note != null) {
+                if (drinkOrder.note != null && drinkOrder.note != "") {
                     Text(
                         text = drinkOrder.note,
                         style = MaterialTheme.typography.labelMedium.copy(
@@ -443,6 +445,8 @@ fun DrinkOrderCardPreview() {
             ), "Bỏ ít đá", 1, 59000F, "Cafe"
         )
         DrinkOrderCard(
+            true,
+            Color.White,
             Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(), drinkOrder, 1, 1, {}, {}) {}

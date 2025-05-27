@@ -40,7 +40,7 @@ try {
             $row2 = mysqli_fetch_assoc($data2);
             $orderId = $row2['id'];
             if ($orderId != null) {
-                $query7 = "INSERT INTO order_status_order VALUES (null,'$orderId',1)";
+                $query7 = "INSERT INTO order_status_order VALUES (null,'$orderId',1,'$dateTime')";
                 $data7 = mysqli_query($connect, $query7);
                 if ($data7) {
                     $listDrink = json_decode($listDrinkOrder, true);
@@ -190,7 +190,9 @@ try {
     if ($allSuccess) {
         sleep(3);
         $status = ($paymentMethod == "Tiền mặt") ? 2 : 3;
-        $query8 = "INSERT INTO order_status_order VALUES (null,'$orderId',$status)";
+        date_default_timezone_set("Asia/Ho_Chi_Minh");
+        $time = date("Y-m-d H:i:s");
+        $query8 = "INSERT INTO order_status_order VALUES (null,'$orderId',$status,'$time')";
         $data8 = mysqli_query($connect, $query8);
         if ($data8) {
             $response = [

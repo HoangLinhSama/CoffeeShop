@@ -338,6 +338,8 @@ fun OrderScreen(
                             state.listDrinkOrder.let { listDrinkOrder ->
                                 repeat(listDrinkOrder.size) { index ->
                                     DrinkOrderCard(
+                                        true,
+                                        Color.White,
                                         Modifier
                                             .fillMaxWidth()
                                             .wrapContentHeight(),

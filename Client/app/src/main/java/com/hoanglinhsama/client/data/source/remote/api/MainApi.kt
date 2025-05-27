@@ -4,6 +4,7 @@ import com.hoanglinhsama.client.data.model.Drink
 import com.hoanglinhsama.client.data.model.DrinkCategory
 import com.hoanglinhsama.client.data.model.MainResponse
 import com.hoanglinhsama.client.data.model.Onboarding
+import com.hoanglinhsama.client.data.model.OrderStatus
 import com.hoanglinhsama.client.data.model.Policies
 import com.hoanglinhsama.client.data.model.Shop
 import com.hoanglinhsama.client.data.model.User
@@ -106,4 +107,8 @@ interface MainApi {
         @Field("paymentBillId") paymentBillId: String?,
         @Field("listDrinkOrder") listDrinkOrder: String,
     ): Response<MainResponse<Int>>
+
+    @POST("GetOrderStatus.php")
+    @FormUrlEncoded
+    suspend fun getOrderStatus(@Field("orderId") orderId: Int): Response<MainResponse<OrderStatus>>
 }

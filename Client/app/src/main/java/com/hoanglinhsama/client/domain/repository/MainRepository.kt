@@ -6,6 +6,7 @@ import com.hoanglinhsama.client.data.model.UniqueResult
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
 import com.hoanglinhsama.client.domain.model.DrinkOrder
+import com.hoanglinhsama.client.domain.model.OrderStatus
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
@@ -50,4 +51,6 @@ interface MainRepository {
         paymentBillId: String?,
         listDrinkOrder: List<com.hoanglinhsama.client.data.model.DrinkOrder>,
     ): Flow<Result<Int>>
+
+    fun getOrderStatus(orderId: Int): Flow<Result<OrderStatus>>
 }
