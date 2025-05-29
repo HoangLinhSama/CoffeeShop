@@ -4,6 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoanglinhsama.client.domain.usecase.main.CreateTempOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.SendTempOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.SendUpdateDrinkOrderUseCase
 import com.hoanglinhsama.client.presentation.viewmodel.common.TempOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.common.UpdateDrinkOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.DetailDrinkEvent
@@ -15,6 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailDrinkViewModel @Inject constructor(
     private val createTempOrderUseCase: CreateTempOrderUseCase,
+    private val sendTempOrderUseCase: SendTempOrderUseCase,
+    private val sendUpdateDrinkOrderUseCase: SendUpdateDrinkOrderUseCase
 ) : ViewModel() {
     private val _state = mutableStateOf(DetailDrinkState())
     val state = _state
@@ -65,7 +69,7 @@ class DetailDrinkViewModel @Inject constructor(
                         event.totalPrice,
                         event.drinkCategory
                     ).collect {
-                        TempOrderHolder.setTempOrder(it)
+                        sendTempOrderUseCase(it)
                     }
                 }
             }
@@ -79,7 +83,7 @@ class DetailDrinkViewModel @Inject constructor(
             }
 
             is DetailDrinkEvent.SendUpdateDrinkOrderEvent -> {
-                UpdateDrinkOrderHolder.setUpdateDrinkOrder(event.drink)
+                sendUpdateDrinkOrderUseCase(event.drink)
             }
         }
     }

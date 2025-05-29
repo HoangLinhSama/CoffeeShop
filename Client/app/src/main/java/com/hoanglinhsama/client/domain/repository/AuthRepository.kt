@@ -31,17 +31,8 @@ interface AuthRepository {
         callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
     )
 
-    fun checkPermission(
-        activityResultLauncher: ActivityResultLauncher<Intent>,
-        requestPermissionLauncher: ActivityResultLauncher<String>,
-    )
-
-    fun handleImageResult(
-        activityResult: ActivityResult,
-        callback: (MultipartBody.Part) -> Unit,
-    )
-
     fun getPolicy(): Flow<PagingData<Policies>>
+
     fun uploadAvatar(
         multipartBody: MultipartBody.Part,
     ): Flow<Result<String>>

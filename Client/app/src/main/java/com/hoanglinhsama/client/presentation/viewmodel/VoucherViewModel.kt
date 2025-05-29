@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.hoanglinhsama.client.R
-import com.hoanglinhsama.client.domain.usecase.main.GetUserUseCase
+import com.hoanglinhsama.client.domain.usecase.main.ReceiveVoucherUseCase
 import com.hoanglinhsama.client.presentation.viewmodel.common.VoucherHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.VoucherEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.VoucherState
@@ -17,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VoucherViewModel @Inject constructor(
+    private val receiveVoucherUseCase: ReceiveVoucherUseCase,
 ) : ViewModel() {
     private val _state = mutableStateOf(VoucherState())
     val state = _state
@@ -25,20 +26,9 @@ class VoucherViewModel @Inject constructor(
         initListTabRow()
     }
 
-    private fun receiveInfo(typeOrder: String) {
-        getVoucher(typeOrder)
-    }
-
     private fun getVoucher(typeOrder: String) {
-        val itemsVoucher = VoucherHolder.voucher
-            .filterNotNull()
-            .map { pagingData ->
-                pagingData.filter { voucher ->
-                    voucher.type == typeOrder
-                }
-            }.cachedIn(viewModelScope)
-        _state.value =
-            _state.value.copy(_itemsVoucher = itemsVoucher)
+        val itemsVoucher = receiveVoucherUseCase.getVoucherByType(viewModelScope, typeOrder)
+        _state.value = _state.value.copy(_itemsVoucher = itemsVoucher)
     }
 
     private fun initListTabRow() {
@@ -82,7 +72,7 @@ class VoucherViewModel @Inject constructor(
             }
 
             is VoucherEvent.ReceiveInfoEvent -> {
-                receiveInfo(event.typeOrder)
+                getVoucher(event.typeOrder)
             }
         }
     }

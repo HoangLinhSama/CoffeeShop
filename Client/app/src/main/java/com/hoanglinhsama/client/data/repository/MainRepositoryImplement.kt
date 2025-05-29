@@ -111,38 +111,6 @@ class MainRepositoryImplement @Inject constructor(
             }).flow
     }
 
-    override fun createTempOrder(
-        id: Int,
-        picture: String,
-        name: String,
-        size: String?,
-        listTopping: List<String>?,
-        noteOrder: String,
-        countDrink: Int,
-        totalPrice: Float,
-        drinkCategory: String,
-    ): Flow<UniqueResult<DrinkOrder>> {
-        return flow {
-            emit(UniqueResult(result = Result.Loading))
-            try {
-                val order = DrinkOrder(
-                    id,
-                    picture,
-                    name,
-                    size,
-                    listTopping,
-                    noteOrder,
-                    countDrink,
-                    totalPrice,
-                    drinkCategory
-                )
-                emit(UniqueResult(result = Result.Success(order)))
-            } catch (e: Exception) {
-                emit(UniqueResult(result = Result.Error(e)))
-            }
-        }
-    }
-
     override fun getRequiredBean(phone: String): Flow<Result<Int>> {
         return flow {
             emit(Result.Loading)
@@ -246,5 +214,9 @@ class MainRepositoryImplement @Inject constructor(
                 emit(Result.Error(e))
             }
         }
+    }
+
+    override fun createOrderZaloPay(pay: com.hoanglinhsama.client.domain.model.OrderZaloPay) {
+
     }
 }

@@ -71,6 +71,15 @@ fun OrderStatusScreen(
     LaunchedEffect(Unit) {
         event(OrderStatusEvent.GetOrderStatusEvent(orderId))
     }
+    LaunchedEffect(state.orderStatus) {
+        if (!state.hasLaunchedPayment) {
+            state.orderStatus?.let {
+                if (it.listStatus.lastOrNull()?.name == "Chờ thanh toán") {
+                    event(OrderStatusEvent.PaymentEvent(true, it.methodPayment))
+                }
+            }
+        }
+    }
     val formatterMoney = DecimalFormat("#,###")
     val formatterTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     ConstraintLayout(

@@ -1,13 +1,6 @@
 package com.hoanglinhsama.client.data.repository
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -29,16 +22,12 @@ import com.hoanglinhsama.client.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AuthRepositoryImplement @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val intent: Intent,
-    private val context: Context,
     private val mainApi: MainApi,
     private val userSettingDataStore: DataStore<Preferences>,
 ) : AuthRepository {
@@ -105,39 +94,6 @@ class AuthRepositoryImplement @Inject constructor(
                 }
             }).setForceResendingToken(token).build()
         PhoneAuthProvider.verifyPhoneNumber(options)
-    }
-
-    override fun checkPermission(
-        activityResultLauncher: ActivityResultLauncher<Intent>,
-        requestPermissionLauncher: ActivityResultLauncher<String>,
-    ) {
-        if (ContextCompat.checkSelfPermission(
-                context, READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) activityResultLauncher.launch(intent)
-        else requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
-    }
-
-    override fun handleImageResult(
-        activityResult: ActivityResult,
-        callback: (MultipartBody.Part) -> Unit,
-    ) {
-        if (activityResult.resultCode == Activity.RESULT_OK && activityResult.data != null) {
-            val uri = activityResult.data?.data ?: return
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val requestBody =
-                inputStream?.readBytes()?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val fileName = "avatar_${System.currentTimeMillis()}.jpg"
-            requestBody?.let {
-                callback(
-                    MultipartBody.Part.createFormData(
-                        "pictureAvatar",
-                        fileName,
-                        it
-                    )
-                )
-            }
-        }
     }
 
     override fun getPolicy(): Flow<PagingData<Policies>> {

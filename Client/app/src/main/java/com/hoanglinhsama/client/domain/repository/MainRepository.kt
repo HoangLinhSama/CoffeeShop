@@ -7,6 +7,7 @@ import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
 import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.OrderStatus
+import com.hoanglinhsama.client.domain.model.OrderZaloPay
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
@@ -21,18 +22,6 @@ interface MainRepository {
     suspend fun updateStateLogIn()
     suspend fun logOut()
     fun getShop(): Flow<PagingData<Shop>>
-    fun createTempOrder(
-        id: Int,
-        picture: String,
-        name: String,
-        size: String?,
-        listTopping: List<String>?,
-        noteOrder: String,
-        countDrink: Int,
-        totalPrice: Float,
-        drinkCategory: String,
-    ): Flow<UniqueResult<DrinkOrder>>
-
     fun getRequiredBean(phone: String): Flow<Result<Int>>
     fun insertOrder(
         userId: Int,
@@ -53,4 +42,5 @@ interface MainRepository {
     ): Flow<Result<Int>>
 
     fun getOrderStatus(orderId: Int): Flow<Result<OrderStatus>>
+    fun createOrderZaloPay(pay: OrderZaloPay)
 }

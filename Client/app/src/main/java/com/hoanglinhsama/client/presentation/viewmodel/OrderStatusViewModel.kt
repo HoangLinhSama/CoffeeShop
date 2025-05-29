@@ -1,10 +1,12 @@
 package com.hoanglinhsama.client.presentation.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoanglinhsama.client.data.model.Result
-import com.hoanglinhsama.client.domain.usecase.main.GetOrderHistoryUseCase
+import com.hoanglinhsama.client.domain.usecase.main.GetOrderStatusUseCase
+import com.hoanglinhsama.client.domain.usecase.main.PayWithZaloPayUseCase
 import com.hoanglinhsama.client.presentation.viewmodel.event.OrderStatusEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.OrderStatusState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +14,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OrderStatusViewModel @Inject constructor(private val getOrderHistoryUseCase: GetOrderHistoryUseCase) :
+class OrderStatusViewModel @Inject constructor(
+    private val getOrderStatusUseCase: GetOrderStatusUseCase,
+    private val payWithZaloPayUseCase: PayWithZaloPayUseCase,
+) :
     ViewModel() {
     private val _state = mutableStateOf(OrderStatusState())
     val state = _state
@@ -28,10 +33,10 @@ class OrderStatusViewModel @Inject constructor(private val getOrderHistoryUseCas
 
             is OrderStatusEvent.GetOrderStatusEvent -> {
                 viewModelScope.launch {
-                    getOrderHistoryUseCase.getOrderStatus(event.orderId).collect {
+                    getOrderStatusUseCase(event.orderId).collect {
                         when (it) {
                             is Result.Error -> {
-
+                                Log.d("TAG", "GetOrderStatusUseCase: ${it.exception}")
                             }
 
                             is Result.Loading -> {
@@ -52,6 +57,16 @@ class OrderStatusViewModel @Inject constructor(private val getOrderHistoryUseCas
 
             OrderStatusEvent.ShowProcessStatusOrderEvent -> {
 
+            }
+
+            is OrderStatusEvent.PaymentEvent -> {
+                _state.value = _state.value.copy(_hasLaunchedPayment = true)
+                when (event.methodPayment) {
+                    "ZaloPay" -> {
+//                        val orderZaloPay = OrderZaloPay()
+//                        payWithZaloPayUseCase()
+                    }
+                }
             }
         }
     }

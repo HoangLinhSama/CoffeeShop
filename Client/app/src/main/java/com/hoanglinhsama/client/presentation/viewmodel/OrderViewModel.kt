@@ -6,9 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.domain.model.FeatureItem
+import com.hoanglinhsama.client.domain.usecase.main.CalculateDeliveryFeeUseCase
+import com.hoanglinhsama.client.domain.usecase.main.CalculateSubtotalUseCase
+import com.hoanglinhsama.client.domain.usecase.main.CalculateTotalPaymentUseCase
+import com.hoanglinhsama.client.domain.usecase.main.CheckVoucherAvailabilityUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetUserUseCase
 import com.hoanglinhsama.client.domain.usecase.main.InsertOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.ReceiveTempOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.ReceiveUpdateDrinkOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.UpdateCountDrinkOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.UpdateSizeDrinkOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.UpdateToppingDrinkOrderUseCase
+import com.hoanglinhsama.client.domain.usecase.main.UpdateUseBeanUseCase
+import com.hoanglinhsama.client.domain.usecase.main.UpdateUseVoucherUseCase
 import com.hoanglinhsama.client.presentation.view.screen.BottomSheetContent
 import com.hoanglinhsama.client.presentation.viewmodel.common.TempOrderHolder
 import com.hoanglinhsama.client.presentation.viewmodel.common.UpdateDrinkOrderHolder
@@ -21,13 +32,23 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.properties.Delegates
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getPhoneUseCase: GetPhoneUseCase,
     private val insertOrderUseCase: InsertOrderUseCase,
+    private val receiveTempOrderUseCase: ReceiveTempOrderUseCase,
+    private val calculateDeliveryFeeUseCase: CalculateDeliveryFeeUseCase,
+    private val calculateSubTotalUseCase: CalculateSubtotalUseCase,
+    private val calculateTotalPaymentUseCase: CalculateTotalPaymentUseCase,
+    private val receiveUpdateDrinkOrderUseCase: ReceiveUpdateDrinkOrderUseCase,
+    private val checkVoucherAvailabilityUseCase: CheckVoucherAvailabilityUseCase,
+    private val updateSizeDrinkOrderUseCase: UpdateSizeDrinkOrderUseCase,
+    private val updateToppingDrinkOrderUseCase: UpdateToppingDrinkOrderUseCase,
+    private val updateCountDrinkOrderUseCase: UpdateCountDrinkOrderUseCase,
+    private val updateUseVoucherUseCase: UpdateUseVoucherUseCase,
+    private val updateUseBeanUseCase: UpdateUseBeanUseCase,
 ) : ViewModel() {
     private val _state = mutableStateOf(OrderState())
     val state = _state
@@ -58,21 +79,8 @@ class OrderViewModel @Inject constructor(
     private fun receiveUpdateDrinkOrder() {
         viewModelScope.launch {
             UpdateDrinkOrderHolder.updateDrinkOrder.collect { drink ->
-                val listUpdateDrinkOrder = _state.value.listUpdateDrinkOrder?.toMutableList()
-                if (_state.value.listUpdateDrinkOrder?.isNotEmpty() == true) {
-                    val index = listUpdateDrinkOrder?.indexOfFirst {
-                        it.id == drink?.id
-                    }
-                    if (index == -1) {
-                        drink?.let {
-                            listUpdateDrinkOrder.add(it)
-                        }
-                    }
-                } else {
-                    drink?.let {
-                        listUpdateDrinkOrder?.add(it)
-                    }
-                }
+                val listUpdateDrinkOrder =
+                    receiveUpdateDrinkOrderUseCase(_state.value.listUpdateDrinkOrder, drink)
                 _state.value = _state.value.copy(_listUpdateDrinkOrder = listUpdateDrinkOrder)
             }
         }
@@ -83,25 +91,7 @@ class OrderViewModel @Inject constructor(
             TempOrderHolder.tempOrder.collect { result ->
                 if (result?.result is Result.Success) {
                     val data = (result.result as Result.Success).data
-                    val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
-                    if (_state.value.listDrinkOrder?.isNotEmpty() == true) {
-                        val index = listDrinkOrder?.indexOfFirst { drinkOrder ->
-                            drinkOrder.id == data.id && drinkOrder.size == data.size && drinkOrder.listTopping == data.listTopping && drinkOrder.note == data.note
-                        }
-                        index?.let { index ->
-                            if (index != -1) {
-                                val drinkOrder = listDrinkOrder[index]
-                                listDrinkOrder[index] = drinkOrder.copy(
-                                    _count = drinkOrder.count + data.count,
-                                    _price = drinkOrder.price + data.price
-                                )
-                            } else {
-                                listDrinkOrder.add(data)
-                            }
-                        }
-                    } else {
-                        listDrinkOrder?.add(data)
-                    }
+                    val listDrinkOrder = receiveTempOrderUseCase(_state.value.listDrinkOrder, data)
                     _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
                     updateSubTotal()
                     updateTotalPayment()
@@ -133,33 +123,24 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun updateTotalPayment() {
-        val totalPayment = _state.value.shippingFee?.let {
-            _state.value.subTotal?.plus(it)?.minus(_state.value.disCount)
-        }
+        val totalPayment = calculateTotalPaymentUseCase(
+            _state.value.shippingFee,
+            _state.value.subTotal,
+            _state.value.disCount
+        )
         _state.value = _state.value.copy(_totalPayment = totalPayment)
     }
 
     private fun updateSubTotal() {
-        val subTotal = _state.value.listDrinkOrder?.sumOf {
-            it.price.toInt()
-        }?.toFloat()
+        val subTotal = calculateSubTotalUseCase(_state.value.listDrinkOrder)
         _state.value = _state.value.copy(_subTotal = subTotal)
     }
 
     private fun updateDeliveryFee() {
-        val address = state.value.listInformation?.get(2)?.lowercase()
-        val shippingFee = (if (!state.value.isDelivery) {
-            0
-        } else {
-            if (address?.contains("hồ chí minh") == true || address?.contains("ho chi minh") == true || address?.contains(
-                    "hochiminh"
-                ) == true || address?.contains("hcm") == true
-            ) {
-                15000
-            } else {
-                30000
-            }
-        }).toFloat()
+        val shippingFee = calculateDeliveryFeeUseCase(
+            state.value.listInformation?.get(2)?.lowercase(),
+            state.value.isDelivery
+        )
         _state.value = _state.value.copy(
             _shippingFee = shippingFee
         )
@@ -167,40 +148,19 @@ class OrderViewModel @Inject constructor(
 
     private fun checkVoucherAvailability() {
         _state.value.voucher?.let {
-            val typeOrder = if (_state.value.isDelivery) "delivery" else "takeaway"
-            val quantity = _state.value.listDrinkOrder?.sumOf {
-                it.count
-            }
-            var quantityCondition by Delegates.notNull<Int>()
-            var priceCondition by Delegates.notNull<Int>()
-            val listDrinkCategory =
-                _state.value.listDrinkOrder?.map { it.drinkCategory }?.distinct()
-            val drinkCategoryCondition = listDrinkCategory?.any { drinkCategory ->
-                drinkCategory in it.categoryDrink
-            }
-            if (it.conditions.toString().length < 4) {
-                quantityCondition = it.conditions.toString().toInt()
-                if (it.type != typeOrder || quantity!! < quantityCondition || drinkCategoryCondition == false) {
-                    _state.value = _state.value.copy(_voucher = null, _disCount = 0F)
-                    updateDeliveryFee()
-                    state.value.listDrinkOrder?.let { listDrinkOrder ->
-                        if (listDrinkOrder.isNotEmpty()) {
-                            viewModelScope.launch {
-                                _eventFlow.emit(ShowToast("Voucher không còn khả dụng"))
-                            }
-                        }
-                    }
-                }
-            } else {
-                priceCondition = it.conditions.toString().toInt()
-                if (it.type != typeOrder || state.value.subTotal!! < priceCondition || drinkCategoryCondition == false) {
-                    _state.value = _state.value.copy(_voucher = null, _disCount = 0F)
-                    updateDeliveryFee()
-                    state.value.listDrinkOrder?.let { listDrinkOrder ->
-                        if (listDrinkOrder.isNotEmpty()) {
-                            viewModelScope.launch {
-                                _eventFlow.emit(ShowToast("Voucher không còn khả dụng"))
-                            }
+            val isAvailable = checkVoucherAvailabilityUseCase(
+                it,
+                _state.value.listDrinkOrder,
+                _state.value.isDelivery,
+                _state.value.subTotal!!
+            )
+            if (!isAvailable) {
+                _state.value = _state.value.copy(_voucher = null, _disCount = 0F)
+                updateDeliveryFee()
+                state.value.listDrinkOrder?.let { listDrinkOrder ->
+                    if (listDrinkOrder.isNotEmpty()) {
+                        viewModelScope.launch {
+                            _eventFlow.emit(ShowToast("Voucher không còn khả dụng"))
                         }
                     }
                 }
@@ -219,7 +179,10 @@ class OrderViewModel @Inject constructor(
 
             is OrderEvent.SelectBottomSheetShowEvent -> {
                 _state.value =
-                    _state.value.copy(_showBottomSheet = true, _bottomSheet = event.bottomSheet)
+                    _state.value.copy(
+                        _showBottomSheet = true,
+                        _bottomSheet = event.bottomSheet
+                    )
             }
 
             is OrderEvent.UpdateInfoDeliveryEvent -> {
@@ -243,7 +206,8 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.UpdateSelectModeEvent -> {
-                _state.value = _state.value.copy(_shopScreenIsSelectMode = event.isSelectMode)
+                _state.value =
+                    _state.value.copy(_shopScreenIsSelectMode = event.isSelectMode)
             }
 
             is OrderEvent.UpdateSelectShopEvent -> {
@@ -262,7 +226,10 @@ class OrderViewModel @Inject constructor(
                 val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
                 listDrinkOrder?.removeAt(event.index)
                 _state.value =
-                    _state.value.copy(_listDrinkOrder = listDrinkOrder, _currentlySwipedIndex = -1)
+                    _state.value.copy(
+                        _listDrinkOrder = listDrinkOrder,
+                        _currentlySwipedIndex = -1
+                    )
                 updateSubTotal()
                 checkVoucherAvailability()
                 updateTotalPayment()
@@ -283,7 +250,8 @@ class OrderViewModel @Inject constructor(
 
             is OrderEvent.UpdateNoteEvent -> {
                 val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
-                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
+                var updateDrinkOrder =
+                    listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
                 updateDrinkOrder = updateDrinkOrder?.copy(_note = event.note)
                 updateDrinkOrder.let {
                     it?.let { element ->
@@ -296,16 +264,12 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.UpdateSizeEvent -> {
-                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
-                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
-                val priceSizeOld = event.drink.priceSize?.get(updateDrinkOrder?.size)!!
-                val priceSizeNew = event.drink.priceSize[event.size]!!
-                val newPrice =
-                    (priceSizeNew - priceSizeOld) * updateDrinkOrder!!.count + updateDrinkOrder.price
-                updateDrinkOrder = updateDrinkOrder.copy(_size = event.size, _price = newPrice)
-                updateDrinkOrder.let {
-                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
-                }
+                val listDrinkOrder = updateSizeDrinkOrderUseCase(
+                    _state.value.listDrinkOrder,
+                    _state.value.indexUpdateOrderDrink,
+                    event.size,
+                    event.drink
+                )
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
                 updateSubTotal()
                 checkVoucherAvailability()
@@ -313,30 +277,13 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.UpdateToppingEvent -> {
-                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
-                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
-                val listUpdateTopping = updateDrinkOrder?.listTopping?.toMutableList()
-                val listTopping = event.drink.toppingPrice?.keys?.toList()
-                val topping = listTopping?.get(event.index)
-                val totalToppingPriceOld = updateDrinkOrder?.listTopping?.sumOf {
-                    event.drink.toppingPrice?.get(it) ?: 0
-                } ?: 0
-                if (event.isSelect) {
-                    listUpdateTopping?.add(topping.toString())
-                } else {
-                    listUpdateTopping?.remove(topping.toString())
-                }
-                updateDrinkOrder = updateDrinkOrder?.copy(_listTopping = listUpdateTopping)
-                val totalToppingPriceNew = updateDrinkOrder?.listTopping?.sumOf {
-                    event.drink.toppingPrice?.get(it) ?: 0
-                } ?: 0
-                val price = (totalToppingPriceNew.minus(totalToppingPriceOld)).times(
-                    updateDrinkOrder?.count ?: 1
-                ).plus(updateDrinkOrder!!.price)
-                updateDrinkOrder = updateDrinkOrder.copy(_price = price)
-                updateDrinkOrder.let {
-                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
-                }
+                val listDrinkOrder = updateToppingDrinkOrderUseCase(
+                    _state.value.listDrinkOrder,
+                    _state.value.indexUpdateOrderDrink,
+                    event.isSelect,
+                    event.index,
+                    event.drink
+                )
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
                 updateSubTotal()
                 checkVoucherAvailability()
@@ -344,14 +291,11 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.UpdateCountDrinkEvent -> {
-                val listDrinkOrder = _state.value.listDrinkOrder?.toMutableList()
-                var updateDrinkOrder = listDrinkOrder?.get(state.value.indexUpdateOrderDrink)
-                val price = (updateDrinkOrder!!.price / updateDrinkOrder.count) * event.quantity
-                updateDrinkOrder = updateDrinkOrder.copy(_price = price, _count = event.quantity)
-                updateDrinkOrder.let {
-                    listDrinkOrder?.set(state.value.indexUpdateOrderDrink, it)
-                }
-                _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
+                val listDrinkOrder = updateCountDrinkOrderUseCase(
+                    _state.value.listDrinkOrder,
+                    _state.value.indexUpdateOrderDrink,
+                    event.quantity
+                )
                 _state.value = _state.value.copy(_listDrinkOrder = listDrinkOrder)
                 updateSubTotal()
                 checkVoucherAvailability()
@@ -360,27 +304,24 @@ class OrderViewModel @Inject constructor(
 
             is OrderEvent.UpdateVoucherEvent -> {
                 _state.value = _state.value.copy(_voucher = event.voucher)
-                _state.value.voucher?.value?.let {
+                _state.value.voucher?.let {
                     viewModelScope.launch {
                         _eventFlow.emit(ShowToast("Đã áp dụng Voucher"))
                     }
-                    if (it < 1) {
-                        _state.value.subTotal?.times(it)?.let { discount ->
-                            _state.value =
-                                _state.value.copy(_disCount = discount)
-                            updateTotalPayment()
-                        }
-                    } else {
-                        _state.value = _state.value.copy(_disCount = it)
-                        updateTotalPayment()
-                    }
-                    if (_state.value.voucher?.freeShip == true) {
-                        _state.value = _state.value.copy(_shippingFee = 0F)
-                        updateTotalPayment()
-                    } else {
+                    val updateUseVoucherResult = updateUseVoucherUseCase(
+                        it.value,
+                        _state.value.subTotal,
+                        _state.value.shippingFee,
+                        it.freeShip
+                    )
+                    _state.value = _state.value.copy(
+                        _disCount = updateUseVoucherResult.discount,
+                        _shippingFee = updateUseVoucherResult.shippingFee
+                    )
+                    if (_state.value.voucher?.freeShip == false) {
                         updateDeliveryFee()
-                        updateTotalPayment()
                     }
+                    updateTotalPayment()
                 }
             }
 
@@ -396,22 +337,20 @@ class OrderViewModel @Inject constructor(
             }
 
             is OrderEvent.UpdateUseBeanEvent -> {
+                val updateUseBeanResult =
+                    updateUseBeanUseCase(event.useBean, _state.value.currentBean)
+                _state.value = _state.value.copy(
+                    _useBean = updateUseBeanResult.useBean,
+                    _disCount = updateUseBeanResult.discount,
+                    _voucher = if (updateUseBeanResult.useBean) null else _state.value.voucher,
+                    _showDialog = if (!updateUseBeanResult.useBean) false else _state.value.showDialog
+                )
+                viewModelScope.launch {
+                    _eventFlow.emit(ShowToast(updateUseBeanResult.toastMessage))
+                }
                 _state.value = _state.value.copy(
                     _useBean = event.useBean
                 )
-                if (event.useBean) {
-                    _state.value.currentBean?.times(1000)?.toFloat()?.let {
-                        _state.value = _state.value.copy(_voucher = null, _disCount = it)
-                        viewModelScope.launch {
-                            _eventFlow.emit(ShowToast("Đã áp dụng đổi bean"))
-                        }
-                    }
-                } else {
-                    _state.value = _state.value.copy(_disCount = 0F, _showDialog = false)
-                    viewModelScope.launch {
-                        _eventFlow.emit(ShowToast("Đã hủy áp dụng đổi bean"))
-                    }
-                }
                 updateTotalPayment()
             }
 
