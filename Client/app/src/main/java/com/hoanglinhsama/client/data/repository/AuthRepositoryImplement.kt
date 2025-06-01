@@ -1,20 +1,14 @@
 package com.hoanglinhsama.client.data.repository
 
-import android.app.Activity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
 import com.hoanglinhsama.client.data.model.Result
+import com.hoanglinhsama.client.data.source.local.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.paging.PolicyPagingSource
-import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
 import com.hoanglinhsama.client.data.source.remote.api.ApiUtil
 import com.hoanglinhsama.client.data.source.remote.api.MainApi
 import com.hoanglinhsama.client.domain.model.Policies
@@ -23,79 +17,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AuthRepositoryImplement @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
     private val mainApi: MainApi,
     private val userSettingDataStore: DataStore<Preferences>,
 ) : AuthRepository {
-    override suspend fun sendVerificationCode(
-        activity: Activity,
-        phoneNumber: String,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    ) {
-        firebaseAuth.setLanguageCode("vi")
-        val options = PhoneAuthOptions.newBuilder(firebaseAuth).setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS).setActivity(activity)
-            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                    callback(true, null, null)
-                    signInWithPhoneAuthCredential(p0, callback)
-                }
-
-                override fun onVerificationFailed(p0: FirebaseException) {
-                    callback(false, p0.message, null)
-                }
-
-                override fun onCodeSent(
-                    verificationId: String,
-                    token: PhoneAuthProvider.ForceResendingToken,
-                ) {
-                    callback(true, verificationId, token)
-                }
-            }).build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
-    }
-
-    override suspend fun verifyCode(
-        verificationId: String,
-        code: String,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    ) {
-        val credential = PhoneAuthProvider.getCredential(verificationId, code)
-        signInWithPhoneAuthCredential(credential, callback)
-    }
-
-    override suspend fun resendOtp(
-        activity: Activity,
-        phoneNumber: String,
-        token: PhoneAuthProvider.ForceResendingToken,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    ) {
-        val options = PhoneAuthOptions.newBuilder(firebaseAuth).setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS).setActivity(activity)
-            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                    callback(true, null, null)
-                    signInWithPhoneAuthCredential(p0, callback)
-                }
-
-                override fun onVerificationFailed(p0: FirebaseException) {
-                    callback(false, p0.message, null)
-                }
-
-                override fun onCodeSent(
-                    verificationId: String,
-                    token: PhoneAuthProvider.ForceResendingToken,
-                ) {
-                    callback(true, verificationId, token)
-                }
-            }).setForceResendingToken(token).build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
-    }
-
     override fun getPolicy(): Flow<PagingData<Policies>> {
         return Pager(
             config = PagingConfig(initialLoadSize = 4, pageSize = 4),
@@ -210,20 +137,6 @@ class AuthRepositoryImplement @Inject constructor(
     override fun autoFillPhone(): Flow<Boolean> {
         return userSettingDataStore.data.map {
             it[PreferenceKey.CHECKED_SAVE_PHONE] == true
-        }
-    }
-
-    private fun signInWithPhoneAuthCredential(
-        credential: PhoneAuthCredential,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    ) {
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val user = task.result?.user
-                callback(true, user?.uid, null)
-            } else {
-                callback(false, task.exception?.message, null)
-            }
         }
     }
 }

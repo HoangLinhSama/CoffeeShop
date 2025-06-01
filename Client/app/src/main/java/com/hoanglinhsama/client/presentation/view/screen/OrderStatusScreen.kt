@@ -1,7 +1,9 @@
 package com.hoanglinhsama.client.presentation.view.screen
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,12 +65,14 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderStatusScreen(
+    activity: Activity? = null,
     orderId: Int,
     openFromOrderHistory: Boolean,
     state: OrderStatusState,
     event: (OrderStatusEvent) -> Unit,
     onBackClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         event(OrderStatusEvent.GetOrderStatusEvent(orderId))
     }
@@ -75,7 +80,36 @@ fun OrderStatusScreen(
         if (!state.hasLaunchedPayment) {
             state.orderStatus?.let {
                 if (it.listStatus.lastOrNull()?.name == "Chờ thanh toán") {
-                    event(OrderStatusEvent.PaymentEvent(true, it.methodPayment))
+                    event(
+                        OrderStatusEvent.PaymentEvent(
+                            it.methodPayment,
+                            orderId,
+                            activity!!
+                        ) { status, dataMessage ->
+                            if (status) {
+                                event(
+                                    OrderStatusEvent.UpdateStatePaymentEvent(
+                                        dataMessage,
+                                        true,
+                                        orderId,
+                                        23
+                                    ) { status, message ->
+                                        if (status == "success") {
+                                            onBackClick()
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Đã có lỗi xảy ra: $message",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                )
+                            } else {
+                                Toast.makeText(context, dataMessage, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -710,6 +744,7 @@ fun OrderStatusScreenPreview() {
             ),
             "Linh Hoàng",
             "+84968674274",
+            "63",
             "Quận 12, Hồ Chí Minh",
             listOf(drinkOrder, drinkOrder),
             null,
@@ -722,7 +757,7 @@ fun OrderStatusScreenPreview() {
             null,
             "Free ship đơn 30K"
         )
-        OrderStatusScreen(1, false, OrderStatusState(orderStatus, "ZLPCFS170125052025"), {}) {
+        OrderStatusScreen(null, 1, false, OrderStatusState(orderStatus, "ZLPCFS170125052025"), {}) {
 
         }
     }

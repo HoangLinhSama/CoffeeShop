@@ -172,6 +172,21 @@ class OrderViewModel @Inject constructor(
         when (event) {
             is OrderEvent.OrderTypeClickEvent -> {
                 _state.value = _state.value.copy(_isDelivery = event.isDelivery)
+                val listPaymentMethod = _state.value.listMethodPayment?.toMutableList()
+                if (_state.value.isDelivery) {
+                    val hasCash = listPaymentMethod?.any { it.title == "Tiền mặt" } == true
+                    if (!hasCash) {
+                        listPaymentMethod?.add(
+                            0,
+                            FeatureItem(R.drawable.ic_cash, "Tiền mặt", null, null)
+                        )
+                    }
+                } else {
+                    if (listPaymentMethod?.firstOrNull()?.title == "Tiền mặt") {
+                        listPaymentMethod.removeAt(0)
+                    }
+                }
+                _state.value = _state.value.copy(_listMethodPayment = listPaymentMethod)
                 checkVoucherAvailability()
                 updateDeliveryFee()
                 updateTotalPayment()

@@ -5,6 +5,7 @@ data class OrderStatus(
     private val _listStatus: List<Status>,
     private val _name: String?,
     private val _phone: String?,
+    private val _userId: String,
     private val _address: String?,
     private val _listDrinkOrder: List<DrinkOrder>,
     private val _shopName: String?,
@@ -21,6 +22,7 @@ data class OrderStatus(
     val listStatus = _listStatus
     val name = _name
     val phone = _phone
+    val userId = _userId
     val address = _address
     val listDrinkOrder = _listDrinkOrder
     val shopName = _shopName

@@ -8,7 +8,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.CipherSuite
+import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.TlsVersion
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -20,7 +25,41 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideRequest(url: String, formBody: RequestBody): Request {
+        return Request.Builder()
+            .url(url)
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .post(formBody)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideConnectionSpec(): ConnectionSpec {
+        return ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+            .tlsVersions(TlsVersion.TLS_1_2)
+            .cipherSuites(
+                CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+                CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+                CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+            )
+            .build()
+    }
+
+    @Provides
+    @ZaloPayOkHttpClient
+    @Singleton
+    fun provideZaloPayOkHttpClient(spec: ConnectionSpec): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectionSpecs(listOf(spec))
+            .callTimeout(5, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @RetrofitOkHttpClient
+    @Singleton
+    fun provideRetrofitOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(10000, TimeUnit.MILLISECONDS)
             .retryOnConnectionFailure(true)
@@ -40,7 +79,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(
-        okHttpClient: OkHttpClient,
+        @RetrofitOkHttpClient okHttpClient: OkHttpClient,
         gson: Gson,
     ): Retrofit {
         return Retrofit.Builder()
@@ -53,7 +92,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun profileMainApi(retrofit: Retrofit): MainApi {
+    fun provideMainApi(retrofit: Retrofit): MainApi {
         return retrofit.create(MainApi::class.java)
     }
 }

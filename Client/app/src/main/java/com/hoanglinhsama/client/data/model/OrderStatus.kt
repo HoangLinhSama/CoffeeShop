@@ -5,6 +5,7 @@ data class OrderStatus(
     val listStatus: List<Status>,
     val name: String?,
     val phone: String?,
+    val userId: String,
     val address: String?,
     val listDrinkOrder: List<DrinkOrder>,
     val shopName: String?,

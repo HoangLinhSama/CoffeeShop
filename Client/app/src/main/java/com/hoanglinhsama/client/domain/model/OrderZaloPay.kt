@@ -1,11 +1,11 @@
 package com.hoanglinhsama.client.domain.model
 
 data class OrderZaloPay(
-    private val _appId: String,
+    private val _appId: Int,
     private val _appUser: String,
     private val _appTransId: String,
-    private val _appTime: String,
-    private val _amount: Float,
+    private val _appTime: Long,
+    private val _amount: Long,
     private val _item: String,
     private val _description: String,
     private val _embedData: String,

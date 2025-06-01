@@ -161,7 +161,7 @@ fun SignupScreen(
                     .clickable {
                         event(
                             SignupEvent.CheckPermissionEvent(
-                                activityResultLauncher!!, requestPermissionLauncher!!
+                                activityResultLauncher!!, requestPermissionLauncher!!, context
                             )
                         )
                     }, color = GainsBoro

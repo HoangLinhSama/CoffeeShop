@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.hoanglinhsama.client.data.config.AppInfo
+import com.hoanglinhsama.client.data.source.remote.zalopay.config.AppInfo
 import com.hoanglinhsama.client.presentation.view.nav.NavigationGraph
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.viewmodel.MainViewModel
@@ -39,6 +39,7 @@ class MainActivity() : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ZaloPaySDK.init(AppInfo.APP_ID, Environment.SANDBOX)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen().apply {
             setKeepOnScreenCondition(condition = { mainViewModel.state.value.splashCondition })
@@ -72,7 +73,7 @@ class MainActivity() : ComponentActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) {
             if (it.resultCode == RESULT_OK) {
-                signupViewModel.onEvent(SignupEvent.HandleImageResultEvent(it) {
+                signupViewModel.onEvent(SignupEvent.HandleImageResultEvent(it, this) {
                     signupViewModel.onEvent(SignupEvent.UploadAvatarEvent(it))
                 })
             }

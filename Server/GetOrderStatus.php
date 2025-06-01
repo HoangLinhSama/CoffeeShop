@@ -7,6 +7,7 @@ try {
   $query1 = "SELECT 
       orderr.is_delivery AS isDelivery,
       orderr.name,
+      orderr.customer_id AS userId,
       orderr.phone,
       orderr.address,
       orderr.sub_total AS subTotal,

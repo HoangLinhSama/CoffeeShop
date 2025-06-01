@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.presentation.view.nav
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.DrawableRes
@@ -84,7 +85,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainNavigator() {
+fun MainNavigator(activity: Activity) {
     val orderViewModel: OrderViewModel = hiltViewModel()
     val snackBarHostState = remember { SnackbarHostState() }
     val bottomNavigationItems = remember {
@@ -408,6 +409,7 @@ fun MainNavigator() {
                 val orderStatusViewModel: OrderStatusViewModel = hiltViewModel()
                 orderId?.let {
                     OrderStatusScreen(
+                        activity,
                         it,
                         openFromOrderHistory == true,
                         orderStatusViewModel.state.value,

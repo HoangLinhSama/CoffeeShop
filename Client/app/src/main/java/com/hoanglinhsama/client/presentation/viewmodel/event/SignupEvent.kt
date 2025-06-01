@@ -1,5 +1,6 @@
 package com.hoanglinhsama.client.presentation.viewmodel.event
 
+import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -10,6 +11,7 @@ sealed class SignupEvent {
     data class CheckPermissionEvent(
         val activityResultLauncher: ActivityResultLauncher<Intent>,
         val requestPermissionLauncher: ActivityResultLauncher<String>,
+        val context: Context,
     ) : SignupEvent()
 
     data class UpdateFirstNameEvent(val firstName: String) : SignupEvent()
@@ -20,6 +22,7 @@ sealed class SignupEvent {
     data class CheckBoxCheckEvent(val isChecked: Boolean) : SignupEvent()
     data class HandleImageResultEvent(
         val activityResult: ActivityResult,
+        val context: Context,
         val callback: (MultipartBody.Part) -> Unit,
     ) : SignupEvent()
 

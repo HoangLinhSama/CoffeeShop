@@ -2,16 +2,15 @@ package com.hoanglinhsama.client.domain.repository
 
 import androidx.paging.PagingData
 import com.hoanglinhsama.client.data.model.Result
-import com.hoanglinhsama.client.data.model.UniqueResult
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
-import com.hoanglinhsama.client.domain.model.DrinkOrder
 import com.hoanglinhsama.client.domain.model.OrderStatus
 import com.hoanglinhsama.client.domain.model.OrderZaloPay
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
 import kotlinx.coroutines.flow.Flow
+import org.json.JSONObject
 
 interface MainRepository {
     fun getPromotion(phone: String): Flow<PagingData<Voucher>>
@@ -42,5 +41,11 @@ interface MainRepository {
     ): Flow<Result<Int>>
 
     fun getOrderStatus(orderId: Int): Flow<Result<OrderStatus>>
-    fun createOrderZaloPay(pay: OrderZaloPay)
+    suspend fun createOrderZaloPay(pay: OrderZaloPay): JSONObject?
+    fun insertStatusOrder(orderId: Int, statusId: Int): Flow<Result<Unit>>
+    fun updatePaymentBillId(
+        orderId: Int,
+        paymentBillId: String,
+        callback: (String,Boolean?) -> Unit,
+    ): Flow<Result<Unit>>
 }

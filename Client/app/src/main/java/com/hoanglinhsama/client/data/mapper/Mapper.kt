@@ -144,6 +144,7 @@ fun OrderStatus.toOrderStatusDomain(): com.hoanglinhsama.client.domain.model.Ord
         listStatusDomain,
         this.name,
         this.phone,
+        this.userId,
         this.address,
         listDrinkOrderDomain,
         this.shopName,

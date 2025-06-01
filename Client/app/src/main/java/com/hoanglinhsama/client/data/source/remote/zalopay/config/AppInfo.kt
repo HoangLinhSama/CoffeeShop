@@ -1,4 +1,4 @@
-package com.hoanglinhsama.client.data.config
+package com.hoanglinhsama.client.data.source.remote.zalopay.config
 
 object AppInfo {
     private const val _APP_ID: Int = 2553

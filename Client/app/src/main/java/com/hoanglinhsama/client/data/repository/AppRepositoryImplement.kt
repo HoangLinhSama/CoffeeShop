@@ -2,7 +2,7 @@ package com.hoanglinhsama.client.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.hoanglinhsama.client.data.source.paging.preferences.PreferenceKey
+import com.hoanglinhsama.client.data.source.local.preferences.PreferenceKey
 import com.hoanglinhsama.client.domain.repository.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

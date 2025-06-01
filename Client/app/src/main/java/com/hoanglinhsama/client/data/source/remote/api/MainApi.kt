@@ -111,4 +111,18 @@ interface MainApi {
     @POST("GetOrderStatus.php")
     @FormUrlEncoded
     suspend fun getOrderStatus(@Field("orderId") orderId: Int): Response<MainResponse<OrderStatus>>
+
+    @POST("InsertStatusOrder.php")
+    @FormUrlEncoded
+    suspend fun insertStatusOrder(
+        @Field("orderId") orderId: Int,
+        @Field("statusId") statusId: Int,
+    ): Response<String>
+
+    @POST("UpdatePaymentBillId.php")
+    @FormUrlEncoded
+    suspend fun updatePaymentBillId(
+        @Field("orderId") orderId: Int,
+        @Field("paymentBillId") paymentBillId: String,
+    ): Response<MainResponse<Boolean>>
 }
