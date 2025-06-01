@@ -338,6 +338,8 @@ fun OrderScreen(
                             state.listDrinkOrder.let { listDrinkOrder ->
                                 repeat(listDrinkOrder.size) { index ->
                                     DrinkOrderCard(
+                                        true,
+                                        Color.White,
                                         Modifier
                                             .fillMaxWidth()
                                             .wrapContentHeight(),
@@ -798,17 +800,11 @@ fun OrderScreen(
 
                     is BottomSheetContent.BottomSheetPaymentMethod -> {
                         state.listMethodPayment?.let {
-                            var listMethodPayment = it
-                            if (!state.isDelivery) {
-                                listMethodPayment = it.filter {
-                                    it.title == "Tiền mặt"
-                                }
-                            }
                             BottomSheetPaymentMethod(
                                 Modifier
                                     .fillMaxWidth()
                                     .wrapContentHeight(),
-                                listMethodPayment,
+                                it,
                                 state.indexPaymentSelected
                             ) {
                                 event(UpdatePaymentSelectedEvent(it))

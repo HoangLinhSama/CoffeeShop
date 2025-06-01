@@ -4,14 +4,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
 import com.hoanglinhsama.client.R
 import com.hoanglinhsama.client.domain.usecase.auth.AutoFillPhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.CheckHadAccountUseCase
-import com.hoanglinhsama.client.domain.usecase.auth.ResendOtpUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.SavePhoneUseCase
-import com.hoanglinhsama.client.domain.usecase.auth.SendVerificationCodeUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.UpdateStateRememberPhoneUseCase
-import com.hoanglinhsama.client.domain.usecase.auth.VerifyCodeUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
 import com.hoanglinhsama.client.presentation.view.screen.revertE164ToPhoneNumber
 import com.hoanglinhsama.client.presentation.view.ui.theme.DarkCharcoal2
@@ -22,18 +24,17 @@ import com.hoanglinhsama.client.presentation.viewmodel.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
-    private val verifyCodeUseCase: VerifyCodeUseCase,
-    private val resendOtpUseCase: ResendOtpUseCase,
     private val checkHadAccountUseCase: CheckHadAccountUseCase,
     private val savePhoneUseCase: SavePhoneUseCase,
     private val updateStateRememberPhoneUseCase: UpdateStateRememberPhoneUseCase,
     private val autoFillPhoneUseCase: AutoFillPhoneUseCase,
     private val getPhoneUseCase: GetPhoneUseCase,
+    private val firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
     private val _state = mutableStateOf(LoginState())
     val state = _state
@@ -91,11 +92,9 @@ class LoginViewModel @Inject constructor(
 
             is LoginEvent.VerifyCodeEvent -> {
                 viewModelScope.launch {
-                    verifyCodeUseCase(
-                        verificationId = event.verificationId,
-                        code = event.code,
-                        callback = event.callback
-                    )
+                    val credential =
+                        PhoneAuthProvider.getCredential(event.verificationId, event.code)
+                    signInWithPhoneAuthCredential(credential, event.callback)
                 }
             }
 
@@ -107,7 +106,29 @@ class LoginViewModel @Inject constructor(
 
             is LoginEvent.ButtonLoginClickEvent -> {
                 viewModelScope.launch {
-                    sendVerificationCodeUseCase(event.activity, event.phoneNumber, event.callback)
+                    firebaseAuth.setLanguageCode("vi")
+                    val options =
+                        PhoneAuthOptions.newBuilder(firebaseAuth).setPhoneNumber(event.phoneNumber)
+                            .setTimeout(60L, TimeUnit.SECONDS).setActivity(event.activity)
+                            .setCallbacks(object :
+                                PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                                    event.callback(true, null, null)
+                                    signInWithPhoneAuthCredential(p0, event.callback)
+                                }
+
+                                override fun onVerificationFailed(p0: FirebaseException) {
+                                    event.callback(false, p0.message, null)
+                                }
+
+                                override fun onCodeSent(
+                                    verificationId: String,
+                                    token: PhoneAuthProvider.ForceResendingToken,
+                                ) {
+                                    event.callback(true, verificationId, token)
+                                }
+                            }).build()
+                    PhoneAuthProvider.verifyPhoneNumber(options)
                 }
             }
 
@@ -125,7 +146,28 @@ class LoginViewModel @Inject constructor(
 
             is LoginEvent.ResendingOtpEvent -> {
                 viewModelScope.launch {
-                    resendOtpUseCase(event.activity, event.phoneNumber, event.token, event.callback)
+                    val options =
+                        PhoneAuthOptions.newBuilder(firebaseAuth).setPhoneNumber(event.phoneNumber)
+                            .setTimeout(60L, TimeUnit.SECONDS).setActivity(event.activity)
+                            .setCallbacks(object :
+                                PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                                    event.callback(true, null, null)
+                                    signInWithPhoneAuthCredential(p0, event.callback)
+                                }
+
+                                override fun onVerificationFailed(p0: FirebaseException) {
+                                    event.callback(false, p0.message, null)
+                                }
+
+                                override fun onCodeSent(
+                                    verificationId: String,
+                                    token: PhoneAuthProvider.ForceResendingToken,
+                                ) {
+                                    event.callback(true, verificationId, token)
+                                }
+                            }).setForceResendingToken(event.token).build()
+                    PhoneAuthProvider.verifyPhoneNumber(options)
                 }
             }
 
@@ -145,6 +187,20 @@ class LoginViewModel @Inject constructor(
                 viewModelScope.launch {
                     savePhoneUseCase(event.phoneNumber, event.callback)
                 }
+            }
+        }
+    }
+
+    private fun signInWithPhoneAuthCredential(
+        credential: PhoneAuthCredential,
+        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
+    ) {
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = task.result?.user
+                callback(true, user?.uid, null)
+            } else {
+                callback(false, task.exception?.message, null)
             }
         }
     }

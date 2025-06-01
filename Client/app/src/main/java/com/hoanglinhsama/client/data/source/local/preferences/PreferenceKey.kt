@@ -1,4 +1,4 @@
-package com.hoanglinhsama.client.data.source.paging.preferences
+package com.hoanglinhsama.client.data.source.local.preferences
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

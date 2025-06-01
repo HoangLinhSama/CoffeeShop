@@ -1,31 +1,35 @@
 package com.hoanglinhsama.client.presentation.viewmodel
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.hoanglinhsama.client.data.model.Result
-import com.hoanglinhsama.client.domain.usecase.auth.CheckPermissionUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.GetPolicyUseCase
-import com.hoanglinhsama.client.domain.usecase.auth.HandleImageResultUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.SavePhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.SignupUseCase
 import com.hoanglinhsama.client.domain.usecase.auth.UploadAvatarUseCase
-import com.hoanglinhsama.client.presentation.view.screen.formatPhoneNumberToE164
 import com.hoanglinhsama.client.presentation.viewmodel.event.SignupEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.SignupState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(
-    private val checkPermissionUseCase: CheckPermissionUseCase,
-    private val handleImageResultUseCase: HandleImageResultUseCase,
     private val getPolicyUseCase: GetPolicyUseCase,
     private val uploadAvatarUseCase: UploadAvatarUseCase,
     private val signupUseCase: SignupUseCase,
     private val savePhoneUseCase: SavePhoneUseCase,
+    private val intent: Intent,
 ) : ViewModel() {
     private val _state = mutableStateOf(SignupState())
     val state = _state
@@ -46,9 +50,11 @@ class SignupViewModel @Inject constructor(
             }
 
             is SignupEvent.CheckPermissionEvent -> {
-                checkPermissionUseCase(
-                    event.activityResultLauncher, event.requestPermissionLauncher
-                )
+                if (ContextCompat.checkSelfPermission(
+                        event.context, READ_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) event.activityResultLauncher.launch(intent)
+                else event.requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
             }
 
             is SignupEvent.UpdateFirstNameEvent -> {
@@ -84,8 +90,23 @@ class SignupViewModel @Inject constructor(
             }
 
             is SignupEvent.HandleImageResultEvent -> {
-                handleImageResultUseCase(event.activityResult, event.callback)
-
+                if (event.activityResult.resultCode == Activity.RESULT_OK && event.activityResult.data != null) {
+                    val uri = event.activityResult.data?.data ?: return
+                    val inputStream = event.context.contentResolver.openInputStream(uri)
+                    val requestBody =
+                        inputStream?.readBytes()
+                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                    val fileName = "avatar_${System.currentTimeMillis()}.jpg"
+                    requestBody?.let {
+                        event.callback(
+                            MultipartBody.Part.createFormData(
+                                "pictureAvatar",
+                                fileName,
+                                it
+                            )
+                        )
+                    }
+                }
             }
 
             is SignupEvent.ReadPolicyEvent -> {

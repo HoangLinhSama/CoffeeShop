@@ -32,7 +32,7 @@ data class OrderState(
     private val _currentBean: Int? = null,
     private val _voucher: Voucher? = null,
     private val _listMethodPayment: List<FeatureItem>? = null,
-    private val _indexPaymentSelected: Int = 0,
+    private val _indexPaymentSelected: Int = if (_isDelivery) 0 else 1,
     private val _useBean: Boolean = false,
     private val _showDialog: Boolean = false,
     private val _orderResultFlow: Flow<Result<Int>>? = null,

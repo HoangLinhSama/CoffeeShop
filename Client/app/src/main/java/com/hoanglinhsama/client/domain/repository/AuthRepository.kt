@@ -1,47 +1,14 @@
 package com.hoanglinhsama.client.domain.repository
 
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.paging.PagingData
-import com.google.firebase.auth.PhoneAuthProvider
 import com.hoanglinhsama.client.data.model.Result
 import com.hoanglinhsama.client.domain.model.Policies
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
 interface AuthRepository {
-    suspend fun sendVerificationCode(
-        activity: Activity,
-        phoneNumber: String,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    )
-
-    suspend fun verifyCode(
-        verificationId: String,
-        code: String,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    )
-
-    suspend fun resendOtp(
-        activity: Activity,
-        phoneNumber: String,
-        token: PhoneAuthProvider.ForceResendingToken,
-        callback: (Boolean, String?, PhoneAuthProvider.ForceResendingToken?) -> Unit,
-    )
-
-    fun checkPermission(
-        activityResultLauncher: ActivityResultLauncher<Intent>,
-        requestPermissionLauncher: ActivityResultLauncher<String>,
-    )
-
-    fun handleImageResult(
-        activityResult: ActivityResult,
-        callback: (MultipartBody.Part) -> Unit,
-    )
-
     fun getPolicy(): Flow<PagingData<Policies>>
+
     fun uploadAvatar(
         multipartBody: MultipartBody.Part,
     ): Flow<Result<String>>

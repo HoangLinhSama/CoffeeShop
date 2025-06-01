@@ -1,3 +1,5 @@
+import java.util.regex.Pattern.compile
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -130,7 +132,17 @@ dependencies {
     implementation("io.github.kevinnzou:compose-swipebox:1.4.0")
 
     //  ZXing
-    implementation ("com.google.zxing:core:3.5.2")
-    implementation ("androidx.core:core-ktx:1.12.0")
+    implementation("com.google.zxing:core:3.5.2")
+    implementation("androidx.core:core-ktx:1.12.0")
 
+    // ZaloPay
+    implementation(
+        fileTree(
+            mapOf<String, Any>(
+                "dir" to "D:\\xampp\\htdocs\\CoffeeShop\\Client\\app\\libs",
+                "include" to listOf("*.aar", "*.jar"),
+                "exclude" to emptyList<String>()
+            )
+        )
+    )
 }

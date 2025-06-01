@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.presentation.view.nav
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.DrawableRes
@@ -84,7 +85,7 @@ import com.hoanglinhsama.client.presentation.viewmodel.event.OrderEvent
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainNavigator() {
+fun MainNavigator(activity: Activity) {
     val orderViewModel: OrderViewModel = hiltViewModel()
     val snackBarHostState = remember { SnackbarHostState() }
     val bottomNavigationItems = remember {
@@ -305,8 +306,9 @@ fun MainNavigator() {
                     {
                         navController.popBackStack()
                     }) {
+                    val openFromOrderHistory = false
                     navController.navigate(
-                        "${Route.OrderStatusScreen.route}/$it"
+                        "${Route.OrderStatusScreen.route}/$it/$openFromOrderHistory"
                     )
                 }
             }
@@ -392,16 +394,24 @@ fun MainNavigator() {
                 }
             }
             composable(
-                route = "${Route.OrderStatusScreen.route}/{orderId}", arguments = listOf(
+                route = "${Route.OrderStatusScreen.route}/{orderId}/{openFromOrderHistory}",
+                arguments = listOf(
                     navArgument("orderId") {
                         type = NavType.IntType
+                    },
+                    navArgument("openFromOrderHistory") {
+                        type = NavType.BoolType
                     })
+
             ) {
                 val orderId = it.arguments?.getInt("orderId")
+                val openFromOrderHistory = it.arguments?.getBoolean("openFromOrderHistory")
                 val orderStatusViewModel: OrderStatusViewModel = hiltViewModel()
                 orderId?.let {
                     OrderStatusScreen(
+                        activity,
                         it,
+                        openFromOrderHistory == true,
                         orderStatusViewModel.state.value,
                         orderStatusViewModel::onEvent
                     ) {

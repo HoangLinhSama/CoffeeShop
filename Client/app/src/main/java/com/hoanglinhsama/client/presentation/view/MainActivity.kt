@@ -1,6 +1,7 @@
 package com.hoanglinhsama.client.presentation.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -8,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,12 +19,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.hoanglinhsama.client.data.source.remote.zalopay.config.AppInfo
 import com.hoanglinhsama.client.presentation.view.nav.NavigationGraph
 import com.hoanglinhsama.client.presentation.view.ui.theme.ClientTheme
 import com.hoanglinhsama.client.presentation.viewmodel.MainViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.SignupViewModel
 import com.hoanglinhsama.client.presentation.viewmodel.event.SignupEvent
 import dagger.hilt.android.AndroidEntryPoint
+import vn.zalopay.sdk.Environment
+import vn.zalopay.sdk.ZaloPaySDK
 
 @AndroidEntryPoint
 class MainActivity() : ComponentActivity() {
@@ -31,8 +36,10 @@ class MainActivity() : ComponentActivity() {
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ZaloPaySDK.init(AppInfo.APP_ID, Environment.SANDBOX)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen().apply {
             setKeepOnScreenCondition(condition = { mainViewModel.state.value.splashCondition })
@@ -66,7 +73,7 @@ class MainActivity() : ComponentActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) {
             if (it.resultCode == RESULT_OK) {
-                signupViewModel.onEvent(SignupEvent.HandleImageResultEvent(it) {
+                signupViewModel.onEvent(SignupEvent.HandleImageResultEvent(it, this) {
                     signupViewModel.onEvent(SignupEvent.UploadAvatarEvent(it))
                 })
             }
@@ -79,5 +86,10 @@ class MainActivity() : ComponentActivity() {
                     Toast.makeText(this, "Quyền truy cập bị từ chối", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        ZaloPaySDK.getInstance().onResult(intent)
     }
 }

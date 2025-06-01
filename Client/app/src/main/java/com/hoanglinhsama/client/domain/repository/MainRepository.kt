@@ -2,14 +2,15 @@ package com.hoanglinhsama.client.domain.repository
 
 import androidx.paging.PagingData
 import com.hoanglinhsama.client.data.model.Result
-import com.hoanglinhsama.client.data.model.UniqueResult
 import com.hoanglinhsama.client.domain.model.Drink
 import com.hoanglinhsama.client.domain.model.DrinkCategory
-import com.hoanglinhsama.client.domain.model.DrinkOrder
+import com.hoanglinhsama.client.domain.model.OrderStatus
+import com.hoanglinhsama.client.domain.model.OrderZaloPay
 import com.hoanglinhsama.client.domain.model.Shop
 import com.hoanglinhsama.client.domain.model.User
 import com.hoanglinhsama.client.domain.model.Voucher
 import kotlinx.coroutines.flow.Flow
+import org.json.JSONObject
 
 interface MainRepository {
     fun getPromotion(phone: String): Flow<PagingData<Voucher>>
@@ -20,18 +21,6 @@ interface MainRepository {
     suspend fun updateStateLogIn()
     suspend fun logOut()
     fun getShop(): Flow<PagingData<Shop>>
-    fun createTempOrder(
-        id: Int,
-        picture: String,
-        name: String,
-        size: String?,
-        listTopping: List<String>?,
-        noteOrder: String,
-        countDrink: Int,
-        totalPrice: Float,
-        drinkCategory: String,
-    ): Flow<UniqueResult<DrinkOrder>>
-
     fun getRequiredBean(phone: String): Flow<Result<Int>>
     fun insertOrder(
         userId: Int,
@@ -50,4 +39,13 @@ interface MainRepository {
         paymentBillId: String?,
         listDrinkOrder: List<com.hoanglinhsama.client.data.model.DrinkOrder>,
     ): Flow<Result<Int>>
+
+    fun getOrderStatus(orderId: Int): Flow<Result<OrderStatus>>
+    suspend fun createOrderZaloPay(pay: OrderZaloPay): JSONObject?
+    fun insertStatusOrder(orderId: Int, statusId: Int): Flow<Result<Unit>>
+    fun updatePaymentBillId(
+        orderId: Int,
+        paymentBillId: String,
+        callback: (String,Boolean?) -> Unit,
+    ): Flow<Result<Unit>>
 }

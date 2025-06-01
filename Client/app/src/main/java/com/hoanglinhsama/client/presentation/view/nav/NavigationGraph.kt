@@ -96,7 +96,7 @@ fun NavigationGraph(
             startDestination = Route.MainNavigatorScreen.route
         ) {
             composable(route = Route.MainNavigatorScreen.route) {
-                MainNavigator()
+                MainNavigator(activity)
             }
         }
     }

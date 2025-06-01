@@ -10,8 +10,8 @@ import com.hoanglinhsama.client.domain.usecase.main.GetDrinkUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetPhoneUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetPromotionUseCase
 import com.hoanglinhsama.client.domain.usecase.main.GetUserUseCase
+import com.hoanglinhsama.client.domain.usecase.main.SendVoucherUseCase
 import com.hoanglinhsama.client.domain.usecase.main.UpdateStateLoginUseCase
-import com.hoanglinhsama.client.presentation.viewmodel.common.VoucherHolder
 import com.hoanglinhsama.client.presentation.viewmodel.event.HomeEvent
 import com.hoanglinhsama.client.presentation.viewmodel.state.HomeState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +26,7 @@ class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getPhoneUseCase: GetPhoneUseCase,
     private val updateStateLoginUseCase: UpdateStateLoginUseCase,
+    private val sendVoucherUseCase: SendVoucherUseCase,
 ) : ViewModel() {
     private val _state = mutableStateOf(HomeState())
     val state = _state
@@ -76,7 +77,7 @@ class HomeViewModel @Inject constructor(
                         getPromotionUseCase(it).cachedIn(viewModelScope)
                     _state.value = _state.value.copy(_itemsVoucher = itemsVoucher)
                     itemsVoucher.collect {
-                        VoucherHolder.setVoucher(it)
+                        sendVoucherUseCase(it)
                     }
                 }
             }
