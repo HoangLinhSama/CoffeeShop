@@ -12,16 +12,16 @@ class UpdateSizeDrinkOrderUseCase @Inject constructor() {
         size: String,
         drink: Drink,
     ): MutableList<DrinkOrder>? {
-        val listDrinkOrder = listDrinkOrderCurrent?.toMutableList()
+        val listDrinkOrder = listDrinkOrderCurrent?.toMutableList() ?: return null
         var updateDrinkOrder =
-            listDrinkOrder?.get(indexUpdateOrderDrink)
-        val priceSizeOld = drink.priceSize?.get(updateDrinkOrder?.size)!!
+            listDrinkOrder[indexUpdateOrderDrink]
+        val priceSizeOld = drink.priceSize?.get(updateDrinkOrder.size)!!
         val priceSizeNew = drink.priceSize[size]!!
         val newPrice =
-            (priceSizeNew - priceSizeOld) * updateDrinkOrder!!.count + updateDrinkOrder.price
+            (priceSizeNew - priceSizeOld) * updateDrinkOrder.count + updateDrinkOrder.price
         updateDrinkOrder = updateDrinkOrder.copy(_size = size, _price = newPrice)
         updateDrinkOrder.let {
-            listDrinkOrder?.set(indexUpdateOrderDrink, it)
+            listDrinkOrder.set(indexUpdateOrderDrink, it)
         }
         return listDrinkOrder
     }

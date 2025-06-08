@@ -6,7 +6,7 @@ import javax.inject.Inject
 class CalculateSubtotalUseCase @Inject constructor() {
     operator fun invoke(listDrinkOrder: List<DrinkOrder>?): Float? {
         val subTotal = listDrinkOrder?.sumOf {
-            it.price.toInt()
+            it.price.toDouble()
         }?.toFloat()
         return subTotal
     }

@@ -1,6 +1,5 @@
 package com.hoanglinhsama.client.domain.usecase.main
 
-import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter

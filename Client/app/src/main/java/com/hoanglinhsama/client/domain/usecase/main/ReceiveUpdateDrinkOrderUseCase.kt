@@ -5,9 +5,9 @@ import javax.inject.Inject
 
 class ReceiveUpdateDrinkOrderUseCase @Inject constructor() {
     operator fun invoke(listDrink: List<Drink>?, drink: Drink?): MutableList<Drink>? {
-        val listUpdateDrinkOrder = listDrink?.toMutableList()
+        val listUpdateDrinkOrder = listDrink?.toMutableList() ?: mutableListOf()
         if (listDrink?.isNotEmpty() == true) {
-            val index = listUpdateDrinkOrder?.indexOfFirst {
+            val index = listUpdateDrinkOrder.indexOfFirst {
                 it.id == drink?.id
             }
             if (index == -1) {
@@ -17,7 +17,7 @@ class ReceiveUpdateDrinkOrderUseCase @Inject constructor() {
             }
         } else {
             drink?.let {
-                listUpdateDrinkOrder?.add(it)
+                listUpdateDrinkOrder.add(it)
             }
         }
         return listUpdateDrinkOrder

@@ -8,15 +8,12 @@ class UpdateCountDrinkOrderUseCase @Inject constructor() {
         listDrinkOrderCurrent: List<DrinkOrder>?,
         indexUpdateOrderDrink: Int, quantity: Int,
     ): MutableList<DrinkOrder>? {
-        val listDrinkOrder = listDrinkOrderCurrent?.toMutableList()
-        var updateDrinkOrder =
-            listDrinkOrder?.get(indexUpdateOrderDrink)
-        val price =
-            (updateDrinkOrder!!.price / updateDrinkOrder.count) * quantity
-        updateDrinkOrder =
-            updateDrinkOrder.copy(_price = price, _count = quantity)
+        val listDrinkOrder = listDrinkOrderCurrent?.toMutableList() ?: return null
+        var updateDrinkOrder = listDrinkOrder[indexUpdateOrderDrink]
+        val price = (updateDrinkOrder.price / updateDrinkOrder.count) * quantity
+        updateDrinkOrder = updateDrinkOrder.copy(_price = price, _count = quantity)
         updateDrinkOrder.let {
-            listDrinkOrder?.set(indexUpdateOrderDrink, it)
+            listDrinkOrder.set(indexUpdateOrderDrink, it)
         }
         return listDrinkOrder
     }

@@ -205,7 +205,11 @@ class OrderViewModel @Inject constructor(
                 listInformation?.set(event.index, event.value)
                 _state.value = _state.value.copy(_listInformation = listInformation)
                 if (event.index == 2) {
-                    updateDeliveryFee()
+                    if (event.value == "") {
+                        _state.value = _state.value.copy(_shippingFee = 0F)
+                    } else {
+                        updateDeliveryFee()
+                    }
                     updateTotalPayment()
                 }
             }

@@ -7,14 +7,16 @@ class CalculateDeliveryFeeUseCase @Inject constructor() {
         val shippingFee = (if (!isDelivery) {
             0
         } else {
-            if (address?.contains("hồ chí minh") == true || address?.contains("ho chi minh") == true || address?.contains(
-                    "hochiminh"
-                ) == true || address?.contains("hcm") == true
+            if (address?.lowercase()?.contains("hồ chí minh") == true ||
+                address?.lowercase()?.contains("ho chi minh") == true ||
+                address?.lowercase()?.contains("hochiminh") == true ||
+                address?.lowercase()?.contains("hcm") == true
             ) {
-                15000
+                15000f
             } else {
-                30000
+                30000f
             }
+
         }).toFloat()
         return shippingFee
     }
