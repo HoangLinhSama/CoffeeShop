@@ -145,4 +145,35 @@ dependencies {
             )
         )
     )
+
+    // Testing
+
+    // Mockito
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    // Kotlin coroutine test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Paging test
+    testImplementation("androidx.paging:paging-common-ktx:3.3.2")
+
+    // Turbine
+    testImplementation("app.cash.turbine:turbine:0.13.0")
+
+    // Google Truth
+    testImplementation ("com.google.truth:truth:1.4.0")
+
+    // AndroidX Test Core Library
+    testImplementation ("androidx.test:core:1.5.0")
+
+    // Robolectric
+    testImplementation("org.robolectric:robolectric:4.10.3")
+
+    // AndroidX Paging - Common
+    testImplementation("androidx.paging:paging-testing:3.3.2")
+
+    // Core-Testing
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
 }

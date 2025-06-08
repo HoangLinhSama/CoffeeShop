@@ -24,7 +24,7 @@ interface AuthRepository {
     fun checkHadAccount(
         phone: String,
         callback: (String, Boolean?) -> Unit,
-    ): Flow<Unit>
+    ): Flow<Result<Unit>>
 
     suspend fun savePhone(phone: String, callback: () -> Unit)
     suspend fun updateStateRememberPhone(isRemember: Boolean)

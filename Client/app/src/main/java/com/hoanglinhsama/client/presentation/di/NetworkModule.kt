@@ -25,16 +25,6 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideRequest(url: String, formBody: RequestBody): Request {
-        return Request.Builder()
-            .url(url)
-            .addHeader("Content-Type", "application/x-www-form-urlencoded")
-            .post(formBody)
-            .build()
-    }
-
-    @Provides
-    @Singleton
     fun provideConnectionSpec(): ConnectionSpec {
         return ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)

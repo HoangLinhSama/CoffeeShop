@@ -244,7 +244,7 @@ class MainRepositoryImplement @Inject constructor(
                 if (response.isSuccessful) {
                     if (response.body() == "success") {
                         emit(Result.Success(Unit))
-                    } else if (response.body()== "fail") {
+                    } else if (response.body() == "fail") {
                         emit(Result.Error(Exception(response.body())))
                     } else {
                         emit(Result.Error(Exception(response.body())))
@@ -264,23 +264,29 @@ class MainRepositoryImplement @Inject constructor(
         callback: (String, Boolean?) -> Unit,
     ): Flow<Result<Unit>> {
         return flow {
+            emit(Result.Loading)
             try {
                 val response = mainApi.updatePaymentBillId(orderId, paymentBillId)
                 if (response.isSuccessful) {
                     if (response.body()?.status == "success") {
                         response.body()?.result?.get(0)?.let {
                             callback(response.body()?.status ?: "", it)
+                            emit(Result.Success(Unit))
                         }
                     } else if (response.body()?.status == "fail") {
                         callback(response.body()?.status ?: "", null)
+                        emit(Result.Error(Exception(response.body()?.status)))
                     } else {
                         callback(response.body()?.status ?: "", null)
+                        emit(Result.Error(Exception(response.body()?.status)))
                     }
                 } else {
                     callback("API request failed with status: ${response.code()}", null)
+                    emit(Result.Error(Exception(("API request failed with status: ${response.code()}"))))
                 }
             } catch (e: Exception) {
                 callback("${e.message}", null)
+                emit(Result.Error(e))
             }
         }
     }
